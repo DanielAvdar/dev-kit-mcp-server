@@ -13,8 +13,8 @@ sys.path.insert(0, os.path.abspath("../../"))
 # sys.path.insert(0, os.path.abspath("./"))  # in conf.py
 
 
-project = "python-template"  # todo: change this to your project name
-version = version("my-pkg")  # todo: change my-pkg to your package name
+project = "py-code-mcp-server"  # Updated project name
+version = version("py-code-mcp-server")  # Updated package name
 release = version
 
 copyright = "2025, DanielAvdar"  # noqa  todo: change this to your name

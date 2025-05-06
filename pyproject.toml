@@ -1,5 +1,5 @@
 [project]
-name = "my-pkg" # todo: change to your package name
+name = "py-code-mcp-server" # changed from my-pkg
 dynamic = ["version"]
 description = ""
 authors = [
@@ -41,13 +41,12 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 [tool.hatch.build.targets.sdist]
-only-include = ["my_pkg", ] # todo: change to your package name
+only-include = ["py_code_mcp_server", ] # changed from my_pkg
 source = "."
 
 [tool.hatch.build.targets.wheel]
-only-include = ["my_pkg", ] # todo: change to your package name
+only-include = ["py_code_mcp_server", ] # changed from my_pkg
 source = "."
-
 
 
 [build-system]

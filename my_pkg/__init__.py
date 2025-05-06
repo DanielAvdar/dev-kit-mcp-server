@@ -1,5 +1,5 @@
-"""Demo init."""  # todo: change to package description.
+"""MCP Server Python implementation."""  # Updated package description
 
 from importlib.metadata import version
 
-__version__ = version("my-pkg")  # todo: replace with your package name
+__version__ = version("py-code-mcp-server")  # Updated package name
