@@ -3,9 +3,9 @@
 import ast
 from typing import Any, Dict, Optional
 
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi_mcp import FastApiMCP
-from fastmcp import Client, FastMCP
+from fastmcp import Client, Context, FastMCP
 from pydantic import BaseModel
 
 from py_code_mcp_server.analyzer import CodeAnalyzer
@@ -32,10 +32,21 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# Create MCP server
+mcp = FastMCP(
+    name="Python Code MCP Server",
+    description="Model Context Protocol server for Python code analysis using AST and tokenize",
+)
 
-@app.get("/", operation_id="get_server_info")
-async def root():
-    """Root endpoint that returns server info."""
+
+@mcp.tool()
+async def get_server_info() -> Dict[str, Any]:
+    """Get server information.
+
+    Returns:
+        Server information including name, version, and description
+
+    """
     return {
         "name": "Python Code MCP Server",
         "version": "0.1.0",
@@ -43,88 +54,96 @@ async def root():
     }
 
 
-@app.post("/analyze", response_model=AnalysisResponse, operation_id="analyze_full")
-async def analyze_code(request: CodeRequest = Body(...)):
+@mcp.tool()
+async def analyze_full(code: str, path: Optional[str] = None) -> Dict[str, Any]:
     """Analyze Python code using AST and tokenize.
 
     Args:
-        request: CodeRequest with code string and optional file path
+        code: Python code string to analyze
+        path: Optional file path for the code
 
     Returns:
         Analysis results including AST and token information
 
     """
     try:
-        result = CodeAnalyzer.analyze(request.code)
+        result = CodeAnalyzer.analyze(code)
         return {"result": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error analyzing code: {str(e)}")
+        raise Exception(f"Error analyzing code: {str(e)}")
 
 
-@app.post("/ast", response_model=AnalysisResponse, operation_id="analyze_ast")
-async def ast_analysis(request: CodeRequest = Body(...)):
+@mcp.tool()
+async def analyze_ast(code: str, path: Optional[str] = None) -> Dict[str, Any]:
     """Parse Python code and return AST analysis.
 
     Args:
-        request: CodeRequest with code string and optional file path
+        code: Python code string to analyze
+        path: Optional file path for the code
 
     Returns:
         AST analysis results
 
     """
     # First check for syntax errors
-    if request.code is None:
-        raise HTTPException(status_code=500, detail="Error parsing AST: code cannot be None")
+    if code is None:
+        raise Exception("Error parsing AST: code cannot be None")
 
     try:
         # Try to parse the code to catch syntax errors early
-        ast.parse(request.code)
+        ast.parse(code)
     except SyntaxError as e:
-        raise HTTPException(status_code=500, detail=f"Error parsing AST: {str(e)}")
+        raise Exception(f"Error parsing AST: {str(e)}")
 
     try:
-        result = CodeAnalyzer.parse_ast(request.code)
+        result = CodeAnalyzer.parse_ast(code)
         return {"result": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error parsing AST: {str(e)}")
+        raise Exception(f"Error parsing AST: {str(e)}")
 
 
-@app.post("/tokenize", response_model=AnalysisResponse, operation_id="analyze_tokens")
-async def tokenize_code(request: CodeRequest = Body(...)):
+@mcp.tool()
+async def analyze_tokens(code: str, path: Optional[str] = None) -> Dict[str, Any]:
     """Tokenize Python code.
 
     Args:
-        request: CodeRequest with code string and optional file path
+        code: Python code string to tokenize
+        path: Optional file path for the code
 
     Returns:
         Tokenization results
 
     """
     # First check for None values to match test expectations
-    if request.code is None:
-        raise HTTPException(status_code=500, detail="Error tokenizing code: code cannot be None")
+    if code is None:
+        raise Exception("Error tokenizing code: code cannot be None")
 
     try:
-        tokens = CodeAnalyzer.tokenize_code(request.code)
+        tokens = CodeAnalyzer.tokenize_code(code)
         # Limit token output
         return {"result": {"tokens": tokens[:100]}}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error tokenizing code: {str(e)}")
+        raise Exception(f"Error tokenizing code: {str(e)}")
 
 
-@app.post("/count", response_model=AnalysisResponse, operation_id="count_elements")
-async def count_elements(request: CodeRequest = Body(...)):
+@mcp.tool()
+async def count_elements(code: str, path: Optional[str] = None, ctx: Context = None) -> Dict[str, Any]:
     """Count elements in Python code (functions, classes, imports).
 
     Args:
-        request: CodeRequest with code string and optional file path
+        code: Python code string to analyze
+        path: Optional file path for the code
+        ctx: Optional MCP context
 
     Returns:
         Count of code elements
 
     """
     try:
-        ast_analysis = CodeAnalyzer.parse_ast(request.code)
+        if ctx:
+            await ctx.info(f"Counting elements in code with {len(code)} characters")
+
+        ast_analysis = CodeAnalyzer.parse_ast(code)
         result = {
             "function_count": len(ast_analysis.get("functions", [])),
             "class_count": len(ast_analysis.get("classes", [])),
@@ -133,7 +152,7 @@ async def count_elements(request: CodeRequest = Body(...)):
         }
         return {"result": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error counting elements: {str(e)}")
+        raise Exception(f"Error counting elements: {str(e)}")
 
 
 # Create FastAPI-MCP server
