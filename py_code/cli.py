@@ -27,7 +27,7 @@ def main() -> None:
 
             start_server(host=args.host, port=args.port)
         elif args.server_type == "fastmcp":
-            from .fastmcp_server import start_server
+            from .mcp_server import start_server
 
             start_server(host=args.host, port=args.port)
         else:  # integrated

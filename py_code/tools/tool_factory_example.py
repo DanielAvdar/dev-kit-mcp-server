@@ -8,7 +8,7 @@ from typing import Any, Dict
 from fastmcp import Context, FastMCP
 
 from py_code.analyzer import CodeAnalyzer
-from py_code.tool_factory import ToolFactory
+from py_code.tools.tool_factory import ToolFactory
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

@@ -8,7 +8,7 @@ from fastmcp import Client, Context, FastMCP
 from pydantic import BaseModel
 
 from .fastmcp_server import mcp as fastmcp_server
-from .mcp_tools import (
+from .tools.mcp_tools import (
     analyze_ast as impl_analyze_ast,
     analyze_full as impl_analyze_full,
     analyze_tokens as impl_analyze_tokens,
