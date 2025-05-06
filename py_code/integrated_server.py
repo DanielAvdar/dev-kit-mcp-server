@@ -2,10 +2,12 @@
 
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi_mcp import FastApiMCP
 from fastmcp import Client, Context, FastMCP
 from pydantic import BaseModel
+from starlette.responses import Response
 
 from .fastmcp_server import mcp as fastmcp_server
 from .tools.mcp_tools import (
@@ -37,6 +39,128 @@ app = FastAPI(
     description="Model Context Protocol server for Python code analysis",
     version=__version__,
 )
+
+
+# Add HTTP endpoints to the FastAPI app
+@app.get("/server-info")
+async def server_info() -> Dict[str, Any]:
+    """Server info endpoint that returns server details.
+
+    Returns:
+        Dictionary with server name, version, and description
+
+    """
+    return impl_get_server_info()
+
+
+@app.get("/", include_in_schema=False)
+async def root(request: Request) -> Response:
+    """Root endpoint that handles both HTTP and SSE requests.
+
+    This endpoint detects the Accept header to determine whether to return
+    JSON info or to pass the request to the MCP SSE handler.
+
+    Args:
+        request: The incoming request
+
+    Returns:
+        Response appropriate for the request type
+
+    """
+    accept_header = request.headers.get("accept", "")
+
+    # If client accepts event-stream (SSE), let the MCP handler take over in the middleware
+    if "text/event-stream" in accept_header:
+        # This return value will be ignored as the request will be handled by the mounted MCP
+        return Response(status_code=200)
+
+    # Otherwise return server info as JSON
+    return JSONResponse(content=impl_get_server_info())
+
+
+@app.post("/analyze", response_model=AnalysisResponse)
+async def analyze_code(request: CodeRequest) -> AnalysisResponse:
+    """Analyze Python code using AST and tokenize.
+
+    Args:
+        request: CodeRequest with code string and optional file path
+
+    Returns:
+        Analysis results including AST and token information
+
+    Raises:
+        HTTPException: If there's an error analyzing the code
+
+    """
+    try:
+        result = impl_analyze_full(request.code, request.path)
+        return AnalysisResponse(result=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error analyzing code: {str(e)}") from e
+
+
+@app.post("/ast", response_model=AnalysisResponse)
+async def ast_analysis(request: CodeRequest) -> AnalysisResponse:
+    """Parse Python code and return AST analysis.
+
+    Args:
+        request: CodeRequest with code string and optional file path
+
+    Returns:
+        AST analysis results
+
+    Raises:
+        HTTPException: If there's a syntax error or problem parsing the AST
+
+    """
+    try:
+        result = impl_analyze_ast(request.code, request.path)
+        return AnalysisResponse(result=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing AST: {str(e)}") from e
+
+
+@app.post("/tokenize", response_model=AnalysisResponse)
+async def tokenize_code(request: CodeRequest) -> AnalysisResponse:
+    """Tokenize Python code.
+
+    Args:
+        request: CodeRequest with code string and optional file path
+
+    Returns:
+        Tokenization results
+
+    Raises:
+        HTTPException: If there's an error tokenizing the code
+
+    """
+    try:
+        result = impl_analyze_tokens(request.code, request.path)
+        return AnalysisResponse(result=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error tokenizing code: {str(e)}") from e
+
+
+@app.post("/count", response_model=AnalysisResponse)
+async def count_code_elements(request: CodeRequest) -> AnalysisResponse:
+    """Count elements in Python code (functions, classes, imports).
+
+    Args:
+        request: CodeRequest with code string and optional file path
+
+    Returns:
+        Count of code elements
+
+    Raises:
+        HTTPException: If there's an error counting elements in the code
+
+    """
+    try:
+        result = impl_count_elements(request.code, request.path, None)
+        return AnalysisResponse(result=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error counting elements: {str(e)}") from e
+
 
 # Create MCP server
 mcp = FastMCP(
@@ -151,7 +275,7 @@ def create_combined_server() -> FastAPI:
         FastAPI application instance with MCP server mounted
 
     """
-    # Mount the MCP server to make FastAPI endpoints available as MCP tools
+    # Mount the MCP server - simple call without parameters that aren't supported
     fastapi_mcp.mount()
 
     return app

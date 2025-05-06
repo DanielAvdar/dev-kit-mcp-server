@@ -96,9 +96,12 @@ strict_optional = false
 [[tool.mypy.overrides]]
 module = [
     "fastapi",
+    "fastapi.responses",
     "fastapi_mcp",
     "fastmcp",
     "pydantic",
+    "starlette",
+    "starlette.responses",
     "uvicorn"
 ]
 ignore_missing_imports = true

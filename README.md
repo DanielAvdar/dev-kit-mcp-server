@@ -33,10 +33,13 @@ pip install py-code-mcp-server
 ### Running the Server
 
 ```bash
-# Start the MCP server
-py-mcp-server
+# Recommended method (fastest startup)
+uv run python -m py_code.mcp_server
 
-# Specify host and port
+# Alternative method
+python -m py_code.mcp_server
+
+# Traditional method with optional parameters
 py-mcp-server --host 127.0.0.1 --port 8080
 ```
 

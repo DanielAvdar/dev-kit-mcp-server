@@ -1,5 +1,7 @@
 """Tests for the MCP server implementation."""
 
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 
 from py_code.server import app
@@ -112,3 +114,19 @@ def get_files(directory: str) -> List[str]:
     functions = ast_analysis["functions"]
     function_names = [f["name"] for f in functions]
     assert "get_files" in function_names
+
+
+def test_start_server():
+    """Test the start_server function in mcp_server package."""
+    with patch("py_code.fastmcp_server.start_server") as mock_start_server:
+        from py_code.mcp_server import start_server
+
+        # Call with default args
+        start_server()
+        mock_start_server.assert_called_once_with(host="0.0.0.0", port=8000)
+
+        mock_start_server.reset_mock()
+
+        # Call with custom args
+        start_server(host="127.0.0.1", port=9000)
+        mock_start_server.assert_called_once_with(host="127.0.0.1", port=9000)
