@@ -157,7 +157,7 @@ def create_combined_server() -> FastAPI:
 
 
 # Entry point to run the server
-def run_server(host: str = "0.0.0.0", port: int = 8000) -> None:
+def run_server(host: str = "localhost", port: int = 8000) -> None:
     """Run the integrated MCP server.
 
     Args:

@@ -46,3 +46,7 @@ doc-build:
 doc: doctest doc-build
 
 check-all: check test mypy doc
+
+
+run:
+	uv run py_code_mcp_server
