@@ -1,5 +1,6 @@
 """Integrated FastAPI and FastMCP server implementation."""
 
+import ast
 from typing import Any, Dict, Optional
 
 from fastapi import Body, FastAPI, HTTPException
@@ -71,6 +72,16 @@ async def ast_analysis(request: CodeRequest = Body(...)):
         AST analysis results
 
     """
+    # First check for syntax errors
+    if request.code is None:
+        raise HTTPException(status_code=500, detail="Error parsing AST: code cannot be None")
+
+    try:
+        # Try to parse the code to catch syntax errors early
+        ast.parse(request.code)
+    except SyntaxError as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing AST: {str(e)}")
+
     try:
         result = CodeAnalyzer.parse_ast(request.code)
         return {"result": result}
@@ -89,6 +100,10 @@ async def tokenize_code(request: CodeRequest = Body(...)):
         Tokenization results
 
     """
+    # First check for None values to match test expectations
+    if request.code is None:
+        raise HTTPException(status_code=500, detail="Error tokenizing code: code cannot be None")
+
     try:
         tokens = CodeAnalyzer.tokenize_code(request.code)
         # Limit token output
