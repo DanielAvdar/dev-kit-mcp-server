@@ -1,0 +1,30 @@
+name: Codecov
+on:
+  pull_request:
+    paths:
+      - 'my_pkg/**' # todo: change my_pkg to the name of the package
+      - 'tests/**'
+      - '.github/workflows/codecov.yml'
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  upload-coverage-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.11
+      - run: make
+      - run: make coverage
+      - uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
