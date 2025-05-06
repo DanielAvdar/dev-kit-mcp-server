@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from py_code_mcp_server.analyzer import CodeAnalyzer
+from .analyzer import CodeAnalyzer
 
 # Create FastAPI app
 app = FastAPI(

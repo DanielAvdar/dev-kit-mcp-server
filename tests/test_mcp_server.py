@@ -2,7 +2,7 @@
 
 from fastapi.testclient import TestClient
 
-from py_code_mcp_server.server import app
+from py_code.server import app
 
 client = TestClient(app)
 

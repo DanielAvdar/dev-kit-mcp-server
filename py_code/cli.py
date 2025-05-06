@@ -23,15 +23,15 @@ def main() -> None:
 
     try:
         if args.server_type == "fastapi":
-            from py_code_mcp_server.server import start_server
+            from .server import start_server
 
             start_server(host=args.host, port=args.port)
         elif args.server_type == "fastmcp":
-            from py_code_mcp_server.fastmcp_server import start_server
+            from .fastmcp_server import start_server
 
             start_server(host=args.host, port=args.port)
         else:  # integrated
-            from py_code_mcp_server.integrated_server import run_server
+            from .integrated_server import run_server
 
             run_server(host=args.host, port=args.port)
     except KeyboardInterrupt:

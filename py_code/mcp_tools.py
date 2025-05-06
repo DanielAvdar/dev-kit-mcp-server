@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 from fastmcp import Context
 
-from py_code_mcp_server.analyzer import CodeAnalyzer
+from .analyzer import CodeAnalyzer
 
 
 def get_server_info() -> Dict[str, Any]:

@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 from fastmcp import Context, FastMCP
 
-from py_code_mcp_server.analyzer import CodeAnalyzer
+from .analyzer import CodeAnalyzer
 
 # Create the FastMCP server
 mcp = FastMCP(
