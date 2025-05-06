@@ -30,7 +30,7 @@ dependencies = [
 ]
 
 [project.scripts]
-py-mcp-server = "py_code_mcp_server.cli:main"
+py-mcp-server = "py_code.mcp_server.__main__:main"
 
 [dependency-groups]
 dev = [
@@ -51,11 +51,11 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 [tool.hatch.build.targets.sdist]
-only-include = ["py_code_mcp_server", ] # changed from my_pkg
+only-include = ["py_code", ] # changed from py_code_mcp_server
 source = "."
 
 [tool.hatch.build.targets.wheel]
-only-include = ["py_code_mcp_server", ] # changed from my_pkg
+only-include = ["py_code", ] # changed from py_code_mcp_server
 source = "."
 
 
