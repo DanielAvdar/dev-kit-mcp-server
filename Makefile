@@ -23,14 +23,13 @@ check:
 	uv run pre-commit run --all-files
 
 coverage:
-	uv run pytest --cov=py_code_mcp_server --cov-report=xml # Updated package name
+	uv run pytest --cov=py_code_mcp_server --cov-report=xml
 
 cov:
-	uv run pytest --cov=py_code_mcp_server --cov-report=term-missing # Updated package name
+	uv run pytest --cov=py_code_mcp_server --cov-report=term-missing
 
 mypy:
 	uv tool run mypy py_code_mcp_server --config-file pyproject.toml
-# Updated package name
 
 doc:
 	uv run sphinx-build -M html docs/source docs/build/
