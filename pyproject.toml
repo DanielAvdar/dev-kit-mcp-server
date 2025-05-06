@@ -88,3 +88,13 @@ check_untyped_defs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 strict_optional = false
+
+[[tool.mypy.overrides]]
+module = [
+    "fastapi",
+    "fastapi_mcp",
+    "fastmcp",
+    "pydantic",
+    "uvicorn"
+]
+ignore_missing_imports = true

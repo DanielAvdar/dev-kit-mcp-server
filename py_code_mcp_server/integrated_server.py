@@ -1,6 +1,5 @@
 """Integrated FastAPI and FastMCP server implementation."""
 
-import ast
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI
@@ -8,8 +7,14 @@ from fastapi_mcp import FastApiMCP
 from fastmcp import Client, Context, FastMCP
 from pydantic import BaseModel
 
-from py_code_mcp_server.analyzer import CodeAnalyzer
 from py_code_mcp_server.fastmcp_server import mcp as fastmcp_server
+from py_code_mcp_server.mcp_tools import (
+    analyze_ast as impl_analyze_ast,
+    analyze_full as impl_analyze_full,
+    analyze_tokens as impl_analyze_tokens,
+    count_elements as impl_count_elements,
+    get_server_info as impl_get_server_info,
+)
 
 
 class CodeRequest(BaseModel):
@@ -47,11 +52,7 @@ async def get_server_info() -> Dict[str, Any]:
         Server information including name, version, and description
 
     """
-    return {
-        "name": "Python Code MCP Server",
-        "version": "0.1.0",
-        "description": "Model Context Protocol server for Python code analysis using AST and tokenize",
-    }
+    return impl_get_server_info()
 
 
 @mcp.tool()
@@ -65,15 +66,8 @@ async def analyze_full(code: str, path: Optional[str] = None) -> Dict[str, Any]:
     Returns:
         Analysis results including AST and token information
 
-    Raises:
-        Exception: If there's an error analyzing the code
-
     """
-    try:
-        result = CodeAnalyzer.analyze(code)
-        return {"result": result}
-    except Exception as e:
-        raise Exception(f"Error analyzing code: {str(e)}") from e
+    return impl_analyze_full(code, path)
 
 
 @mcp.tool()
@@ -87,25 +81,8 @@ async def analyze_ast(code: str, path: Optional[str] = None) -> Dict[str, Any]:
     Returns:
         AST analysis results
 
-    Raises:
-        Exception: If code is None or there's a syntax/parsing error
-
     """
-    # First check for syntax errors
-    if code is None:
-        raise Exception("Error parsing AST: code cannot be None")
-
-    try:
-        # Try to parse the code to catch syntax errors early
-        ast.parse(code)
-    except SyntaxError as e:
-        raise Exception(f"Error parsing AST: {str(e)}") from e
-
-    try:
-        result = CodeAnalyzer.parse_ast(code)
-        return {"result": result}
-    except Exception as e:
-        raise Exception(f"Error parsing AST: {str(e)}") from e
+    return impl_analyze_ast(code, path)
 
 
 @mcp.tool()
@@ -119,20 +96,8 @@ async def analyze_tokens(code: str, path: Optional[str] = None) -> Dict[str, Any
     Returns:
         Tokenization results
 
-    Raises:
-        Exception: If code is None or there's an error tokenizing the code
-
     """
-    # First check for None values to match test expectations
-    if code is None:
-        raise Exception("Error tokenizing code: code cannot be None")
-
-    try:
-        tokens = CodeAnalyzer.tokenize_code(code)
-        # Limit token output
-        return {"result": {"tokens": tokens[:100]}}
-    except Exception as e:
-        raise Exception(f"Error tokenizing code: {str(e)}") from e
+    return impl_analyze_tokens(code, path)
 
 
 @mcp.tool()
@@ -147,24 +112,8 @@ async def count_elements(code: str, path: Optional[str] = None, ctx: Context = N
     Returns:
         Count of code elements
 
-    Raises:
-        Exception: If there's an error counting elements in the code
-
     """
-    try:
-        if ctx:
-            await ctx.info(f"Counting elements in code with {len(code)} characters")
-
-        ast_analysis = CodeAnalyzer.parse_ast(code)
-        result = {
-            "function_count": len(ast_analysis.get("functions", [])),
-            "class_count": len(ast_analysis.get("classes", [])),
-            "import_count": len(ast_analysis.get("imports", [])),
-            "variable_count": len(ast_analysis.get("variables", [])),
-        }
-        return {"result": result}
-    except Exception as e:
-        raise Exception(f"Error counting elements: {str(e)}") from e
+    return impl_count_elements(code, path, ctx)
 
 
 # Create FastAPI-MCP server
