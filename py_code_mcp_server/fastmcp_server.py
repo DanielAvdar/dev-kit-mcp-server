@@ -60,6 +60,7 @@ async def count_functions(code: str, ctx: Context) -> Dict[str, Any]:
 
     Args:
         code: Python code as string
+        ctx: Context object for logging and interaction
 
     Returns:
         Counts of functions, classes, and imports
@@ -82,7 +83,12 @@ async def count_functions(code: str, ctx: Context) -> Dict[str, Any]:
 
 @mcp.resource("code://examples/hello_world")
 def hello_world_example() -> str:
-    """Provides a simple Hello World example in Python."""
+    """Provide a simple Hello World example in Python.
+
+    Returns:
+        A string containing a Hello World example in Python
+
+    """
     return """# Hello World example
 def greet(name: str) -> str:
     '''Greet someone by name'''
@@ -95,7 +101,12 @@ if __name__ == "__main__":
 
 @mcp.resource("code://examples/class_example")
 def class_example() -> str:
-    """Provides a simple class example in Python."""
+    """Provide a simple class example in Python.
+
+    Returns:
+        A string containing a class example in Python
+
+    """
     return """# Class example
 class Person:
     def __init__(self, name: str, age: int):
@@ -111,7 +122,7 @@ if __name__ == "__main__":
 """
 
 
-def start_server(host: str = "0.0.0.0", port: int = 8000):
+def start_server(host: str = "0.0.0.0", port: int = 8000) -> None:
     """Start the MCP server with the specified transport.
 
     Args:

@@ -29,8 +29,13 @@ class AnalysisResponse(BaseModel):
 
 
 @app.get("/")
-async def root():
-    """Root endpoint that returns server info."""
+async def root() -> Dict[str, Any]:
+    """Root endpoint that returns server info.
+
+    Returns:
+        Dictionary with server name, version, and description
+
+    """
     return {
         "name": "Python Code MCP Server",
         "version": "0.1.0",
@@ -39,7 +44,7 @@ async def root():
 
 
 @app.post("/analyze", response_model=AnalysisResponse)
-async def analyze_code(request: CodeRequest):
+async def analyze_code(request: CodeRequest) -> AnalysisResponse:
     """Analyze Python code using AST and tokenize.
 
     Args:
@@ -48,16 +53,19 @@ async def analyze_code(request: CodeRequest):
     Returns:
         Analysis results including AST and token information
 
+    Raises:
+        HTTPException: If there's an error analyzing the code
+
     """
     try:
         result = CodeAnalyzer.analyze(request.code)
-        return {"result": result}
+        return AnalysisResponse(result=result)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error analyzing code: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error analyzing code: {str(e)}") from e
 
 
 @app.post("/ast", response_model=AnalysisResponse)
-async def ast_analysis(request: CodeRequest):
+async def ast_analysis(request: CodeRequest) -> AnalysisResponse:
     """Parse Python code and return AST analysis.
 
     Args:
@@ -66,16 +74,19 @@ async def ast_analysis(request: CodeRequest):
     Returns:
         AST analysis results
 
+    Raises:
+        HTTPException: If there's an error parsing the AST
+
     """
     try:
         result = CodeAnalyzer.parse_ast(request.code)
-        return {"result": result}
+        return AnalysisResponse(result=result)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error parsing AST: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error parsing AST: {str(e)}") from e
 
 
 @app.post("/tokenize", response_model=AnalysisResponse)
-async def tokenize_code(request: CodeRequest):
+async def tokenize_code(request: CodeRequest) -> AnalysisResponse:
     """Tokenize Python code.
 
     Args:
@@ -84,16 +95,46 @@ async def tokenize_code(request: CodeRequest):
     Returns:
         Tokenization results
 
+    Raises:
+        HTTPException: If there's an error tokenizing the code
+
     """
     try:
         tokens = CodeAnalyzer.tokenize_code(request.code)
         # Limit token output
-        return {"result": {"tokens": tokens[:100]}}
+        return AnalysisResponse(result={"tokens": tokens[:100]})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error tokenizing code: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error tokenizing code: {str(e)}") from e
 
 
-def start_server(host: str = "0.0.0.0", port: int = 8000):
+@app.post("/count", response_model=AnalysisResponse)
+async def count_elements(request: CodeRequest) -> AnalysisResponse:
+    """Count elements in Python code (functions, classes, imports).
+
+    Args:
+        request: CodeRequest with code string and optional file path
+
+    Returns:
+        Count of code elements
+
+    Raises:
+        HTTPException: If there's an error counting elements in the code
+
+    """
+    try:
+        ast_analysis = CodeAnalyzer.parse_ast(request.code)
+        result = {
+            "function_count": len(ast_analysis.get("functions", [])),
+            "class_count": len(ast_analysis.get("classes", [])),
+            "import_count": len(ast_analysis.get("imports", [])),
+            "variable_count": len(ast_analysis.get("variables", [])),
+        }
+        return AnalysisResponse(result=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error counting elements: {str(e)}") from e
+
+
+def start_server(host: str = "0.0.0.0", port: int = 8000) -> None:
     """Start the MCP server with uvicorn.
 
     Args:

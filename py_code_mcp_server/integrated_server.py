@@ -65,12 +65,15 @@ async def analyze_full(code: str, path: Optional[str] = None) -> Dict[str, Any]:
     Returns:
         Analysis results including AST and token information
 
+    Raises:
+        Exception: If there's an error analyzing the code
+
     """
     try:
         result = CodeAnalyzer.analyze(code)
         return {"result": result}
     except Exception as e:
-        raise Exception(f"Error analyzing code: {str(e)}")
+        raise Exception(f"Error analyzing code: {str(e)}") from e
 
 
 @mcp.tool()
@@ -84,6 +87,9 @@ async def analyze_ast(code: str, path: Optional[str] = None) -> Dict[str, Any]:
     Returns:
         AST analysis results
 
+    Raises:
+        Exception: If code is None or there's a syntax/parsing error
+
     """
     # First check for syntax errors
     if code is None:
@@ -93,13 +99,13 @@ async def analyze_ast(code: str, path: Optional[str] = None) -> Dict[str, Any]:
         # Try to parse the code to catch syntax errors early
         ast.parse(code)
     except SyntaxError as e:
-        raise Exception(f"Error parsing AST: {str(e)}")
+        raise Exception(f"Error parsing AST: {str(e)}") from e
 
     try:
         result = CodeAnalyzer.parse_ast(code)
         return {"result": result}
     except Exception as e:
-        raise Exception(f"Error parsing AST: {str(e)}")
+        raise Exception(f"Error parsing AST: {str(e)}") from e
 
 
 @mcp.tool()
@@ -113,6 +119,9 @@ async def analyze_tokens(code: str, path: Optional[str] = None) -> Dict[str, Any
     Returns:
         Tokenization results
 
+    Raises:
+        Exception: If code is None or there's an error tokenizing the code
+
     """
     # First check for None values to match test expectations
     if code is None:
@@ -123,7 +132,7 @@ async def analyze_tokens(code: str, path: Optional[str] = None) -> Dict[str, Any
         # Limit token output
         return {"result": {"tokens": tokens[:100]}}
     except Exception as e:
-        raise Exception(f"Error tokenizing code: {str(e)}")
+        raise Exception(f"Error tokenizing code: {str(e)}") from e
 
 
 @mcp.tool()
@@ -137,6 +146,9 @@ async def count_elements(code: str, path: Optional[str] = None, ctx: Context = N
 
     Returns:
         Count of code elements
+
+    Raises:
+        Exception: If there's an error counting elements in the code
 
     """
     try:
@@ -152,7 +164,7 @@ async def count_elements(code: str, path: Optional[str] = None, ctx: Context = N
         }
         return {"result": result}
     except Exception as e:
-        raise Exception(f"Error counting elements: {str(e)}")
+        raise Exception(f"Error counting elements: {str(e)}") from e
 
 
 # Create FastAPI-MCP server
@@ -166,8 +178,13 @@ fastapi_mcp = FastApiMCP(
 
 
 # Create a proxy to the FastMCP server
-async def proxy_to_fastmcp():
-    """Proxy requests to the FastMCP server."""
+async def proxy_to_fastmcp() -> FastMCP:
+    """Proxy requests to the FastMCP server.
+
+    Returns:
+        FastMCP proxy instance that bridges FastAPI and the separate FastMCP implementation
+
+    """
     # This creates a bridge between FastAPI and the separate FastMCP implementation
     proxy = FastMCP.from_client(
         Client(fastmcp_server),  # Use in-memory client
@@ -177,8 +194,13 @@ async def proxy_to_fastmcp():
 
 
 # Configure the combined server
-def create_combined_server():
-    """Create and configure the combined FastAPI+MCP server."""
+def create_combined_server() -> FastAPI:
+    """Create and configure the combined FastAPI+MCP server.
+
+    Returns:
+        FastAPI application instance with MCP server mounted
+
+    """
     # Mount the MCP server to make FastAPI endpoints available as MCP tools
     fastapi_mcp.mount()
 
@@ -186,7 +208,7 @@ def create_combined_server():
 
 
 # Entry point to run the server
-def run_server(host: str = "0.0.0.0", port: int = 8000):
+def run_server(host: str = "0.0.0.0", port: int = 8000) -> None:
     """Run the integrated MCP server.
 
     Args:

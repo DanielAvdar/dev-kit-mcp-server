@@ -40,7 +40,7 @@ doctest:
 
 # Optional target that builds docs but ignores warnings
 doc-build:
-	uv run sphinx-build -M html docs/source docs/build/
+	uv run sphinx-build -M html docs/source docs/build/ -W --keep-going
 
 
 doc: doctest doc-build

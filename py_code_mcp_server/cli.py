@@ -4,7 +4,7 @@ import argparse
 import sys
 
 
-def main():
+def main() -> None:
     """Parse command line arguments and start the server."""
     parser = argparse.ArgumentParser(description="Python Code MCP Server")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind the server to (default: 0.0.0.0)")

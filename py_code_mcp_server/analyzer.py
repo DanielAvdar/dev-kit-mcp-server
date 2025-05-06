@@ -24,7 +24,7 @@ class CodeAnalyzer:
             tree = ast.parse(code)
 
             # Extract key information
-            result = {"imports": [], "functions": [], "classes": [], "variables": []}
+            result: Dict[str, List[Dict[str, Any]]] = {"imports": [], "functions": [], "classes": [], "variables": []}
 
             # Process imports
             for node in ast.walk(tree):
@@ -99,7 +99,7 @@ class CodeAnalyzer:
         tokens = CodeAnalyzer.tokenize_code(code)
 
         # Count token types
-        token_types = {}
+        token_types: Dict[str, int] = {}
         for token in tokens:
             if "type" in token:
                 token_type = token["type"]
