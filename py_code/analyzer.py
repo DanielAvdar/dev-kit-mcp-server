@@ -59,6 +59,22 @@ class CodeAnalyzer:
             return {"error": f"Syntax error: {str(e)}"}
 
     @staticmethod
+    def parse_raw_ast(code: str) -> ast.AST:
+        """Parse Python code into raw AST object.
+
+        Args:
+            code: Python code as string
+
+        Returns:
+            Raw AST object for further analysis
+
+        Raises:
+            SyntaxError: If the code has syntax errors
+
+        """
+        return ast.parse(code)
+
+    @staticmethod
     def tokenize_code(code: str) -> List[Dict[str, Any]]:
         """Tokenize Python code.
 
