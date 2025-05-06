@@ -15,6 +15,7 @@ from .tools.mcp_tools import (
     count_elements as impl_count_elements,
     get_server_info as impl_get_server_info,
 )
+from .version import __version__
 
 
 class CodeRequest(BaseModel):
@@ -34,7 +35,7 @@ class AnalysisResponse(BaseModel):
 app = FastAPI(
     title="Python Code MCP Server",
     description="Model Context Protocol server for Python code analysis",
-    version="0.1.0",
+    version=__version__,
 )
 
 # Create MCP server

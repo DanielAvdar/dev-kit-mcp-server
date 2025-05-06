@@ -6,12 +6,13 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from .analyzer import CodeAnalyzer
+from .version import __version__
 
 # Create FastAPI app
 app = FastAPI(
     title="Python Code MCP Server",
     description="Model Context Protocol server for Python code analysis",
-    version="0.1.0",
+    version=__version__,
 )
 
 
@@ -38,7 +39,7 @@ async def root() -> Dict[str, Any]:
     """
     return {
         "name": "Python Code MCP Server",
-        "version": "0.1.0",
+        "version": __version__,
         "description": "Model Context Protocol server for Python code analysis using AST and tokenize",
     }
 

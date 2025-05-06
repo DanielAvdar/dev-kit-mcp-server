@@ -34,7 +34,12 @@ def log_execution_time(result: Any, *args: Any, **kwargs: Any) -> None:
 
 
 def start_timer(*args: Any, **kwargs: Any) -> Dict[str, Any]:
-    """Start a timer for the function execution (pre-hook)."""
+    """Start a timer for the function execution (pre-hook).
+
+    Returns:
+        Dictionary with start time information
+
+    """
     return {"_start_time": time.time()}
 
 
@@ -95,7 +100,7 @@ def get_code_summary(code: str) -> Dict[str, Any]:
 
 
 @tool_factory
-async def validate_code(code: str, ctx: Context) -> Dict[str, bool]:
+async def validate_code(code: str, ctx: Context) -> Dict[str, Any]:
     """Validate Python code by attempting to parse it.
 
     Args:
@@ -120,7 +125,7 @@ async def validate_code(code: str, ctx: Context) -> Dict[str, bool]:
 class CodeMetricsAnalyzer:
     """Analyzer for code metrics."""
 
-    def count_statements(self, code: str) -> Dict[str, int]:
+    def count_statements(self, code: str) -> Dict[str, Any]:
         """Count the number of statements in the Python code.
 
         Args:

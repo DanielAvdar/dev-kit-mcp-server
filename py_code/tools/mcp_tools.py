@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 from fastmcp import Context
 
 from ..analyzer import CodeAnalyzer
+from ..version import __version__
 
 
 def get_server_info() -> Dict[str, Any]:
@@ -17,7 +18,7 @@ def get_server_info() -> Dict[str, Any]:
     """
     return {
         "name": "Python Code MCP Server",
-        "version": "0.1.0",
+        "version": __version__,
         "description": "Model Context Protocol server for Python code analysis using AST and tokenize",
     }
 

@@ -68,9 +68,6 @@ class CodeAnalyzer:
         Returns:
             Raw AST object for further analysis
 
-        Raises:
-            SyntaxError: If the code has syntax errors
-
         """
         return ast.parse(code)
 
