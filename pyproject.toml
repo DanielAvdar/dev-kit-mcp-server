@@ -1,9 +1,9 @@
 [project]
-name = "py-code-mcp-server" # changed from my-pkg
+name = "py-code-mcp-server"
 dynamic = ["version"]
-description = ""
+description = "A Model Context Protocol server for Python code analysis"
 authors = [
-    { name = "DanielAvdar", email = "66269169+DanielAvdar@users.noreply.github.com" }, # todo: change to your name and email
+    { name = "DanielAvdar", email = "66269169+DanielAvdar@users.noreply.github.com" },
 ]
 license = { text = "MIT" }
 readme = "README.md"
@@ -19,7 +19,11 @@ classifiers = [
 requires-python = ">=3.10"
 
 keywords = [
-    "python"
+    "python",
+    "mcp",
+    "code-analysis",
+    "ast",
+    "tokenize"
 ]
 dependencies = [
     "fastapi>=0.104.0",
@@ -51,11 +55,11 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 [tool.hatch.build.targets.sdist]
-only-include = ["py_code", ] # changed from py_code_mcp_server
+only-include = ["py_code", ]
 source = "."
 
 [tool.hatch.build.targets.wheel]
-only-include = ["py_code", ] # changed from py_code_mcp_server
+only-include = ["py_code", ]
 source = "."
 
 
