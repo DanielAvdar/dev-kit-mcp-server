@@ -131,3 +131,8 @@ def start_server(host: str = "0.0.0.0", port: int = 8000) -> None:
 
     """
     mcp.run(transport="sse", host=host, port=port)
+
+
+if __name__ == "__main__":
+    # This allows running the module directly
+    start_server(host="127.0.0.1", port=9090)

@@ -49,7 +49,7 @@ check-all: check test mypy doc
 
 
 run:
-	uv run python -m uvicorn "py_code.integrated_server:create_combined_server" --reload --host 0.0.0.0 --port 9090
+	uv run fastmcp dev run_fastmcp.py
 
 run-dev:
 	uv run python -m uvicorn "py_code.integrated_server:create_combined_server" --reload --host 127.0.0.1 --port 9090
