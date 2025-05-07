@@ -49,4 +49,11 @@ check-all: check test mypy doc
 
 
 run:
-	uv run py_code_mcp_server
+	uv run python -m uvicorn "py_code.integrated_server:create_combined_server" --reload --host 0.0.0.0 --port 9090
+
+run-dev:
+	uv run python -m uvicorn "py_code.integrated_server:create_combined_server" --reload --host 127.0.0.1 --port 9090
+
+# Alternative run option with watching capability but using the standard server startup
+run-watch:
+	uv run watchfiles "python -m py_code.mcp_server.__main__ --host 127.0.0.1 --port 9090" py_code

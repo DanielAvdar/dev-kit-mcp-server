@@ -60,7 +60,7 @@ async def count_functions(code: str, ctx: Context) -> Dict[str, Any]:
 
     Args:
         code: Python code as string
-        ctx: Context object for logging and interaction
+        ctx: Context object for logging and interaction.
 
     Returns:
         Counts of functions, classes, and imports
