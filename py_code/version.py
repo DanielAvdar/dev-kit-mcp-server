@@ -9,4 +9,8 @@ except PackageNotFoundError:
     __version__ = "0.1.0"
 
 # Export the version explicitly to ensure coverage
-VERSION = version("py-code-mcp-server")
+try:
+    VERSION = version("py-code-mcp-server")
+except PackageNotFoundError:
+    # Use the default version if the package is not installed
+    VERSION = __version__
