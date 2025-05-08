@@ -12,12 +12,14 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Last Commit](https://img.shields.io/github/last-commit/DanielAvdar/py-code-mcp-server/main)
 
-A Model Context Protocol (MCP) server for interacting with codebases. This package provides tools for turning any repository or code base into an MCP system, allowing for efficient navigation and exploration of code repositories.
+A Model Context Protocol (MCP) server for interacting with codebases. 
+This package provides tools for turning any repository or code base into an MCP system.
 
 ## Features
 
-- 🔍 **Repository Navigation**: Navigate and explore code repositories with ease
 - 🔌 **MCP Integration**: Turn any codebase into an MCP-compliant system
+- 🛠️ **Custom Tools**: Create custom tools for specific repository needs
+- 🔍 **Repository Navigation**: Navigate and explore code repositories with ease
 - 🧩 **Code Structure Analysis**: Understand code structure through AST analysis
 - 🔢 **Code Exploration**: Explore code elements like functions, classes, and imports
 - 🚀 **Fast API**: Built with FastAPI for high performance
@@ -51,29 +53,7 @@ py-mcp-server --host 127.0.0.1 --port 8080
 - `POST /tokenize`: Detailed code element identification
 - `POST /count`: Repository component summarization
 
-### Example Repository Navigation
 
-```python
-import requests
-
-# Example code from a repository file
-code = """
-def process_data(data_path):
-    """Process data from the specified path."""
-    with open(data_path, 'r') as f:
-        data = f.read()
-    return data
-
-class DataNavigator:
-    """Navigate through repository data structures."""
-    def __init__(self, repo_path):
-        self.repo_path = repo_path
-
-    def find_components(self):
-        """Find all components in the repository."""
-        # Implementation details
-        return ["component1", "component2"]
-"""
 
 # Get repository structure for navigation
 response = requests.post(
