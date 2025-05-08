@@ -99,16 +99,21 @@ def analyze_full(
         # For backward compatibility
         if code is not None:
             # Use the provided code directly
-            pass
-        elif repo_root is not None and file_path is not None:
-            # Read code from the file path
-            code = read_code_from_path(repo_root, file_path)
+            result = CodeAnalyzer.analyze(code)
+            return {"result": result}
+        elif repo_root is not None:
+            if file_path is not None:
+                # For specific file/directory analysis
+                code = read_code_from_path(repo_root, file_path)
+                result = CodeAnalyzer.analyze(code)
+                return {"result": result}
+            else:
+                # For repository-wide analysis
+                result = CodeAnalyzer.analyze_repository(repo_root)
+                return {"result": result}
         else:
             # For tests that expect an error when no code is provided
-            pass
-
-        result = CodeAnalyzer.analyze(code)
-        return {"result": result}
+            raise Exception("Repository path or code is required")
     except Exception as e:
         raise Exception(f"Error analyzing code: {str(e)}") from e
 
@@ -197,21 +202,46 @@ def analyze_tokens(
         # For backward compatibility
         if code is not None:
             # Use the provided code directly
-            pass
-        elif repo_root is not None and file_path is not None:
-            # Read code from the file path
-            code = read_code_from_path(repo_root, file_path)
+            tokens = CodeAnalyzer.tokenize_code(code)
+            # Limit token output
+            return {"result": {"tokens": tokens[:100]}}
+        elif repo_root is not None:
+            if file_path is not None:
+                # For specific file/directory
+                code = read_code_from_path(repo_root, file_path)
+                tokens = CodeAnalyzer.tokenize_code(code)
+                # Limit token output
+                return {"result": {"tokens": tokens[:100]}}
+            else:
+                # For repository-wide analysis, we'll just analyze the first few Python files
+                # to avoid excessive output
+                python_files = []
+                for root, _, files in os.walk(repo_root):
+                    for file in files:
+                        if file.endswith(".py"):
+                            python_files.append(os.path.join(root, file))
+                            if len(python_files) >= 5:  # Limit to 5 files
+                                break
+                    if len(python_files) >= 5:
+                        break
+
+                all_tokens = []
+                for file_path in python_files[:5]:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        code = f.read()
+                    file_tokens = CodeAnalyzer.tokenize_code(code)
+                    all_tokens.extend(file_tokens[:20])  # Take only first 20 tokens from each file
+
+                return {
+                    "result": {
+                        "tokens": all_tokens[:100],
+                        "files_analyzed": len(python_files),
+                        "note": "Token analysis limited to first few files for brevity",
+                    }
+                }
         else:
-            # This will maintain the existing behavior for tests
-            pass
-
-        # Check for None values to match test expectations
-        if code is None:
+            # Check for None values to match test expectations
             raise Exception("Error tokenizing code: code cannot be None")
-
-        tokens = CodeAnalyzer.tokenize_code(code)
-        # Limit token output
-        return {"result": {"tokens": tokens[:100]}}
     except Exception as e:
         raise Exception(f"Error tokenizing code: {str(e)}") from e
 
@@ -248,24 +278,68 @@ def count_elements(
         # For backward compatibility
         if code is not None:
             # Use the provided code directly
-            pass
-        elif repo_root is not None and file_path is not None:
-            # Read code from the file path
-            code = read_code_from_path(repo_root, file_path)
+            if ctx:
+                ctx.info(f"Counting elements in code with {len(code)} characters")
+
+            ast_analysis = CodeAnalyzer.parse_ast(code)
+            result = {
+                "function_count": len(ast_analysis.get("functions", [])),
+                "class_count": len(ast_analysis.get("classes", [])),
+                "import_count": len(ast_analysis.get("imports", [])),
+                "variable_count": len(ast_analysis.get("variables", [])),
+            }
+
+        elif repo_root is not None:
+            if ctx:
+                ctx.info(f"Counting elements in repository at {repo_root}")
+
+            if file_path is not None:
+                # For specific file/directory
+                code = read_code_from_path(repo_root, file_path)
+                ast_analysis = CodeAnalyzer.parse_ast(code)
+                result = {
+                    "function_count": len(ast_analysis.get("functions", [])),
+                    "class_count": len(ast_analysis.get("classes", [])),
+                    "import_count": len(ast_analysis.get("imports", [])),
+                    "variable_count": len(ast_analysis.get("variables", [])),
+                }
+            else:
+                # For entire repository
+                repo_analysis = CodeAnalyzer.analyze_repository(repo_root)
+                result = {
+                    "function_count": repo_analysis["total_functions"],
+                    "class_count": repo_analysis["total_classes"],
+                    "import_count": repo_analysis["total_imports"],
+                    "files_analyzed": repo_analysis["files_analyzed"],
+                }
         else:
-            # This will maintain the existing behavior for tests
-            pass
+            raise Exception("Repository path or code is required")
 
-        if ctx:
-            ctx.info(f"Counting elements in code with {len(code)} characters")
-
-        ast_analysis = CodeAnalyzer.parse_ast(code)
-        result = {
-            "function_count": len(ast_analysis.get("functions", [])),
-            "class_count": len(ast_analysis.get("classes", [])),
-            "import_count": len(ast_analysis.get("imports", [])),
-            "variable_count": len(ast_analysis.get("variables", [])),
-        }
         return {"result": result}
     except Exception as e:
         raise Exception(f"Error counting elements: {str(e)}") from e
+
+
+def analyze_dependencies(
+    repo_root: str,
+) -> Dict[str, Any]:
+    """Analyze dependencies between files in a repository.
+
+    Args:
+        repo_root: Path to the root of the repository
+
+    Returns:
+        Dependency analysis result showing relationships between files
+
+    Raises:
+        Exception: If there's an error analyzing dependencies
+
+    """
+    try:
+        if not os.path.exists(repo_root):
+            raise Exception(f"Repository path does not exist: {repo_root}")
+
+        result = CodeAnalyzer.find_dependencies(repo_root)
+        return {"result": result}
+    except Exception as e:
+        raise Exception(f"Error analyzing dependencies: {str(e)}") from e

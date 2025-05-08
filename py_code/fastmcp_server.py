@@ -1,60 +1,31 @@
 """MCP Server implementation using FastMCP."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastmcp import Context, FastMCP
 
 from .analyzer import CodeAnalyzer
+from .tools.code_analyzer import analyze_code_files, parse_ast_files
+from .tools.file_search import file_search
+from .tools.grep_search import grep_search
+from .tools.list_code_usages import list_code_usages
+from .tools.list_dir import list_dir
+from .tools.read_file import read_file
+from .tools.semantic_search import semantic_search
+from .tools.tool_factory import ToolFactory
+from .tools.vscode_api import get_vscode_api
 
 # Create the FastMCP server
 mcp = FastMCP(
-    name="Python Code Analysis MCP", instructions="This server analyzes Python code using AST and tokenize modules."
+    name="Python Code Analysis MCP",
+    instructions="This server analyzes Python code and repositories using AST and tokenize modules.",
 )
 
+# Create a tool factory instance
+tool_factory = ToolFactory(mcp)
 
-@mcp.tool()
-def analyze_code(code: str) -> Dict[str, Any]:
-    """Analyze Python code using AST and tokenize modules.
+# Define only the functions with unique implementations that don't exist elsewhere
 
-    Args:
-        code: Python code as string
-
-    Returns:
-        Analysis results including AST and token information
-
-    """
-    return CodeAnalyzer.analyze(code)
-
-
-@mcp.tool()
-def parse_ast(code: str) -> Dict[str, Any]:
-    """Parse Python code and return AST analysis.
-
-    Args:
-        code: Python code as string
-
-    Returns:
-        AST analysis results
-
-    """
-    return CodeAnalyzer.parse_ast(code)
-
-
-@mcp.tool()
-def tokenize_code(code: str) -> List[Dict[str, Any]]:
-    """Tokenize Python code.
-
-    Args:
-        code: Python code as string
-
-    Returns:
-        List of tokens with type and string value
-
-    """
-    return CodeAnalyzer.tokenize_code(code)
-
-
-@mcp.tool()
 async def count_functions(code: str, ctx: Context) -> Dict[str, Any]:
     """Count the number of functions, classes, and imports in the code.
 
@@ -80,6 +51,154 @@ async def count_functions(code: str, ctx: Context) -> Dict[str, Any]:
 
     return result
 
+
+async def analyze_code_or_repo(
+    repo_path: Optional[str] = None, file_path: Optional[str] = None, code: Optional[str] = None, ctx: Context = None
+) -> Dict[str, Any]:
+    """Analyze Python code or an entire repository.
+    
+    Args:
+        repo_path: Path to the repository (if analyzing a repository)
+        file_path: Path to a specific file in the repository (optional)
+        code: Python code as string (if analyzing raw code)
+        ctx: Context object for logging and interaction
+        
+    Returns:
+        Analysis results for the code or repository
+        
+    Raises:
+        ValueError: If neither code nor repo_path is provided, or if the specified file_path doesn't exist
+    """
+    if ctx:
+        if code:
+            await ctx.info(f"Analyzing code with {len(code)} characters")
+        elif repo_path:
+            await ctx.info(f"Analyzing repository at {repo_path}")
+            if file_path:
+                await ctx.info(f"Focusing on file/directory: {file_path}")
+
+    try:
+        if code:
+            # Analyze provided code
+            return CodeAnalyzer.analyze(code)
+        elif repo_path:
+            if file_path:
+                # Read and analyze specific file/directory
+                import os
+
+                full_path = os.path.join(repo_path, file_path)
+
+                if os.path.isfile(full_path):
+                    with open(full_path, "r", encoding="utf-8") as f:
+                        file_code = f.read()
+                    return CodeAnalyzer.analyze(file_code)
+                elif os.path.isdir(full_path):
+                    return CodeAnalyzer.analyze_repository(full_path)
+                else:
+                    raise ValueError(f"Path not found: {full_path}")
+            else:
+                # Analyze entire repository
+                return CodeAnalyzer.analyze_repository(repo_path)
+        else:
+            raise ValueError("Either code or repo_path must be provided")
+    except Exception as e:
+        if ctx:
+            await ctx.error(f"Error during analysis: {str(e)}")
+        return {"error": str(e)}
+
+# Create named wrappers for functions that we want to expose with specific names
+@mcp.tool(name="search_code")
+def search_code(query: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Run a natural language search for relevant code or documentation."""
+    return semantic_search(query, ctx)
+
+@mcp.tool(name="find_code_usages")
+def find_code_usages(
+    symbol_name: str, file_paths: Optional[List[str]] = None, ctx: Optional[Context] = None
+) -> Dict[str, Any]:
+    """List all usages of a function, class, method, variable etc."""
+    return list_code_usages(symbol_name, file_paths, ctx)
+
+@mcp.tool(name="search_vscode_api")
+def search_vscode_api(query: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Get VS Code API references for extension development."""
+    return get_vscode_api(query, ctx)
+
+@mcp.tool(name="search_files")
+def search_files(query: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Search for files by glob pattern."""
+    return file_search(query, ctx)
+
+@mcp.tool(name="search_text")
+def search_text(
+    query: str, include_pattern: Optional[str] = None, is_regexp: bool = False, ctx: Optional[Context] = None
+) -> Dict[str, Any]:
+    """Search for text in files."""
+    return grep_search(query, include_pattern, is_regexp, ctx)
+
+@mcp.tool(name="read_file_content")
+def read_file_content(
+    file_path: str,
+    start_line_number_base_zero: int = 0,
+    end_line_number_base_zero: Optional[int] = None,
+    ctx: Optional[Context] = None,
+) -> Dict[str, Any]:
+    """Read the contents of a file."""
+    return read_file(file_path, start_line_number_base_zero, end_line_number_base_zero, ctx)
+
+@mcp.tool(name="list_directory")
+def list_directory(path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """List the contents of a directory."""
+    return list_dir(path, ctx)
+
+@mcp.tool(name="analyze_code")
+def analyze_code(code: str) -> Dict[str, Any]:
+    """Analyze Python code using AST and tokenize modules."""
+    return CodeAnalyzer.analyze(code)
+
+@mcp.tool(name="parse_ast")
+def parse_ast(code: str) -> Dict[str, Any]:
+    """Parse Python code and return AST analysis."""
+    return CodeAnalyzer.parse_ast(code)
+
+@mcp.tool(name="parse_ast_from_files")
+def parse_ast_from_files_tool(
+    pattern: str, root_dir: Optional[str] = None, ignore_gitignore: bool = False, ctx: Optional[Context] = None
+) -> Dict[str, Any]:
+    """Parse Python files matching the pattern and return AST analysis."""
+    return parse_ast_files(pattern, root_dir, ignore_gitignore, ctx)
+
+@mcp.tool(name="analyze_codebase")
+def analyze_codebase_tool(
+    pattern: str,
+    root_dir: Optional[str] = None,
+    ignore_gitignore: bool = False,
+    include_tokens: bool = True,
+    ctx: Optional[Context] = None,
+) -> Dict[str, Any]:
+    """Analyze Python files matching the pattern using AST and tokenize modules."""
+    return analyze_code_files(pattern, root_dir, ignore_gitignore, include_tokens, ctx)
+
+@mcp.tool(name="tokenize_code")
+def tokenize_code(code: str) -> List[Dict[str, Any]]:
+    """Tokenize Python code."""
+    return CodeAnalyzer.tokenize_code(code)
+
+@mcp.tool(name="analyze_repository")
+def analyze_repository(repo_path: str, file_filter: Optional[str] = None) -> Dict[str, Any]:
+    """Analyze an entire repository or a specific path within it."""
+    return CodeAnalyzer.analyze_repository(repo_path, file_filter)
+
+@mcp.tool(name="find_dependencies")
+def find_dependencies(repo_path: str) -> Dict[str, Any]:
+    """Analyze repository to find module dependencies between files."""
+    return CodeAnalyzer.find_dependencies(repo_path)
+
+# Register the two unique functions that we defined above using tool_factory
+tool_factory([
+    count_functions,
+    analyze_code_or_repo
+])
 
 @mcp.resource("code://examples/hello_world")
 def hello_world_example() -> str:
