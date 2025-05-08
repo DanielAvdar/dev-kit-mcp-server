@@ -4,13 +4,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from py_code.tools.mcp_tools import (
+from py_code.tools.code_analysis.mcp_tools import (
     analyze_ast,
     analyze_full,
     analyze_tokens,
     count_elements,
-    get_server_info,
 )
+from py_code.tools.code_editing.mcp_tools import get_server_info
 from py_code.version import __version__
 
 
