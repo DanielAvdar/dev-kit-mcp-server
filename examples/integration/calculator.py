@@ -99,9 +99,6 @@ class Calculator:
         Returns:
             The new value in memory
 
-        Raises:
-            ZeroDivisionError: If x is zero
-
         """
         self.memory = divide(self.memory, x)
         self._record_operation(f"DIVIDE {x}", self.memory)
@@ -127,9 +124,6 @@ class Calculator:
         Returns:
             The new value in memory
 
-        Raises:
-            ValueError: If the memory is negative
-
         """
         self.memory = square_root(self.memory)
         self._record_operation("SQUARE_ROOT", self.memory)
@@ -142,7 +136,6 @@ class Calculator:
             The new value in memory
 
         Raises:
-            ValueError: If the memory is negative
             TypeError: If the memory is not an integer
 
         """
@@ -160,9 +153,6 @@ class Calculator:
 
         Returns:
             The new value in memory
-
-        Raises:
-            ValueError: If the memory is negative or zero, or if base is negative, zero, or 1
 
         """
         self.memory = logarithm(self.memory, base)

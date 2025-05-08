@@ -48,6 +48,7 @@ def factorial(n: int) -> int:
 
     Raises:
         ValueError: If n is negative
+        TypeError: If n is not an integer
 
     """
     if not isinstance(n, int):

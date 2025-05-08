@@ -10,7 +10,7 @@ Prerequisites
 ~~~~~~~~~~~~~
 
 - Python 3.10 or higher
-- [uv](https://github.com/astral-sh/uv) for dependency management
+- `uv <https://github.com/astral-sh/uv>`_ for dependency management
 
 Installation for Development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,12 +44,11 @@ Project Structure
 -----------------
 
 - ``py_code/``: Main package code
-  - ``analyzer.py``: Code analysis using AST and tokenize
-  - ``server.py``: Basic server implementation
-  - ``integrated_server.py``: Combined server implementation
   - ``fastmcp_server.py``: FastMCP server implementation
-  - ``mcp_server/``: MCP server implementation
   - ``tools/``: MCP tools implementation
+    - ``code_analysis/``: Code analysis tools
+    - ``code_editing/``: Code editing tools
+    - ``utils/``: Utility functions
 - ``py_code_mcp_server/``: Separate server package
 - ``tests/``: Test directory
 - ``docs/``: Documentation
@@ -103,11 +102,11 @@ Writing Tests
 
    .. code-block:: python
 
-      """Tests for the analyzer module."""
+      """Tests for the code analyzer module."""
 
       import pytest
 
-      from py_code.analyzer import CodeAnalyzer
+      from py_code.tools.code_analysis.analyzer import CodeAnalyzer
 
 
       def test_parse_ast_simple():
@@ -130,12 +129,12 @@ Code Style
 The project follows strict code style guidelines:
 
 1. Linting:
-   - Uses [ruff](https://github.com/astral-sh/ruff) for linting
+   - Uses `ruff <https://github.com/astral-sh/ruff>`_ for linting
    - Run linting checks with ``make check``
    - Configuration is in ``pyproject.toml`` under ``[tool.ruff]``
 
 2. Type Checking:
-   - Uses [mypy](https://mypy.readthedocs.io/) for static type checking
+   - Uses `mypy <https://mypy.readthedocs.io/>`_ for static type checking
    - Run type checking with ``make mypy``
    - Configuration is in ``pyproject.toml`` under ``[tool.mypy]``
    - All functions and methods should have type annotations
@@ -147,7 +146,7 @@ The project follows strict code style guidelines:
    - Run doctests with ``make doctest``
 
 Pre-commit Hooks
----------------
+----------------
 
 The project uses pre-commit hooks to ensure code quality:
 
@@ -161,7 +160,7 @@ The project uses pre-commit hooks to ensure code quality:
    make check
 
 Continuous Integration
----------------------
+----------------------
 
 The project uses GitHub Actions for CI/CD:
 
@@ -180,7 +179,7 @@ Development Workflow
 6. Merge to ``main`` after approval
 
 Building Documentation
----------------------
+----------------------
 
 The project uses Sphinx for documentation:
 

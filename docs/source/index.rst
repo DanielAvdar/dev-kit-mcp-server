@@ -17,17 +17,17 @@ Features
 - **MCP Compliant**: Follows the Model Context Protocol specification
 
 Installation
------------
+------------
 
 .. code-block:: bash
 
    pip install py-code-mcp-server
 
 Quick Start
-----------
+-----------
 
 Running the Server
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
@@ -38,7 +38,7 @@ Running the Server
    py-mcp-server --host 127.0.0.1 --port 8080
 
 API Endpoints
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 - ``GET /``: Server information
 - ``POST /analyze``: Full code analysis
@@ -47,7 +47,7 @@ API Endpoints
 - ``POST /count``: Element counting
 
 Example Request
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. code-block:: python
 

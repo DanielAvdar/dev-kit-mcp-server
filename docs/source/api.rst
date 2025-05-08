@@ -1,29 +1,9 @@
 API Reference
 =============
 
-Server Module
--------------
-.. automodule:: py_code.server
-   :members:
-
-Integrated Server
-------------------
-.. automodule:: py_code.integrated_server
-   :members:
-
 FastMCP Server
 --------------
 .. automodule:: py_code.fastmcp_server
-   :members:
-
-MCP Server
-----------
-.. automodule:: py_code.mcp_server
-   :members:
-
-Code Analyzer
--------------
-.. automodule:: py_code.analyzer
    :members:
 
 Command Line Interface
@@ -31,12 +11,51 @@ Command Line Interface
 .. automodule:: py_code.cli
    :members:
 
-Tools
------
-.. automodule:: py_code.tools.mcp_tools
+Code Analysis Tools
+-------------------
+
+Analyzer
+~~~~~~~~
+.. automodule:: py_code.tools.code_analysis.analyzer
    :members:
 
+Code Analyzer
+~~~~~~~~~~~~~
+.. automodule:: py_code.tools.code_analysis.code_analyzer
+   :members:
+
+Code Editing Tools
+------------------
+
+File Operations
+~~~~~~~~~~~~~~~
+.. automodule:: py_code.tools.code_editing.file_operations
+   :members:
+
+Read File
+~~~~~~~~~
+.. automodule:: py_code.tools.code_editing.read_file
+   :members:
+
+List Directory
+~~~~~~~~~~~~~~
+.. automodule:: py_code.tools.code_editing.list_dir
+   :members:
+
+Utility Tools
+-------------
+
 Tool Factory
-------------
+~~~~~~~~~~~~
 .. automodule:: py_code.tools.tool_factory
+   :members:
+
+Code Utilities
+~~~~~~~~~~~~~~
+.. automodule:: py_code.tools.utils.code_utils
+   :members:
+
+File Utilities
+~~~~~~~~~~~~~~
+.. automodule:: py_code.tools.utils.file_utils
    :members:

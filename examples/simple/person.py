@@ -31,7 +31,12 @@ class Person:
         return f"Hello, my name is {self.name} and I am {self.age} years old."
 
     def celebrate_birthday(self):
-        """Increment the person's age by 1."""
+        """Increment the person's age by 1.
+
+        Returns:
+            A birthday message string
+
+        """
         self.age += 1
         return f"Happy birthday! {self.name} is now {self.age} years old."
 

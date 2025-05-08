@@ -200,9 +200,6 @@ class Square(Rectangle):
         Args:
             side: The side length of the square
 
-        Raises:
-            ValueError: If side is negative
-
         """
         super().__init__(side, side)
 
@@ -217,9 +214,6 @@ class Square(Rectangle):
 
         Args:
             value: The new side length
-
-        Raises:
-            ValueError: If value is negative
 
         """
         self.width = value
