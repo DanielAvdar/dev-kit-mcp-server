@@ -12,7 +12,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Last Commit](https://img.shields.io/github/last-commit/DanielAvdar/py-code-mcp-server/main)
 
-A Model Context Protocol (MCP) server for interacting with codebases. 
+A Model Context Protocol (MCP) server for interacting with codebases.
 This package provides tools for turning any repository or code base into an MCP system.
 
 ## Features

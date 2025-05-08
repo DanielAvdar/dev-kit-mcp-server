@@ -31,19 +31,15 @@ cov:
 mypy:
 	uv tool run mypy py_code --config-file pyproject.toml
 
+# Add doctests target to specifically run doctest validation
+doctest: install-docs doc
+
+# Update doc target to run doctests as part of documentation build
 doc:
-	uv run sphinx-build -M html docs/source docs/build/
+	uv run --no-project sphinx-build -M doctest docs/source docs/build/ -W --keep-going --fresh-env
+	uv run --no-project sphinx-build -M html docs/source docs/build/ -W --keep-going --fresh-env
 
 
-doctest:
-	uv run sphinx-build -M doctest docs/source docs/build/ -W --keep-going
-
-# Optional target that builds docs but ignores warnings
-doc-build:
-	uv run sphinx-build -M html docs/source docs/build/ -W --keep-going
-
-
-doc: doctest doc-build
 
 check-all: check test mypy doc
 

@@ -40,8 +40,3 @@ Tool Factory
 ------------
 .. automodule:: py_code.tools.tool_factory
    :members:
-
-Tool Factory Example
----------------------
-.. automodule:: py_code.tools.tool_factory_example
-   :members:
