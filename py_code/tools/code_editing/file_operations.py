@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 from fastmcp import Context
 
-from ..utils import normalize_path
+from ..utils.file_utils import normalize_path
 
 
 def move_file_or_folder(source_path: str, destination_path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:

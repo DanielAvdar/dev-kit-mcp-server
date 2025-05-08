@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 from fastmcp import Context
 
-from ..utils import normalize_path
+from ..utils.file_utils import normalize_path
 
 
 def read_file(

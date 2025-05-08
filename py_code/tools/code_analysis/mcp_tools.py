@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 from fastmcp import Context
 
-from ..utils import read_code_from_path
+from ..utils.code_utils import read_code_from_path
 from .analyzer import CodeAnalyzer
 
 
