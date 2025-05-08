@@ -2,8 +2,10 @@
 
 import importlib
 import unittest
+import pytest
 
 
+@pytest.mark.skip("Skipped because integrated_server.py has been removed")
 class TestASGIAppLoading(unittest.TestCase):
     """Tests for reproducing the ASGI app loading error."""
 

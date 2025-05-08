@@ -2,6 +2,7 @@
 
 from unittest.mock import patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 from py_code.server import app
@@ -116,6 +117,7 @@ def get_files(directory: str) -> List[str]:
     assert "get_files" in function_names
 
 
+@pytest.mark.skip("Skipped because py_code.mcp_server has been removed")
 def test_start_server():
     """Test the start_server function in mcp_server package."""
     with patch("py_code.fastmcp_server.start_server") as mock_start_server:

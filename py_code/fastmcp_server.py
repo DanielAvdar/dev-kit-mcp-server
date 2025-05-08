@@ -11,9 +11,7 @@ from .tools.grep_search import grep_search
 from .tools.list_code_usages import list_code_usages
 from .tools.list_dir import list_dir
 from .tools.read_file import read_file
-from .tools.semantic_search import semantic_search
 from .tools.tool_factory import ToolFactory
-from .tools.vscode_api import get_vscode_api
 
 # Create the FastMCP server
 mcp = FastMCP(
@@ -24,7 +22,86 @@ mcp = FastMCP(
 # Create a tool factory instance
 tool_factory = ToolFactory(mcp)
 
-# Define only the functions with unique implementations that don't exist elsewhere
+# Create named wrappers for functions that we want to expose with specific names
+@mcp.tool(name="find_code_usages")
+def find_code_usages(
+    symbol_name: str, file_paths: Optional[List[str]] = None, ctx: Optional[Context] = None
+) -> Dict[str, Any]:
+    """List all usages of a function, class, method, variable etc."""
+    return list_code_usages(symbol_name, file_paths, ctx)
+
+@mcp.tool(name="search_files")
+def search_files(query: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Search for files by glob pattern."""
+    return file_search(query, ctx)
+
+@mcp.tool(name="search_text")
+def search_text(
+    query: str, include_pattern: Optional[str] = None, is_regexp: bool = False, ctx: Optional[Context] = None
+) -> Dict[str, Any]:
+    """Search for text in files."""
+    return grep_search(query, include_pattern, is_regexp, ctx)
+
+@mcp.tool(name="read_file_content")
+def read_file_content(
+    file_path: str,
+    start_line_number_base_zero: int = 0,
+    end_line_number_base_zero: Optional[int] = None,
+    ctx: Optional[Context] = None,
+) -> Dict[str, Any]:
+    """Read the contents of a file."""
+    return read_file(file_path, start_line_number_base_zero, end_line_number_base_zero, ctx)
+
+@mcp.tool(name="list_directory")
+def list_directory(path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """List the contents of a directory."""
+    return list_dir(path, ctx)
+
+@mcp.tool(name="analyze_code")
+def analyze_code(code: str) -> Dict[str, Any]:
+    """Analyze Python code using AST and tokenize modules."""
+    return CodeAnalyzer.analyze(code)
+
+@mcp.tool(name="parse_ast")
+def parse_ast(code: str) -> Dict[str, Any]:
+    """Parse Python code and return AST analysis."""
+    return CodeAnalyzer.parse_ast(code)
+
+@mcp.tool(name="parse_ast_from_files")
+def parse_ast_from_files_tool(
+    pattern: str, root_dir: Optional[str] = None, ignore_gitignore: bool = False, ctx: Optional[Context] = None
+) -> Dict[str, Any]:
+    """Parse Python files matching the pattern and return AST analysis."""
+    return parse_ast_files(pattern, root_dir, ignore_gitignore, ctx)
+
+@mcp.tool(name="analyze_codebase")
+def analyze_codebase_tool(
+    pattern: str,
+    root_dir: Optional[str] = None,
+    ignore_gitignore: bool = False,
+    include_tokens: bool = True,
+    ctx: Optional[Context] = None,
+) -> Dict[str, Any]:
+    """Analyze Python files matching the pattern using AST and tokenize modules."""
+    return analyze_code_files(pattern, root_dir, ignore_gitignore, include_tokens, ctx)
+
+@mcp.tool(name="tokenize_code")
+def tokenize_code(code: str) -> List[Dict[str, Any]]:
+    """Tokenize Python code."""
+    return CodeAnalyzer.tokenize_code(code)
+
+@mcp.tool(name="analyze_repository")
+def analyze_repository(repo_path: str, file_filter: Optional[str] = None) -> Dict[str, Any]:
+    """Analyze an entire repository or a specific path within it."""
+    return CodeAnalyzer.analyze_repository(repo_path, file_filter)
+
+@mcp.tool(name="find_dependencies")
+def find_dependencies(repo_path: str) -> Dict[str, Any]:
+    """Analyze repository to find module dependencies between files."""
+    return CodeAnalyzer.find_dependencies(repo_path)
+
+# Register the tools using tool_factory
+tool_factory([])
 
 async def count_functions(code: str, ctx: Context) -> Dict[str, Any]:
     """Count the number of functions, classes, and imports in the code.
@@ -105,100 +182,6 @@ async def analyze_code_or_repo(
         if ctx:
             await ctx.error(f"Error during analysis: {str(e)}")
         return {"error": str(e)}
-
-# Create named wrappers for functions that we want to expose with specific names
-@mcp.tool(name="search_code")
-def search_code(query: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
-    """Run a natural language search for relevant code or documentation."""
-    return semantic_search(query, ctx)
-
-@mcp.tool(name="find_code_usages")
-def find_code_usages(
-    symbol_name: str, file_paths: Optional[List[str]] = None, ctx: Optional[Context] = None
-) -> Dict[str, Any]:
-    """List all usages of a function, class, method, variable etc."""
-    return list_code_usages(symbol_name, file_paths, ctx)
-
-@mcp.tool(name="search_vscode_api")
-def search_vscode_api(query: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
-    """Get VS Code API references for extension development."""
-    return get_vscode_api(query, ctx)
-
-@mcp.tool(name="search_files")
-def search_files(query: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
-    """Search for files by glob pattern."""
-    return file_search(query, ctx)
-
-@mcp.tool(name="search_text")
-def search_text(
-    query: str, include_pattern: Optional[str] = None, is_regexp: bool = False, ctx: Optional[Context] = None
-) -> Dict[str, Any]:
-    """Search for text in files."""
-    return grep_search(query, include_pattern, is_regexp, ctx)
-
-@mcp.tool(name="read_file_content")
-def read_file_content(
-    file_path: str,
-    start_line_number_base_zero: int = 0,
-    end_line_number_base_zero: Optional[int] = None,
-    ctx: Optional[Context] = None,
-) -> Dict[str, Any]:
-    """Read the contents of a file."""
-    return read_file(file_path, start_line_number_base_zero, end_line_number_base_zero, ctx)
-
-@mcp.tool(name="list_directory")
-def list_directory(path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
-    """List the contents of a directory."""
-    return list_dir(path, ctx)
-
-@mcp.tool(name="analyze_code")
-def analyze_code(code: str) -> Dict[str, Any]:
-    """Analyze Python code using AST and tokenize modules."""
-    return CodeAnalyzer.analyze(code)
-
-@mcp.tool(name="parse_ast")
-def parse_ast(code: str) -> Dict[str, Any]:
-    """Parse Python code and return AST analysis."""
-    return CodeAnalyzer.parse_ast(code)
-
-@mcp.tool(name="parse_ast_from_files")
-def parse_ast_from_files_tool(
-    pattern: str, root_dir: Optional[str] = None, ignore_gitignore: bool = False, ctx: Optional[Context] = None
-) -> Dict[str, Any]:
-    """Parse Python files matching the pattern and return AST analysis."""
-    return parse_ast_files(pattern, root_dir, ignore_gitignore, ctx)
-
-@mcp.tool(name="analyze_codebase")
-def analyze_codebase_tool(
-    pattern: str,
-    root_dir: Optional[str] = None,
-    ignore_gitignore: bool = False,
-    include_tokens: bool = True,
-    ctx: Optional[Context] = None,
-) -> Dict[str, Any]:
-    """Analyze Python files matching the pattern using AST and tokenize modules."""
-    return analyze_code_files(pattern, root_dir, ignore_gitignore, include_tokens, ctx)
-
-@mcp.tool(name="tokenize_code")
-def tokenize_code(code: str) -> List[Dict[str, Any]]:
-    """Tokenize Python code."""
-    return CodeAnalyzer.tokenize_code(code)
-
-@mcp.tool(name="analyze_repository")
-def analyze_repository(repo_path: str, file_filter: Optional[str] = None) -> Dict[str, Any]:
-    """Analyze an entire repository or a specific path within it."""
-    return CodeAnalyzer.analyze_repository(repo_path, file_filter)
-
-@mcp.tool(name="find_dependencies")
-def find_dependencies(repo_path: str) -> Dict[str, Any]:
-    """Analyze repository to find module dependencies between files."""
-    return CodeAnalyzer.find_dependencies(repo_path)
-
-# Register the two unique functions that we defined above using tool_factory
-tool_factory([
-    count_functions,
-    analyze_code_or_repo
-])
 
 @mcp.resource("code://examples/hello_world")
 def hello_world_example() -> str:

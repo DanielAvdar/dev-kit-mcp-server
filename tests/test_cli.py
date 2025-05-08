@@ -11,10 +11,8 @@ from py_code.cli import main
 @pytest.fixture
 def mock_start_server():
     """Mock the server start functions."""
-    with (
-        patch("py_code.mcp_server.start_server") as mock_mcp,
-    ):
-        yield {"mcp": mock_mcp}
+    with patch("py_code.fastmcp_server.start_server") as mock_fastmcp:
+        yield {"fastmcp": mock_fastmcp}
 
 
 def test_cli_default_args(mock_start_server):
@@ -23,10 +21,11 @@ def test_cli_default_args(mock_start_server):
     with patch.object(sys, "argv", ["py_code.cli"]):
         main()
 
-    # By default, should run MCP server on 0.0.0.0:8000
-    mock_start_server["mcp"].assert_called_once_with(host="0.0.0.0", port=8000)
+    # By default, should run FastMCP server directly instead of removed MCP server
+    mock_start_server["fastmcp"].assert_called_once_with(host="0.0.0.0", port=8000)
 
 
+@pytest.mark.skip("Skipped because py_code.mcp_server has been removed")
 def test_cli_mcp_server_explicit(mock_start_server):
     """Test CLI with explicit mcp server type."""
     # Simulate CLI call with server-type=mcp
@@ -43,14 +42,14 @@ def test_cli_custom_host_port(mock_start_server):
     with patch.object(sys, "argv", ["py_code.cli", "--host", "127.0.0.1", "--port", "9000"]):
         main()
 
-    # Should run MCP server with custom host/port
-    mock_start_server["mcp"].assert_called_once_with(host="127.0.0.1", port=9000)
+    # Should run FastMCP server with custom host/port
+    mock_start_server["fastmcp"].assert_called_once_with(host="127.0.0.1", port=9000)
 
 
 def test_cli_keyboard_interrupt(mock_start_server):
     """Test CLI with KeyboardInterrupt."""
-    # Make MCP server raise KeyboardInterrupt
-    mock_start_server["mcp"].side_effect = KeyboardInterrupt()
+    # Make FastMCP server raise KeyboardInterrupt
+    mock_start_server["fastmcp"].side_effect = KeyboardInterrupt()
 
     # Simulate CLI call
     with patch.object(sys, "argv", ["py_code.cli"]), patch("sys.exit") as mock_exit:
