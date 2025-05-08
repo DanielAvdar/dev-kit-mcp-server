@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from fastmcp import Context, FastMCP
 
-from .analyzer import CodeAnalyzer
+from .tools.code_analysis.analyzer import CodeAnalyzer
 from .tools.code_analysis.code_analyzer import analyze_code_files, parse_ast_files
 from .tools.code_analysis.file_search import file_search
 from .tools.code_analysis.grep_search import grep_search

@@ -3,7 +3,7 @@
 import io
 from unittest import mock
 
-from py_code.analyzer import CodeAnalyzer
+from py_code.tools.code_analysis.analyzer import CodeAnalyzer
 
 
 def test_parse_ast_with_syntax_error():

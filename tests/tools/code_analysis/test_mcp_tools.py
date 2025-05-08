@@ -17,7 +17,7 @@ def test_analyze_full_valid_code():
     code = "def hello(): return 'world'"
 
     # Mock the CodeAnalyzer.analyze method
-    with patch("py_code.analyzer.CodeAnalyzer.analyze") as mock_analyze:
+    with patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.analyze") as mock_analyze:
         mock_analyze.return_value = {"sample": "analysis"}
 
         result = analyze_full(code)
@@ -32,7 +32,7 @@ def test_analyze_full_error():
     code = "def hello(): return 'world'"
 
     # Mock the CodeAnalyzer.analyze method to raise an exception
-    with patch("py_code.analyzer.CodeAnalyzer.analyze") as mock_analyze:
+    with patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.analyze") as mock_analyze:
         mock_analyze.side_effect = ValueError("Test error")
 
         # The function should re-raise as a generic Exception
@@ -47,7 +47,7 @@ def test_analyze_ast_valid_code():
     code = "def hello(): return 'world'"
 
     # Mock the CodeAnalyzer.parse_ast method
-    with patch("py_code.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast:
+    with patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast:
         mock_parse_ast.return_value = {"functions": [{"name": "hello"}]}
 
         result = analyze_ast(code)
@@ -82,7 +82,7 @@ def test_analyze_ast_processing_error():
     # Mock ast.parse to pass but CodeAnalyzer.parse_ast to fail
     with (
         patch("ast.parse") as mock_ast_parse,
-        patch("py_code.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast,
+        patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast,
     ):
         mock_ast_parse.return_value = MagicMock()
         mock_parse_ast.side_effect = ValueError("Test error")
@@ -99,7 +99,7 @@ def test_analyze_tokens_valid_code():
     tokens = [{"type": "NAME", "string": "def"}]
 
     # Mock the CodeAnalyzer.tokenize_code method
-    with patch("py_code.analyzer.CodeAnalyzer.tokenize_code") as mock_tokenize:
+    with patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.tokenize_code") as mock_tokenize:
         mock_tokenize.return_value = tokens
 
         result = analyze_tokens(code)
@@ -122,7 +122,7 @@ def test_analyze_tokens_error():
     code = "def hello(): return 'world'"
 
     # Mock the CodeAnalyzer.tokenize_code method to raise an exception
-    with patch("py_code.analyzer.CodeAnalyzer.tokenize_code") as mock_tokenize:
+    with patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.tokenize_code") as mock_tokenize:
         mock_tokenize.side_effect = ValueError("Test error")
 
         with pytest.raises(Exception) as exc_info:
@@ -136,7 +136,7 @@ def test_count_elements_valid_code():
     code = "def hello(): return 'world'"
 
     # Mock the CodeAnalyzer.parse_ast method
-    with patch("py_code.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast:
+    with patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast:
         mock_parse_ast.return_value = {"functions": [{"name": "hello"}], "classes": [], "imports": [], "variables": []}
 
         result = count_elements(code)
@@ -152,7 +152,7 @@ def test_count_elements_with_context():
     mock_ctx = MagicMock()
 
     # Mock the CodeAnalyzer.parse_ast method
-    with patch("py_code.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast:
+    with patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast:
         mock_parse_ast.return_value = {"functions": [{"name": "hello"}], "classes": [], "imports": [], "variables": []}
 
         result = count_elements(code, ctx=mock_ctx)
@@ -170,7 +170,7 @@ def test_count_elements_error():
     code = "def hello(): return 'world'"
 
     # Mock the CodeAnalyzer.parse_ast method to raise an exception
-    with patch("py_code.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast:
+    with patch("py_code.tools.code_analysis.analyzer.CodeAnalyzer.parse_ast") as mock_parse_ast:
         mock_parse_ast.side_effect = ValueError("Test error")
 
         with pytest.raises(Exception) as exc_info:

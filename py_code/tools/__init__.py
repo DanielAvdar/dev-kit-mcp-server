@@ -15,7 +15,7 @@ from .code_analysis import (
 )
 
 # Import from code_editing
-from .code_editing import get_server_info, list_dir, read_code_from_path, read_file
+from .code_editing import delete_file, get_server_info, list_dir, move_file_or_folder, read_code_from_path, read_file
 
 # Import from tool factory
 from .tool_factory import ToolFactory
@@ -38,6 +38,8 @@ __all__ = [
     # Code editing tools
     "get_server_info",
     "list_dir",
+    "move_file_or_folder",
+    "delete_file",
     "read_file",
     "read_code_from_path",
     # Tool factory

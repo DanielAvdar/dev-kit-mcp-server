@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 from fastmcp import Context
 
-from ...analyzer import CodeAnalyzer
+from .analyzer import CodeAnalyzer
 from .code_traversal import find_python_files, parse_gitignore, resolve_path_pattern
 
 

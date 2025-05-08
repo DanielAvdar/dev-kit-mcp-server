@@ -1,14 +1,9 @@
 """Tests for the server module."""
 
-from fastapi.testclient import TestClient
+import pytest
 
-from py_code.server import (
-    app,
-    start_server,
-)
-
-# Create a test client
-client = TestClient(app)
+# Skip all tests in this file since server.py has been removed
+pytestmark = pytest.mark.skip("Skipped because server.py has been removed and we are using fastmcp_server.py instead")
 
 
 def test_root_endpoint():

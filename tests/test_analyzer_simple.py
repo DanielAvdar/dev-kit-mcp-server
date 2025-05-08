@@ -1,6 +1,6 @@
 """Simple test for the CodeAnalyzer class."""
 
-from py_code.analyzer import CodeAnalyzer
+from py_code.tools.code_analysis.analyzer import CodeAnalyzer
 
 
 def test_parse_ast_simple():

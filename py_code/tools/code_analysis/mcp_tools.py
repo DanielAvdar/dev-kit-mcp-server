@@ -6,8 +6,8 @@ from typing import Any, Dict, Optional
 
 from fastmcp import Context
 
-from ...analyzer import CodeAnalyzer
 from ..utils import read_code_from_path
+from .analyzer import CodeAnalyzer
 
 
 def analyze_full(
