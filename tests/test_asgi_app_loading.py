@@ -10,7 +10,8 @@ class TestASGIAppLoading(unittest.TestCase):
     def test_import_with_parentheses_fails(self):
         """Test that trying to import create_combined_server() fails."""
         # This test reproduces the error:
-        # ERROR: Error loading ASGI app. Attribute "create_combined_server()" not found in module "py_code.integrated_server"
+        # ERROR: Error loading ASGI app.
+        # Attribute "create_combined_server()" not found in module "py_code.integrated_server"
 
         # First verify we can import the module itself
         import py_code.integrated_server

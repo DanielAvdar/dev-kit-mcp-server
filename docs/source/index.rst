@@ -73,4 +73,6 @@ Example Request
    :maxdepth: 2
    :caption: Contents:
 
+   usage
+   development
    api

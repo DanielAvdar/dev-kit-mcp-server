@@ -1,6 +1,7 @@
 """Implementation logic for MCP tools."""
 
 import ast
+import os
 from typing import Any, Dict, Optional
 
 from fastmcp import Context
@@ -9,60 +10,151 @@ from ..analyzer import CodeAnalyzer
 from ..version import __version__
 
 
-def get_server_info() -> Dict[str, Any]:
-    """Get server information.
+def read_code_from_path(repo_root: str, file_path: str) -> str:
+    """Read code from a file path.
+
+    Args:
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
 
     Returns:
-        Server information including name, version, and description
+        The code as a string
+
+    Raises:
+        Exception: If the file cannot be read
+
+    """
+    full_path = os.path.join(repo_root, file_path)
+
+    if not os.path.exists(full_path):
+        raise Exception(f"Path does not exist: {full_path}")
+
+    if os.path.isfile(full_path):
+        # Read a single file
+        try:
+            with open(full_path, "r", encoding="utf-8") as f:
+                return f.read()
+        except Exception as e:
+            raise Exception(f"Error reading file {full_path}: {str(e)}") from e
+    elif os.path.isdir(full_path):
+        # For a directory, read all Python files and concatenate them
+        code_parts = []
+        for root, _, files in os.walk(full_path):
+            for file in files:
+                if file.endswith(".py"):
+                    file_path = os.path.join(root, file)
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            code_parts.append(f"# File: {os.path.relpath(file_path, repo_root)}\n")
+                            code_parts.append(f.read())
+                            code_parts.append("\n\n")
+                    except Exception as e:
+                        raise Exception(f"Error reading file {file_path}: {str(e)}") from e
+        return "".join(code_parts)
+    else:
+        raise Exception(f"Path is neither a file nor a directory: {full_path}")
+
+
+def get_server_info() -> Dict[str, Any]:
+    """Get information about the MCP repository navigation server.
+
+    Returns:
+        Server information including name, version, and repository navigation capabilities
 
     """
     return {
         "name": "Python Code MCP Server",
         "version": __version__,
-        "description": "Model Context Protocol server for Python code analysis using AST and tokenize",
+        "description": "Model Context Protocol server for turning repositories into navigable MCP systems",
     }
 
 
-def analyze_full(code: str, path: Optional[str] = None) -> Dict[str, Any]:
-    """Analyze Python code using AST and tokenize.
+def analyze_full(
+    repo_root: Optional[str] = None,
+    file_path: Optional[str] = None,
+    code: Optional[str] = None,
+    path: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Comprehensively analyze code structure for repository navigation.
 
     Args:
-        code: Python code string to analyze
-        path: Optional file path for the code
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
+        code: Code string to analyze (if provided, repo_root and file_path are ignored)
+        path: Optional file path within the repository (for backward compatibility)
 
     Returns:
-        Analysis results including AST and token information
+        Detailed code structure analysis for repository exploration
 
     Raises:
         Exception: If there's an error analyzing the code
 
     """
     try:
+        # Handle case where code is passed as first positional argument
+        if repo_root is not None and code is None and file_path is None:
+            code = repo_root
+            repo_root = None
+
+        # For backward compatibility
+        if code is not None:
+            # Use the provided code directly
+            pass
+        elif repo_root is not None and file_path is not None:
+            # Read code from the file path
+            code = read_code_from_path(repo_root, file_path)
+        else:
+            # For tests that expect an error when no code is provided
+            pass
+
         result = CodeAnalyzer.analyze(code)
         return {"result": result}
     except Exception as e:
         raise Exception(f"Error analyzing code: {str(e)}") from e
 
 
-def analyze_ast(code: str, path: Optional[str] = None) -> Dict[str, Any]:
-    """Parse Python code and return AST analysis.
+def analyze_ast(
+    repo_root: Optional[str] = None,
+    file_path: Optional[str] = None,
+    code: Optional[str] = None,
+    path: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Extract code structure for repository navigation.
 
     Args:
-        code: Python code string to analyze
-        path: Optional file path for the code
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
+        code: Code string to analyze (if provided, repo_root and file_path are ignored)
+        path: Optional file path within the repository (for backward compatibility)
 
     Returns:
-        AST analysis results
+        Code structure information for navigating the repository
 
     Raises:
-        Exception: If code is None or there's a syntax/parsing error
+        Exception: If there's a syntax/parsing error
 
     """
-    # First check for syntax errors
-    if code is None:
-        raise Exception("Error parsing AST: code cannot be None")
-
     try:
+        # Handle case where code is passed as first positional argument
+        if repo_root is not None and code is None and file_path is None:
+            code = repo_root
+            repo_root = None
+
+        # For backward compatibility
+        if code is not None:
+            # Use the provided code directly
+            pass
+        elif repo_root is not None and file_path is not None:
+            # Read code from the file path
+            code = read_code_from_path(repo_root, file_path)
+        else:
+            # This will maintain the existing behavior for tests
+            pass
+
+        # Check for syntax errors
+        if code is None:
+            raise Exception("Error parsing AST: code cannot be None")
+
         # Try to parse the code to catch syntax errors early
         ast.parse(code)
     except SyntaxError as e:
@@ -75,25 +167,48 @@ def analyze_ast(code: str, path: Optional[str] = None) -> Dict[str, Any]:
         raise Exception(f"Error parsing AST: {str(e)}") from e
 
 
-def analyze_tokens(code: str, path: Optional[str] = None) -> Dict[str, Any]:
-    """Tokenize Python code.
+def analyze_tokens(
+    repo_root: Optional[str] = None,
+    file_path: Optional[str] = None,
+    code: Optional[str] = None,
+    path: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Identify code elements for detailed repository exploration.
 
     Args:
-        code: Python code string to tokenize
-        path: Optional file path for the code
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
+        code: Code string to analyze (if provided, repo_root and file_path are ignored)
+        path: Optional file path within the repository (for backward compatibility)
 
     Returns:
-        Tokenization results
+        Detailed code elements for fine-grained repository navigation
 
     Raises:
-        Exception: If code is None or there's an error tokenizing the code
+        Exception: If there's an error identifying code elements
 
     """
-    # First check for None values to match test expectations
-    if code is None:
-        raise Exception("Error tokenizing code: code cannot be None")
-
     try:
+        # Handle case where code is passed as first positional argument
+        if repo_root is not None and code is None and file_path is None:
+            code = repo_root
+            repo_root = None
+
+        # For backward compatibility
+        if code is not None:
+            # Use the provided code directly
+            pass
+        elif repo_root is not None and file_path is not None:
+            # Read code from the file path
+            code = read_code_from_path(repo_root, file_path)
+        else:
+            # This will maintain the existing behavior for tests
+            pass
+
+        # Check for None values to match test expectations
+        if code is None:
+            raise Exception("Error tokenizing code: code cannot be None")
+
         tokens = CodeAnalyzer.tokenize_code(code)
         # Limit token output
         return {"result": {"tokens": tokens[:100]}}
@@ -101,22 +216,46 @@ def analyze_tokens(code: str, path: Optional[str] = None) -> Dict[str, Any]:
         raise Exception(f"Error tokenizing code: {str(e)}") from e
 
 
-def count_elements(code: str, path: Optional[str] = None, ctx: Context = None) -> Dict[str, Any]:
-    """Count elements in Python code (functions, classes, imports).
+def count_elements(
+    repo_root: Optional[str] = None,
+    file_path: Optional[str] = None,
+    code: Optional[str] = None,
+    path: Optional[str] = None,
+    ctx: Context = None,
+) -> Dict[str, Any]:
+    """Summarize repository components for high-level navigation.
 
     Args:
-        code: Python code string to analyze
-        path: Optional file path for the code
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
+        code: Code string to analyze (if provided, repo_root and file_path are ignored)
+        path: Optional file path within the repository (for backward compatibility)
         ctx: Optional MCP context
 
     Returns:
-        Count of code elements
+        Summary of repository components for high-level navigation
 
     Raises:
-        Exception: If there's an error counting elements in the code
+        Exception: If there's an error summarizing repository components
 
     """
     try:
+        # Handle case where code is passed as first positional argument
+        if repo_root is not None and code is None and file_path is None:
+            code = repo_root
+            repo_root = None
+
+        # For backward compatibility
+        if code is not None:
+            # Use the provided code directly
+            pass
+        elif repo_root is not None and file_path is not None:
+            # Read code from the file path
+            code = read_code_from_path(repo_root, file_path)
+        else:
+            # This will maintain the existing behavior for tests
+            pass
+
         if ctx:
             ctx.info(f"Counting elements in code with {len(code)} characters")
 

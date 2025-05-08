@@ -2,13 +2,60 @@
 
 import ast
 import logging
+import os
 import time
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fastmcp import Context, FastMCP
 
 from ..analyzer import CodeAnalyzer
 from ..tools.tool_factory import ToolFactory
+
+
+def read_code_from_path(repo_root: str, file_path: str) -> str:
+    """Read code from a file path.
+
+    Args:
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
+
+    Returns:
+        The code as a string
+
+    Raises:
+        Exception: If the file cannot be read
+
+    """
+    full_path = os.path.join(repo_root, file_path)
+
+    if not os.path.exists(full_path):
+        raise Exception(f"Path does not exist: {full_path}")
+
+    if os.path.isfile(full_path):
+        # Read a single file
+        try:
+            with open(full_path, "r", encoding="utf-8") as f:
+                return f.read()
+        except Exception as e:
+            raise Exception(f"Error reading file {full_path}: {str(e)}") from e
+    elif os.path.isdir(full_path):
+        # For a directory, read all Python files and concatenate them
+        code_parts = []
+        for root, _, files in os.walk(full_path):
+            for file in files:
+                if file.endswith(".py"):
+                    file_path = os.path.join(root, file)
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            code_parts.append(f"# File: {os.path.relpath(file_path, repo_root)}\n")
+                            code_parts.append(f.read())
+                            code_parts.append("\n\n")
+                    except Exception as e:
+                        raise Exception(f"Error reading file {file_path}: {str(e)}") from e
+        return "".join(code_parts)
+    else:
+        raise Exception(f"Path is neither a file nor a directory: {full_path}")
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -50,16 +97,36 @@ def log_input_params(*args: Any, **kwargs: Any) -> None:
 
 # Define some analysis functions that we want to convert to tools
 @tool_factory
-def analyze_code_complexity(code: str) -> Dict[str, Any]:
+def analyze_code_complexity(
+    repo_root: Optional[str] = None, file_path: Optional[str] = None, code: Optional[str] = None
+) -> Dict[str, Any]:
     """Analyze Python code complexity.
 
     Args:
-        code: Python code as string
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
+        code: Code string to analyze (if provided, repo_root and file_path are ignored)
 
     Returns:
         Analysis results including complexity metrics
 
     """
+    # Handle case where code is passed as first positional argument
+    if repo_root is not None and code is None and file_path is None:
+        code = repo_root
+        repo_root = None
+
+    # For backward compatibility
+    if code is not None:
+        # Use the provided code directly
+        pass
+    elif repo_root is not None and file_path is not None:
+        # Read code from the file path
+        code = read_code_from_path(repo_root, file_path)
+    else:
+        # This will maintain the existing behavior for tests
+        pass
+
     ast_analysis = CodeAnalyzer.parse_ast(code)
 
     # Basic complexity metrics
@@ -75,16 +142,36 @@ def analyze_code_complexity(code: str) -> Dict[str, Any]:
 
 
 @tool_factory
-def get_code_summary(code: str) -> Dict[str, Any]:
+def get_code_summary(
+    repo_root: Optional[str] = None, file_path: Optional[str] = None, code: Optional[str] = None
+) -> Dict[str, Any]:
     """Generate a summary of the Python code.
 
     Args:
-        code: Python code as string
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
+        code: Code string to analyze (if provided, repo_root and file_path are ignored)
 
     Returns:
         Summary information about the code
 
     """
+    # Handle case where code is passed as first positional argument
+    if repo_root is not None and code is None and file_path is None:
+        code = repo_root
+        repo_root = None
+
+    # For backward compatibility
+    if code is not None:
+        # Use the provided code directly
+        pass
+    elif repo_root is not None and file_path is not None:
+        # Read code from the file path
+        code = read_code_from_path(repo_root, file_path)
+    else:
+        # This will maintain the existing behavior for tests
+        pass
+
     ast_analysis = CodeAnalyzer.parse_ast(code)
     token_analysis = CodeAnalyzer.tokenize_code(code)
 
@@ -100,11 +187,15 @@ def get_code_summary(code: str) -> Dict[str, Any]:
 
 
 @tool_factory
-async def validate_code(code: str, ctx: Context) -> Dict[str, Any]:
+async def validate_code(
+    repo_root: Optional[str] = None, file_path: Optional[str] = None, code: Optional[str] = None, ctx: Context = None
+) -> Dict[str, Any]:
     """Validate Python code by attempting to parse it.
 
     Args:
-        code: Python code as string
+        repo_root: Path to the root of the repository
+        file_path: Path to the file or package to analyze, relative to repo_root
+        code: Code string to analyze (if provided, repo_root and file_path are ignored)
         ctx: MCP context
 
     Returns:
@@ -112,12 +203,37 @@ async def validate_code(code: str, ctx: Context) -> Dict[str, Any]:
 
     """
     try:
+        # Handle case where code is passed as first positional argument
+        if repo_root is not None and code is None and file_path is None and not isinstance(repo_root, Context):
+            code = repo_root
+            repo_root = None
+
+        # Handle case where code and ctx are passed as positional arguments
+        if repo_root is not None and isinstance(file_path, Context) and code is None:
+            code = repo_root
+            ctx = file_path
+            repo_root = None
+            file_path = None
+
+        # For backward compatibility
+        if code is not None:
+            # Use the provided code directly
+            pass
+        elif repo_root is not None and file_path is not None:
+            # Read code from the file path
+            code = read_code_from_path(repo_root, file_path)
+        else:
+            # This will maintain the existing behavior for tests
+            pass
+
         # Try to parse the code
         CodeAnalyzer.parse_ast(code)
-        await ctx.info("Code validation successful")
+        if ctx:
+            await ctx.info("Code validation successful")
         return {"valid": True, "errors": None}
     except Exception as e:
-        await ctx.error(f"Code validation failed: {str(e)}")
+        if ctx:
+            await ctx.error(f"Code validation failed: {str(e)}")
         return {"valid": False, "errors": str(e)}
 
 
@@ -125,11 +241,15 @@ async def validate_code(code: str, ctx: Context) -> Dict[str, Any]:
 class CodeMetricsAnalyzer:
     """Analyzer for code metrics."""
 
-    def count_statements(self, code: str) -> Dict[str, Any]:
+    def count_statements(
+        self, repo_root: Optional[str] = None, file_path: Optional[str] = None, code: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Count the number of statements in the Python code.
 
         Args:
-            code: Python code as string
+            repo_root: Path to the root of the repository
+            file_path: Path to the file or package to analyze, relative to repo_root
+            code: Code string to analyze (if provided, repo_root and file_path are ignored)
 
         Returns:
             Count of different statement types
@@ -137,6 +257,22 @@ class CodeMetricsAnalyzer:
         """
         # Parse the AST
         try:
+            # Handle case where code is passed as first positional argument
+            if repo_root is not None and code is None and file_path is None:
+                code = repo_root
+                repo_root = None
+
+            # For backward compatibility
+            if code is not None:
+                # Use the provided code directly
+                pass
+            elif repo_root is not None and file_path is not None:
+                # Read code from the file path
+                code = read_code_from_path(repo_root, file_path)
+            else:
+                # This will maintain the existing behavior for tests
+                pass
+
             tree = CodeAnalyzer.parse_raw_ast(code)
 
             # Count different types of statements
@@ -159,11 +295,15 @@ class CodeMetricsAnalyzer:
         except Exception as e:
             return {"error": str(e)}
 
-    def measure_complexity(self, code: str) -> Dict[str, Any]:
+    def measure_complexity(
+        self, repo_root: Optional[str] = None, file_path: Optional[str] = None, code: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Measure the cyclomatic complexity of the code.
 
         Args:
-            code: Python code as string
+            repo_root: Path to the root of the repository
+            file_path: Path to the file or package to analyze, relative to repo_root
+            code: Code string to analyze (if provided, repo_root and file_path are ignored)
 
         Returns:
             Complexity metrics
@@ -171,6 +311,22 @@ class CodeMetricsAnalyzer:
         """
         # Basic implementation - could be expanded with actual cyclomatic complexity
         try:
+            # Handle case where code is passed as first positional argument
+            if repo_root is not None and code is None and file_path is None:
+                code = repo_root
+                repo_root = None
+
+            # For backward compatibility
+            if code is not None:
+                # Use the provided code directly
+                pass
+            elif repo_root is not None and file_path is not None:
+                # Read code from the file path
+                code = read_code_from_path(repo_root, file_path)
+            else:
+                # This will maintain the existing behavior for tests
+                pass
+
             tree = CodeAnalyzer.parse_raw_ast(code)
 
             # Count branch points that increase complexity

@@ -1,7 +1,7 @@
 [project]
 name = "py-code-mcp-server"
 dynamic = ["version"]
-description = "A Model Context Protocol server for Python code analysis"
+description = "A Model Context Protocol server for turning repositories into navigable MCP systems"
 authors = [
     { name = "DanielAvdar", email = "66269169+DanielAvdar@users.noreply.github.com" },
 ]
@@ -21,7 +21,9 @@ requires-python = ">=3.10"
 keywords = [
     "python",
     "mcp",
-    "code-analysis",
+    "repository-navigation",
+    "code-exploration",
+    "code-structure",
     "ast",
     "tokenize"
 ]
@@ -47,7 +49,8 @@ dev = [
     "pytest-parametrization>=2022",
     "ruff>=0.8.2",
     "sybil[pytest]",
-    "httpx>=0.27.0"
+    "httpx>=0.27.0",
+    "pytest-asyncio>=0.23.5"
 ]
 docs = [
     "sphinx>=8.2.0; python_version >= '3.11'",

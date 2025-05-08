@@ -36,7 +36,7 @@ class AnalysisResponse(BaseModel):
 # Create FastAPI app
 app = FastAPI(
     title="Python Code MCP Server",
-    description="Model Context Protocol server for Python code analysis",
+    description="Model Context Protocol server for repository navigation and code exploration",
     version=__version__,
 )
 
@@ -44,10 +44,10 @@ app = FastAPI(
 # Add HTTP endpoints to the FastAPI app
 @app.get("/server-info")
 async def server_info() -> Dict[str, Any]:
-    """Server info endpoint that returns server details.
+    """Get information about the repository navigation server.
 
     Returns:
-        Dictionary with server name, version, and description
+        Dictionary with server name, version, and repository navigation capabilities
 
     """
     return impl_get_server_info()
@@ -56,16 +56,16 @@ async def server_info() -> Dict[str, Any]:
 # Create MCP server
 mcp = FastMCP(
     name="Python Code MCP Server",
-    description="Model Context Protocol server for Python code analysis using AST and tokenize",
+    description="Model Context Protocol server for turning repositories into navigable MCP systems",
 )
 
 
 @mcp.tool()
 async def get_server_info() -> Dict[str, Any]:
-    """Get server information.
+    """Get information about the MCP repository navigation server.
 
     Returns:
-        Server information including name, version, and description
+        Server information including name, version, and description of the repository navigation capabilities
 
     """
     return impl_get_server_info()
@@ -73,14 +73,14 @@ async def get_server_info() -> Dict[str, Any]:
 
 @mcp.tool()
 async def analyze_full(code: str, path: Optional[str] = None) -> Dict[str, Any]:
-    """Analyze Python code using AST and tokenize.
+    """Comprehensively analyze code structure for repository navigation.
 
     Args:
-        code: Python code string to analyze
-        path: Optional file path for the code
+        code: Code string to analyze for navigation
+        path: Optional file path within the repository
 
     Returns:
-        Analysis results including AST and token information
+        Detailed code structure analysis for repository exploration
 
     """
     return impl_analyze_full(code, path)
@@ -88,14 +88,14 @@ async def analyze_full(code: str, path: Optional[str] = None) -> Dict[str, Any]:
 
 @mcp.tool()
 async def analyze_ast(code: str, path: Optional[str] = None) -> Dict[str, Any]:
-    """Parse Python code and return AST analysis.
+    """Extract code structure for repository navigation.
 
     Args:
-        code: Python code string to analyze
-        path: Optional file path for the code
+        code: Code string to analyze for structure
+        path: Optional file path within the repository
 
     Returns:
-        AST analysis results
+        Code structure information for navigating the repository
 
     """
     return impl_analyze_ast(code, path)
@@ -103,14 +103,14 @@ async def analyze_ast(code: str, path: Optional[str] = None) -> Dict[str, Any]:
 
 @mcp.tool()
 async def analyze_tokens(code: str, path: Optional[str] = None) -> Dict[str, Any]:
-    """Tokenize Python code.
+    """Identify code elements for detailed repository exploration.
 
     Args:
-        code: Python code string to tokenize
-        path: Optional file path for the code
+        code: Code string to analyze for elements
+        path: Optional file path within the repository
 
     Returns:
-        Tokenization results
+        Detailed code elements for fine-grained repository navigation
 
     """
     return impl_analyze_tokens(code, path)
@@ -118,15 +118,15 @@ async def analyze_tokens(code: str, path: Optional[str] = None) -> Dict[str, Any
 
 @mcp.tool()
 async def count_elements(code: str, path: Optional[str] = None, ctx: Context = None) -> Dict[str, Any]:
-    """Count elements in Python code (functions, classes, imports).
+    """Summarize repository components for high-level navigation.
 
     Args:
-        code: Python code string to analyze
-        path: Optional file path for the code
+        code: Code string to analyze for components
+        path: Optional file path within the repository
         ctx: Optional MCP context
 
     Returns:
-        Count of code elements
+        Summary of repository components for high-level navigation
 
     """
     return impl_count_elements(code, path, ctx)
@@ -151,8 +151,8 @@ async def proxy_to_fastmcp() -> FastMCP:
 # Create FastAPI-MCP server
 fastapi_mcp = FastApiMCP(
     app,  # Pass the FastAPI app directly
-    name="Python Code Analysis API",
-    description="API for Python code analysis using AST and tokenize modules",
+    name="Repository Navigation API",
+    description="API for navigating and exploring code repositories through MCP",
     describe_all_responses=True,
     describe_full_response_schema=True,
 )
@@ -170,15 +170,16 @@ def create_combined_server() -> FastAPI:
     # Add the root endpoint for regular HTTP requests (not SSE)
     @app.get("/", include_in_schema=False)
     async def root(request: Request) -> Response:
-        """Root endpoint that handles regular HTTP requests (not SSE).
+        """Root endpoint for the repository navigation server.
 
+        Provides basic information about the MCP repository navigation capabilities.
         SSE requests are handled by the FastAPI-MCP middleware.
 
         Args:
             request: The incoming request
 
         Returns:
-            Response with server info as JSON
+            Response with repository navigation server info as JSON
 
         """
         # Return server info as JSON for regular HTTP requests
@@ -187,13 +188,13 @@ def create_combined_server() -> FastAPI:
     # Add the other HTTP endpoints
     @app.post("/analyze", response_model=AnalysisResponse)
     async def analyze_code(request: CodeRequest) -> AnalysisResponse:
-        """Analyze Python code using AST and tokenize.
+        """Comprehensively analyze code for repository navigation.
 
         Args:
-            request: CodeRequest with code string and optional file path
+            request: CodeRequest with code string and optional repository file path
 
         Returns:
-            Analysis results including AST and token information
+            Detailed code structure analysis for repository exploration
 
         Raises:
             HTTPException: If there's an error analyzing the code
@@ -207,16 +208,16 @@ def create_combined_server() -> FastAPI:
 
     @app.post("/ast", response_model=AnalysisResponse)
     async def ast_analysis(request: CodeRequest) -> AnalysisResponse:
-        """Parse Python code and return AST analysis.
+        """Extract code structure for repository navigation.
 
         Args:
-            request: CodeRequest with code string and optional file path
+            request: CodeRequest with code string and optional repository file path
 
         Returns:
-            AST analysis results
+            Code structure information for navigating the repository
 
         Raises:
-            HTTPException: If there's a syntax error or problem parsing the AST
+            HTTPException: If there's a syntax error or problem extracting the structure
 
         """
         try:
@@ -227,16 +228,16 @@ def create_combined_server() -> FastAPI:
 
     @app.post("/tokenize", response_model=AnalysisResponse)
     async def tokenize_code(request: CodeRequest) -> AnalysisResponse:
-        """Tokenize Python code.
+        """Identify code elements for detailed repository exploration.
 
         Args:
-            request: CodeRequest with code string and optional file path
+            request: CodeRequest with code string and optional repository file path
 
         Returns:
-            Tokenization results
+            Detailed code elements for fine-grained repository navigation
 
         Raises:
-            HTTPException: If there's an error tokenizing the code
+            HTTPException: If there's an error identifying code elements
 
         """
         try:
@@ -247,16 +248,16 @@ def create_combined_server() -> FastAPI:
 
     @app.post("/count", response_model=AnalysisResponse)
     async def count_code_elements(request: CodeRequest) -> AnalysisResponse:
-        """Count elements in Python code (functions, classes, imports).
+        """Summarize repository components for high-level navigation.
 
         Args:
-            request: CodeRequest with code string and optional file path
+            request: CodeRequest with code string and optional repository file path
 
         Returns:
-            Count of code elements
+            Summary of repository components for high-level navigation
 
         Raises:
-            HTTPException: If there's an error counting elements in the code
+            HTTPException: If there's an error summarizing repository components
 
         """
         try:

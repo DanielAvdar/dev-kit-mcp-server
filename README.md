@@ -12,15 +12,15 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Last Commit](https://img.shields.io/github/last-commit/DanielAvdar/py-code-mcp-server/main)
 
-A Model Context Protocol (MCP) server for Python code analysis. This package provides a fast and efficient way to analyze Python code using Abstract Syntax Trees (AST) and tokenization.
+A Model Context Protocol (MCP) server for interacting with codebases. This package provides tools for turning any repository or code base into an MCP system, allowing for efficient navigation and exploration of code repositories.
 
 ## Features
 
-- 🔍 **Code Analysis**: Analyze Python code structure using AST
-- 🔢 **Tokenization**: Extract tokens from Python code
-- 📊 **Element Counting**: Count functions, classes, imports, and variables
+- 🔍 **Repository Navigation**: Navigate and explore code repositories with ease
+- 🔌 **MCP Integration**: Turn any codebase into an MCP-compliant system
+- 🧩 **Code Structure Analysis**: Understand code structure through AST analysis
+- 🔢 **Code Exploration**: Explore code elements like functions, classes, and imports
 - 🚀 **Fast API**: Built with FastAPI for high performance
-- 🔌 **MCP Compliant**: Follows the Model Context Protocol specification
 
 ## Installation
 
@@ -45,32 +45,46 @@ py-mcp-server --host 127.0.0.1 --port 8080
 
 ### API Endpoints
 
-- `GET /`: Server information
-- `POST /analyze`: Full code analysis
-- `POST /ast`: AST-only analysis
-- `POST /tokenize`: Token extraction
-- `POST /count`: Element counting
+- `GET /`: Repository navigation server information
+- `POST /analyze`: Comprehensive repository structure analysis
+- `POST /ast`: Code structure extraction for navigation
+- `POST /tokenize`: Detailed code element identification
+- `POST /count`: Repository component summarization
 
-### Example Request
+### Example Repository Navigation
 
 ```python
 import requests
 
+# Example code from a repository file
 code = """
-def hello_world():
-    print("Hello, World!")
+def process_data(data_path):
+    """Process data from the specified path."""
+    with open(data_path, 'r') as f:
+        data = f.read()
+    return data
 
-class Person:
-    def __init__(self, name):
-        self.name = name
+class DataNavigator:
+    """Navigate through repository data structures."""
+    def __init__(self, repo_path):
+        self.repo_path = repo_path
+
+    def find_components(self):
+        """Find all components in the repository."""
+        # Implementation details
+        return ["component1", "component2"]
 """
 
+# Get repository structure for navigation
 response = requests.post(
     "http://localhost:8000/analyze",
-    json={"code": code}
+    json={"code": code, "path": "src/data/navigator.py"}
 )
 
-print(response.json())
+# Use the structure for repository navigation
+structure = response.json()
+print(f"Repository components found: {len(structure['result']['ast_analysis']['functions'])} functions, "
+      f"{len(structure['result']['ast_analysis']['classes'])} classes")
 ```
 
 ## Development
