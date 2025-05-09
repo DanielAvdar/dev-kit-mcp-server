@@ -90,6 +90,8 @@ File Operations Endpoints:
 - ``POST /list_directory``: List the contents of a directory
 - ``POST /move_file_or_folder``: Move a file or folder to a new location
 - ``POST /delete_file``: Delete a file from the workspace
+- ``POST /delete_file_or_folder``: Delete a file or folder from the workspace
+- ``POST /create_file_or_folder``: Create a file or folder in the workspace
 
 Example Requests
 ----------------
@@ -212,6 +214,34 @@ Delete File
        "http://localhost:8000/delete_file",
        json={
            "file_path": "path/to/file/to/delete.py"
+       }
+   )
+
+   print(response.json())
+
+Create File or Folder
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+   import requests
+
+   # Create a file with content
+   response = requests.post(
+       "http://localhost:8000/create_file_or_folder",
+       json={
+           "path": "path/to/new/file.py",
+           "content": "print('Hello, World!')"
+       }
+   )
+
+   print(response.json())
+
+   # Create a folder
+   response = requests.post(
+       "http://localhost:8000/create_file_or_folder",
+       json={
+           "path": "path/to/new/folder"
        }
    )
 

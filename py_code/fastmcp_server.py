@@ -9,7 +9,12 @@ from .tools.code_analysis.code_analyzer import analyze_code_files, parse_ast_fil
 from .tools.code_analysis.file_search import file_search
 from .tools.code_analysis.grep_search import grep_search
 from .tools.code_analysis.list_code_usages import list_code_usages
-from .tools.code_editing.file_operations import delete_file, move_file_or_folder
+from .tools.code_editing.file_operations import (
+    create_file_or_folder,
+    delete_file,
+    delete_file_or_folder,
+    move_file_or_folder,
+)
 from .tools.code_editing.list_dir import list_dir
 from .tools.code_editing.read_file import read_file
 from .tools.tool_factory import ToolFactory
@@ -17,7 +22,7 @@ from .tools.tool_factory import ToolFactory
 # Create the FastMCP server
 mcp = FastMCP(
     name="Python Code Analysis MCP",
-    instructions="This server analyzes Python code and repositories using AST and tokenize modules, and provides tools for file operations like reading, listing, moving, and deleting files.",
+    instructions="This server analyzes Python code and repositories using AST and tokenize modules, and provides tools for file operations like reading, listing, moving, deleting, and creating files and folders.",
 )
 
 # Create a tool factory instance
@@ -143,6 +148,39 @@ def delete_file_tool(file_path: str, ctx: Optional[Context] = None) -> Dict[str,
 
     """
     return delete_file(file_path, ctx)
+
+
+@mcp.tool(name="delete_file_or_folder")
+def delete_file_or_folder_tool(path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Delete a file or folder from the workspace.
+
+    Args:
+        path: The path to the file or folder to delete
+        ctx: Optional context for logging
+
+    Returns:
+        A dictionary containing the result of the operation
+
+    """
+    return delete_file_or_folder(path, ctx)
+
+
+@mcp.tool(name="create_file_or_folder")
+def create_file_or_folder_tool(
+    path: str, content: Optional[str] = None, ctx: Optional[Context] = None
+) -> Dict[str, Any]:
+    """Create a file or folder in the workspace.
+
+    Args:
+        path: The path to the file or folder to create
+        content: Optional content for the file (if None and path has no extension, a folder is created)
+        ctx: Optional context for logging
+
+    Returns:
+        A dictionary containing the result of the operation
+
+    """
+    return create_file_or_folder(path, content, ctx)
 
 
 @mcp.tool(name="analyze_code")

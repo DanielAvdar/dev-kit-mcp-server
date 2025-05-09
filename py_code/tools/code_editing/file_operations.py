@@ -79,6 +79,94 @@ def move_file_or_folder(source_path: str, destination_path: str, ctx: Optional[C
         }
 
 
+def delete_file_or_folder(path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Delete a file or folder from the workspace.
+
+    Args:
+        path: The path to the file or folder to delete
+        ctx: Optional MCP context
+
+    Returns:
+        Dictionary containing the result of the operation
+
+    """
+    if ctx:
+        ctx.info(f"Deleting: {path}")
+
+    # Normalize path and handle both absolute and relative paths
+    if not os.path.isabs(path):
+        workspace_root = os.getcwd()
+        path = os.path.join(workspace_root, path)
+
+    path = normalize_path(path)
+
+    # Verify path exists
+    if not os.path.exists(path):
+        return {"error": f"Path not found: {path}", "path": path}
+
+    try:
+        # Delete the file or directory
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+            return {"success": True, "path": path, "type": "directory"}
+        else:
+            os.remove(path)
+            return {"success": True, "path": path, "type": "file"}
+    except Exception as e:
+        return {"error": f"Error deleting: {str(e)}", "path": path}
+
+
+def create_file_or_folder(path: str, content: Optional[str] = None, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Create a file or folder in the workspace.
+
+    Args:
+        path: The path to the file or folder to create
+        content: Optional content for the file (if None and path has no extension, a folder is created)
+        ctx: Optional MCP context
+
+    Returns:
+        Dictionary containing the result of the operation
+
+    """
+    if ctx:
+        ctx.info(f"Creating: {path}")
+
+    # Normalize path and handle both absolute and relative paths
+    if not os.path.isabs(path):
+        workspace_root = os.getcwd()
+        path = os.path.join(workspace_root, path)
+
+    path = normalize_path(path)
+
+    # Check if the path already exists
+    if os.path.exists(path):
+        return {"error": f"Path already exists: {path}", "path": path}
+
+    # Ensure parent directory exists
+    parent_dir = os.path.dirname(path)
+    if not os.path.exists(parent_dir):
+        try:
+            os.makedirs(parent_dir)
+        except Exception as e:
+            return {"error": f"Error creating parent directory: {str(e)}", "path": path}
+
+    try:
+        # Determine if we're creating a file or directory
+        # If content is provided or path has an extension, create a file
+        is_file = content is not None or os.path.splitext(path)[1] != ""
+
+        if is_file:
+            with open(path, "w", encoding="utf-8") as f:
+                if content:
+                    f.write(content)
+            return {"success": True, "path": path, "type": "file"}
+        else:
+            os.makedirs(path, exist_ok=True)
+            return {"success": True, "path": path, "type": "directory"}
+    except Exception as e:
+        return {"error": f"Error creating: {str(e)}", "path": path}
+
+
 def delete_file(file_path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
     """Delete a file from the workspace.
 
