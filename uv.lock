@@ -565,7 +565,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "httpx" },
     { name = "hypothesis" },
     { name = "mypy" },
     { name = "pre-commit" },
@@ -588,7 +587,6 @@ requires-dist = [{ name = "mcp" }]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "httpx", specifier = ">=0.27.0" },
     { name = "hypothesis", specifier = ">=6.23.3" },
     { name = "mypy", specifier = "==1.15.0" },
     { name = "pre-commit", specifier = ">=2.20.0" },

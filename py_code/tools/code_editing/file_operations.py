@@ -4,7 +4,7 @@ import os
 import shutil
 from typing import Any, Dict, Optional
 
-from mcp.server.fastmcp import Context
+from mcp.server.fastmcp import Context  # type: ignore
 
 from ..utils.file_utils import normalize_path
 
@@ -35,6 +35,21 @@ def move_file_or_folder(source_path: str, destination_path: str, ctx: Optional[C
 
     source_path = normalize_path(source_path)
     destination_path = normalize_path(destination_path)
+
+    # Verify paths are within the working directory
+    if not source_path.startswith(workspace_root):
+        return {
+            "error": f"Source path must be within the working directory: {source_path}",
+            "source": source_path,
+            "destination": destination_path,
+        }
+
+    if not destination_path.startswith(workspace_root):
+        return {
+            "error": f"Destination path must be within the working directory: {destination_path}",
+            "source": source_path,
+            "destination": destination_path,
+        }
 
     # Verify source exists
     if not os.path.exists(source_path):
@@ -94,11 +109,19 @@ def delete_file_or_folder(path: str, ctx: Optional[Context] = None) -> Dict[str,
         ctx.info(f"Deleting: {path}")
 
     # Normalize path and handle both absolute and relative paths
+    workspace_root = os.getcwd()
+
     if not os.path.isabs(path):
-        workspace_root = os.getcwd()
         path = os.path.join(workspace_root, path)
 
     path = normalize_path(path)
+
+    # Verify path is within the working directory
+    if not path.startswith(workspace_root):
+        return {
+            "error": f"Path must be within the working directory: {path}",
+            "path": path,
+        }
 
     # Verify path exists
     if not os.path.exists(path):
@@ -132,11 +155,19 @@ def create_file_or_folder(path: str, content: Optional[str] = None, ctx: Optiona
         ctx.info(f"Creating: {path}")
 
     # Normalize path and handle both absolute and relative paths
+    workspace_root = os.getcwd()
+
     if not os.path.isabs(path):
-        workspace_root = os.getcwd()
         path = os.path.join(workspace_root, path)
 
     path = normalize_path(path)
+
+    # Verify path is within the working directory
+    if not path.startswith(workspace_root):
+        return {
+            "error": f"Path must be within the working directory: {path}",
+            "path": path,
+        }
 
     # Check if the path already exists
     if os.path.exists(path):

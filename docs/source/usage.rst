@@ -184,10 +184,10 @@ Element Counting
    print(response.json())
 
 File Operations
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Move File or Folder
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -204,7 +204,7 @@ Move File or Folder
    print(response.json())
 
 Delete File
-^^^^^^^^^^
+^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -220,7 +220,7 @@ Delete File
    print(response.json())
 
 Create File or Folder
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 

@@ -4,7 +4,7 @@ import functools
 import inspect
 from typing import Any, Callable, List, TypeVar, Union, cast
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP  # type: ignore
 
 F = TypeVar("F", bound=Callable[..., Any])
 

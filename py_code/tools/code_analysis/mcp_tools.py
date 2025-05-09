@@ -4,7 +4,7 @@ import ast
 import os
 from typing import Any, Dict, Optional
 
-from mcp.server.fastmcp import Context
+from mcp.server.fastmcp import Context  # type: ignore
 
 from ..utils.code_utils import read_code_from_path
 from .analyzer import CodeAnalyzer

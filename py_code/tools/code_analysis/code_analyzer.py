@@ -3,7 +3,7 @@
 import os
 from typing import Any, Dict, Optional
 
-from mcp.server.fastmcp import Context
+from mcp.server.fastmcp import Context  # type: ignore
 
 from .analyzer import CodeAnalyzer
 from .code_traversal import find_python_files, parse_gitignore, resolve_path_pattern

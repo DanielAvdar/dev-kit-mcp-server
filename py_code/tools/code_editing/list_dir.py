@@ -3,7 +3,7 @@
 import os
 from typing import Any, Dict, Optional
 
-from mcp.server.fastmcp import Context
+from mcp.server.fastmcp import Context  # type: ignore
 
 from ..utils.file_utils import normalize_path
 

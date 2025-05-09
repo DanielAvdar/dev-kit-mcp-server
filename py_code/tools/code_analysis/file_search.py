@@ -4,7 +4,7 @@ import glob
 import os
 from typing import Any, Dict, Optional
 
-from mcp.server.fastmcp import Context
+from mcp.server.fastmcp import Context  # type: ignore
 
 
 def file_search(query: str, ctx: Optional[Context] = None) -> Dict[str, Any]:

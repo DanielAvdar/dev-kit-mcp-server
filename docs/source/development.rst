@@ -44,8 +44,10 @@ Project Structure
 -----------------
 
 - ``py_code/``: Main package code
+
   - ``fastmcp_server.py``: FastMCP server implementation
   - ``tools/``: MCP tools implementation
+
     - ``code_analysis/``: Code analysis tools
     - ``code_editing/``: Code editing tools
     - ``utils/``: Utility functions
@@ -169,7 +171,7 @@ The project uses GitHub Actions for CI/CD:
 3. Coverage: Test coverage reporting
 
 Development Workflow
--------------------
+---------------------
 
 1. Create a feature branch from ``main``
 2. Make changes and add tests

@@ -4,7 +4,7 @@ import os
 import re
 from typing import Any, Dict, List, Optional
 
-from mcp.server.fastmcp import Context
+from mcp.server.fastmcp import Context  # type: ignore
 
 
 def list_code_usages(
