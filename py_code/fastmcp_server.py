@@ -9,6 +9,7 @@ from .tools.code_analysis.code_analyzer import analyze_code_files, parse_ast_fil
 from .tools.code_analysis.file_search import file_search
 from .tools.code_analysis.grep_search import grep_search
 from .tools.code_analysis.list_code_usages import list_code_usages
+from .tools.code_editing.file_operations import delete_file, move_file_or_folder
 from .tools.code_editing.list_dir import list_dir
 from .tools.code_editing.read_file import read_file
 from .tools.tool_factory import ToolFactory
@@ -16,7 +17,7 @@ from .tools.tool_factory import ToolFactory
 # Create the FastMCP server
 mcp = FastMCP(
     name="Python Code Analysis MCP",
-    instructions="This server analyzes Python code and repositories using AST and tokenize modules.",
+    instructions="This server analyzes Python code and repositories using AST and tokenize modules, and provides tools for file operations like reading, listing, moving, and deleting files.",
 )
 
 # Create a tool factory instance
@@ -111,6 +112,37 @@ def list_directory(path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
 
     """
     return list_dir(path, ctx)
+
+
+@mcp.tool(name="move_file_or_folder")
+def move_file_or_folder_tool(source_path: str, destination_path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Move a file or folder to a new location within the workspace.
+
+    Args:
+        source_path: The path to the file or folder to move
+        destination_path: The destination path where the file or folder will be moved
+        ctx: Optional context for logging
+
+    Returns:
+        A dictionary containing the result of the operation
+
+    """
+    return move_file_or_folder(source_path, destination_path, ctx)
+
+
+@mcp.tool(name="delete_file")
+def delete_file_tool(file_path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
+    """Delete a file from the workspace.
+
+    Args:
+        file_path: The path to the file to delete
+        ctx: Optional context for logging
+
+    Returns:
+        A dictionary containing the result of the operation
+
+    """
+    return delete_file(file_path, ctx)
 
 
 @mcp.tool(name="analyze_code")

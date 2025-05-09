@@ -74,13 +74,22 @@ Run the server with file watching:
 API Endpoints
 -------------
 
-The server provides several endpoints for analyzing Python code:
+The server provides several endpoints for analyzing Python code and performing file operations:
+
+Code Analysis Endpoints:
 
 - ``GET /``: Server information
 - ``POST /analyze``: Full code analysis
 - ``POST /ast``: AST-only analysis
 - ``POST /tokenize``: Token extraction
 - ``POST /count``: Element counting
+
+File Operations Endpoints:
+
+- ``POST /read_file_content``: Read the contents of a file
+- ``POST /list_directory``: List the contents of a directory
+- ``POST /move_file_or_folder``: Move a file or folder to a new location
+- ``POST /delete_file``: Delete a file from the workspace
 
 Example Requests
 ----------------
@@ -168,6 +177,42 @@ Element Counting
    response = requests.post(
        "http://localhost:8000/count",
        json={"code": code}
+   )
+
+   print(response.json())
+
+File Operations
+~~~~~~~~~~~~~~
+
+Move File or Folder
+^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+   import requests
+
+   response = requests.post(
+       "http://localhost:8000/move_file_or_folder",
+       json={
+           "source_path": "path/to/source/file.py",
+           "destination_path": "path/to/destination/file.py"
+       }
+   )
+
+   print(response.json())
+
+Delete File
+^^^^^^^^^^
+
+.. code-block:: python
+
+   import requests
+
+   response = requests.post(
+       "http://localhost:8000/delete_file",
+       json={
+           "file_path": "path/to/file/to/delete.py"
+       }
    )
 
    print(response.json())
