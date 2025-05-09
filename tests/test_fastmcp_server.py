@@ -1,6 +1,6 @@
 """Tests for the FastMCP server implementation."""
 
-from py_code.fastmcp_server import mcp
+from py_code.fastmcp_server import fastmcp
 
 
 def test_mcp_server_tools():
@@ -24,11 +24,11 @@ def test_mcp_server_tools():
 def test_mcp_server_name_and_instructions():
     """Test that the FastMCP server has the expected name and instructions."""
     # Check server name
-    assert mcp.name == "Python Code MCP Server"
+    assert fastmcp.name == "Python Code MCP Server"
 
     # Check server instructions
-    assert "file operations" in mcp.instructions
-    assert "create_dir_or_file" in mcp.instructions
-    assert "move_dir_or_file" in mcp.instructions
-    assert "remove_dir_or_file" in mcp.instructions
-    assert "authorized makefile commands" in mcp.instructions
+    assert "file operations" in fastmcp.instructions
+    assert "create_dir_or_file" in fastmcp.instructions
+    assert "move_dir_or_file" in fastmcp.instructions
+    assert "remove_dir_or_file" in fastmcp.instructions
+    assert "authorized makefile commands" in fastmcp.instructions

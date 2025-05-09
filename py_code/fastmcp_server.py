@@ -14,20 +14,20 @@ from .tools.code_editing.file_operations import (
 from .tools.tool_factory import ToolFactory
 
 # Create the FastMCP server
-mcp = FastMCP(
+fastmcp = FastMCP(
     name="Python Code MCP Server",
     instructions="This server provides tools for file operations (create_dir_or_file, move_dir_or_file, "
     "remove_dir_or_file) and running authorized makefile commands.",
 )
 
 # Create a tool factory instance
-tool_factory = ToolFactory(mcp)
+tool_factory = ToolFactory(fastmcp)
 
 
 # Create named wrappers for functions that we want to expose with specific names
 
 
-@mcp.tool(name="move_file_or_folder")
+@fastmcp.tool(name="move_file_or_folder")
 def move_file_or_folder_tool(source_path: str, destination_path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
     """Move a file or folder to a new location within the workspace.
 
@@ -43,7 +43,7 @@ def move_file_or_folder_tool(source_path: str, destination_path: str, ctx: Optio
     return move_file_or_folder(source_path, destination_path, ctx)
 
 
-@mcp.tool(name="delete_file_or_folder")
+@fastmcp.tool(name="delete_file_or_folder")
 def delete_file_or_folder_tool(path: str, ctx: Optional[Context] = None) -> Dict[str, Any]:
     """Delete a file or folder from the workspace.
 
@@ -58,7 +58,7 @@ def delete_file_or_folder_tool(path: str, ctx: Optional[Context] = None) -> Dict
     return delete_file_or_folder(path, ctx)
 
 
-@mcp.tool(name="create_file_or_folder")
+@fastmcp.tool(name="create_file_or_folder")
 def create_file_or_folder_tool(
     path: str, content: Optional[str] = None, ctx: Optional[Context] = None
 ) -> Dict[str, Any]:
@@ -76,7 +76,7 @@ def create_file_or_folder_tool(
     return create_file_or_folder(path, content, ctx)
 
 
-@mcp.tool(name="authorized_commands")
+@fastmcp.tool(name="authorized_commands")
 def authorized_commands(
     commands: List[str], makefile_dir: Optional[str] = None, ctx: Optional[Context] = None
 ) -> Dict[str, Any]:
@@ -162,7 +162,7 @@ def start_server(host: str = "0.0.0.0", port: int = 8000, working_dir: Optional[
     if working_dir:
         os.chdir(working_dir)
 
-    mcp.run(transport="sse", host=host, port=port)
+    fastmcp.run(transport="sse", host=host, port=port)
 
 
 if __name__ == "__main__":
