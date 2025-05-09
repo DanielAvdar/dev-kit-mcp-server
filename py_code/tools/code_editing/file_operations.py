@@ -4,7 +4,7 @@ import os
 import shutil
 from typing import Any, Dict, Optional
 
-from fastmcp import Context
+from mcp.server.fastmcp import Context
 
 from ..utils.file_utils import normalize_path
 

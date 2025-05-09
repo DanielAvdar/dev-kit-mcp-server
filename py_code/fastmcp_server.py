@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List, Optional
 
-from fastmcp import Context, FastMCP
+from mcp.server.fastmcp import FastMCP, Context
 
 from .tools.code_analysis.analyzer import CodeAnalyzer
 from .tools.code_analysis.code_analyzer import analyze_code_files, parse_ast_files

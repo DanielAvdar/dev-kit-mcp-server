@@ -5,7 +5,7 @@ import os
 import re
 from typing import Any, Dict, Optional, cast
 
-from fastmcp import Context
+from mcp.server.fastmcp import Context
 
 from ..utils import filter_binary_files
 

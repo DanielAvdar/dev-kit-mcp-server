@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 
 from py_code.tools.tool_factory import ToolFactory
 
