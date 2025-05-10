@@ -1,5 +1,11 @@
 """Code editing tools package."""
 
-from .file_operations import create_file_or_folder, delete_file_or_folder, move_file_or_folder
+from .create import CreateDirOperation
+from .move import MoveDirOperation
+from .remove import RemoveFileOperation
 
-__all__ = ["create_file_or_folder", "delete_file_or_folder", "move_file_or_folder"]
+__all__ = [
+    "CreateDirOperation",
+    "RemoveFileOperation",
+    "MoveDirOperation",
+]

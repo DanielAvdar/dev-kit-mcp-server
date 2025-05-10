@@ -35,24 +35,6 @@ class ToolFactory:
         """
         [self._decorate_function(func) for func in obj]
 
-    def add_pre_hook(self, hook: Callable[..., Any]) -> None:
-        """Add a hook to run before the decorated function.
-
-        Args:
-            hook: A function to call before the decorated function
-
-        """
-        self._pre_hooks.append(hook)
-
-    def add_post_hook(self, hook: Callable[..., Any]) -> None:
-        """Add a hook to run after the decorated function.
-
-        Args:
-            hook: A function to call after the decorated function
-
-        """
-        self._post_hooks.append(hook)
-
     def _decorate_function(self, func: Callable) -> None:
         """Decorate a function with MCP tool decorator and hooks.
 
