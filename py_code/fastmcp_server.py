@@ -3,33 +3,20 @@
 import argparse
 import os
 from pathlib import Path
+from typing import Dict
 
-from mcp.server.fastmcp import FastMCP  # type: ignore
+# from mcp.server.fastmcp import FastMCP  # type: ignore
+from fastmcp import FastMCP
 
 from .tools import CreateDirOperation, MoveDirOperation, RemoveFileOperation
 from .tools.commands_tool import MakeCommandsTool
 from .tools.tool_factory import ToolFactory
 
 
-def start_server() -> FastMCP:
+def start_server(root_dir=None) -> FastMCP:
     """Start the FastMCP server."""
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Start the FastMCP server")
-    parser.add_argument(
-        "--root-dir",
-        type=str,
-        default=os.getcwd(),
-        help="Root directory for file operations (default: current working directory)",
-    )
-    args = parser.parse_args()
-
-    # Validate root directory
-    root_dir = args.root_dir
-    root_path = Path(root_dir)
-    if not root_path.exists():
-        raise ValueError(f"Root directory does not exist: {root_dir}")
-    if not root_path.is_dir():
-        raise ValueError(f"Root directory is not a directory: {root_dir}")
+    root_dir = root_dir or method_name()
 
     # Create a FastMCP instance
     fastmcp = FastMCP(
@@ -38,15 +25,42 @@ def start_server() -> FastMCP:
         "remove_dir_or_file) and running authorized makefile commands.",
     )
 
+    def move_dir_tool(path: str) -> Dict[str, str]:
+        """Tool to move directories or files."""
+        return MoveDirOperation(root_dir=root_dir)(path)
+
+    # move_dir_tool.name = "move_dir_tool"
+    # move_dir_tool.__name__ = "move_dir_tool"
     # Create a tool factory instance
+    # fastmcp.add_tool(move_dir_tool)
     tool_factory = ToolFactory(fastmcp)
     tool_factory([
+        # move_dir_tool,
         MoveDirOperation(root_dir=root_dir),
         CreateDirOperation(root_dir=root_dir),
         RemoveFileOperation(root_dir=root_dir),
         MakeCommandsTool(root_dir=root_dir),
     ])
     return fastmcp
+
+
+def method_name():
+    parser = argparse.ArgumentParser(description="Start the FastMCP server")
+    parser.add_argument(
+        "--root-dir",
+        type=str,
+        default=os.getcwd(),
+        help="Root directory for file operations (default: current working directory)",
+    )
+    args = parser.parse_args()
+    # Validate root directory
+    root_dir = args.root_dir
+    root_path = Path(root_dir)
+    if not root_path.exists():
+        raise ValueError(f"Root directory does not exist: {root_dir}")
+    if not root_path.is_dir():
+        raise ValueError(f"Root directory is not a directory: {root_dir}")
+    return root_dir
 
 
 def run_server():

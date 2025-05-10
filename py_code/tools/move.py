@@ -6,8 +6,9 @@ from typing import Any, Dict
 from .file_ops import FileOperation
 
 
-@dataclass
+@dataclass(unsafe_hash=True, slots=True)
 class MoveDirOperation(FileOperation):
+    # __slots__ = ("_root_path",)
     """Class to move a file or folder in the workspace."""
 
     name = "move_dir_tool"

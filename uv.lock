@@ -251,7 +251,7 @@ wheels = [
 
 [[package]]
 name = "fastmcp"
-version = "2.3.1"
+version = "2.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "exceptiongroup" },
@@ -263,9 +263,9 @@ dependencies = [
     { name = "typer" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a8/ff/4632edd70a9bab7c2bca88700eba92a7bdac6a7dc80e2cd5feda4b792cab/fastmcp-2.3.1.tar.gz", hash = "sha256:82025d1c5520a931140ba75b47beed1e47f64f5c75d63e51f8ed1ad288bee6de", size = 984101, upload-time = "2025-05-09T22:11:13.037Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/78/fd9f82886ecf04826ed3f5bbfe8c5e400ba77d2cee66258f8a19e3ea01c8/fastmcp-2.3.3.tar.gz", hash = "sha256:f13f87e180158e8176074c2a39a363bfd1ad4283a259377463c81c7735619106", size = 990228, upload-time = "2025-05-10T20:16:56.724Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6a/2d/ad50340d6bc70e385a25754006bdd32e2f58de7d15c1265269622928a71d/fastmcp-2.3.1-py3-none-any.whl", hash = "sha256:78562a1ec0b09581ff05faf05802582e6ddea76dac5a9be146c29e6174f35c7b", size = 92227, upload-time = "2025-05-09T22:11:11.879Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/25/d49eb31b653f8f6fcd496e5abaedef9bdd5b71fac102cb9220d5df4d016e/fastmcp-2.3.3-py3-none-any.whl", hash = "sha256:c4dcd809f4e058aea3fd158952ff51294f2392871de3a870183d61cde032787f", size = 92749, upload-time = "2025-05-10T20:16:55.227Z" },
 ]
 
 [[package]]
@@ -612,12 +612,12 @@ wheels = [
 name = "py-code-mcp-server"
 source = { editable = "." }
 dependencies = [
+    { name = "fastmcp" },
     { name = "mcp" },
 ]
 
 [package.dev-dependencies]
 dev = [
-    { name = "fastmcp" },
     { name = "hypothesis" },
     { name = "mypy" },
     { name = "pre-commit" },
@@ -635,11 +635,13 @@ docs = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "mcp" }]
+requires-dist = [
+    { name = "fastmcp", specifier = ">=2.3.3" },
+    { name = "mcp" },
+]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "fastmcp", specifier = ">=0.1.0" },
     { name = "hypothesis", specifier = ">=6.23.3" },
     { name = "mypy", specifier = "==1.15.0" },
     { name = "pre-commit", specifier = ">=2.20.0" },

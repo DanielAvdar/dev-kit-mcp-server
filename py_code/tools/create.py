@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 from .file_ops import FileOperation
 
@@ -55,3 +55,18 @@ class CreateDirOperation(FileOperation):
                 "error": f"Error creating file or folder: {str(e)}",
                 "path": path,
             }
+
+    def self_warpper(
+        self,
+    ) -> Callable:
+        """Return the self wrapper."""
+
+        def self_wrapper(
+            path: str,
+        ) -> Dict[str, Any]:
+            """Run makefile commands."""
+            return self.__call__(path)
+
+        self_wrapper.__name__ = self.name
+
+        return self_wrapper

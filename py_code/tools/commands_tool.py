@@ -1,6 +1,6 @@
 import subprocess
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from .file_ops import FileOperation
 
@@ -51,7 +51,6 @@ class MakeCommandsTool(FileOperation):
             A dictionary containing the command output and status
 
         """
-
         for c in commands:
             # Check for malicious characters
             if any(char in c for char in self.malicious_chars):
@@ -83,3 +82,18 @@ class MakeCommandsTool(FileOperation):
                 "error": f"Error running makefile commands: {str(e)}",
                 "commands": commands,
             }
+
+    def self_warpper(
+        self,
+    ) -> Callable:
+        """Return the self wrapper."""
+
+        def self_wrapper(
+            commands: List[str],
+        ) -> Dict[str, Any]:
+            """Run makefile commands."""
+            return self.__call__(commands)
+
+        self_wrapper.__name__ = self.name
+
+        return self_wrapper

@@ -37,8 +37,8 @@ class TestFastMCPServer:
 
         # Check that the tools were registered
         # Since list_tools is a coroutine, we need to run it in an event loop
-        tools = asyncio.run(server.list_tools())
-        tool_names = [tool.name for tool in tools]
+        tools = asyncio.run(server.get_tools())
+        tool_names = [tool.name for tool in tools.values()]
         assert "create_dir_tool" in tool_names
         assert "move_dir_tool" in tool_names
         assert "remove_file_tool" in tool_names
@@ -60,8 +60,8 @@ class TestFastMCPServer:
 
         # Check that the tools were registered
         # Since list_tools is a coroutine, we need to run it in an event loop
-        tools = asyncio.run(server.list_tools())
-        tool_names = [tool.name for tool in tools]
+        tools = asyncio.run(server.get_tools())
+        tool_names = [tool.name for tool in tools.values()]
         assert "create_dir_tool" in tool_names
         assert "move_dir_tool" in tool_names
         assert "remove_file_tool" in tool_names

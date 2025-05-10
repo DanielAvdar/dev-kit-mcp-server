@@ -54,4 +54,4 @@ class ToolFactory:
             annotations=ToolAnnotations(
                 destructiveHint=True,
             ),
-        )(func)
+        )(func.self_warpper())

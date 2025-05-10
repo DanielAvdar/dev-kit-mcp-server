@@ -1,7 +1,8 @@
 import abc
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
+
 
 @dataclass
 class _Operation:
@@ -42,10 +43,9 @@ class _Operation:
             raise ValueError(f"Path is not within the root directory: {root_path.as_posix()}")
         return abs_path.as_posix()
 
-@dataclass
+
+@dataclass(unsafe_hash=True, slots=True)
 class FileOperation(_Operation):
-
-
     @abc.abstractmethod
     def __call__(
         self,
@@ -54,8 +54,31 @@ class FileOperation(_Operation):
     ) -> Dict[str, Any]:
         """Perform the file operation and return the result."""
 
+    # @abc.abstractmethod
+    #
+    # def self_warpper(self, ) -> Callable:
+    #     """Wrap the operation in a self-contained function."""
+    #     # def w_func(*args: Optional[Tuple], **kwargs: Optional[dict]) -> Dict[str, Any]:
+    #     #     return self.__call__(*args, **kwargs)
+    #     # w_func.__name__ = self.name
+    #     # return w_func
+    def self_warpper(
+        self,
+    ) -> Callable:
+        """Return the self wrapper."""
 
-@dataclass
+        def self_wrapper(
+            path: str,
+        ) -> Dict[str, Any]:
+            """Run makefile commands."""
+            return self.__call__(path)
+
+        self_wrapper.__name__ = self.name
+
+        return self_wrapper
+
+
+@dataclass(unsafe_hash=True, slots=True)
 class AsyncOperation(_Operation):
     @abc.abstractmethod
     async def __call__(
@@ -64,3 +87,13 @@ class AsyncOperation(_Operation):
         **kwargs: Optional[dict],
     ) -> Dict[str, Any]:
         """Perform the file operation and return the result."""
+
+    @abc.abstractmethod
+    def self_warpper(
+        self,
+    ) -> Callable:
+        """Wrap the operation in a self-contained function."""
+        # async def w_func(*args: Optional[Tuple], **kwargs: Optional[dict]) -> Dict[str, Any]:
+        #     return await self.__call__(*args, **kwargs)
+        # w_func.__name__ = self.name
+        # return w_func
