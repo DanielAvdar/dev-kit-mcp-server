@@ -7,8 +7,7 @@ from typing import Generator, Tuple
 
 import pytest
 
-from py_code.tools.code_editing import CreateDirOperation, MoveDirOperation, RemoveFileOperation
-from py_code.tools.code_editing.file_ops import FileOperation
+from py_code.tools import CreateDirOperation, FileOperation, MoveDirOperation, RemoveFileOperation
 
 
 @pytest.fixture
@@ -41,10 +40,7 @@ def remove_operation(temp_root_dir: str) -> RemoveFileOperation:
         "/test_file.txt",
         "./test_file.txt",
         "new_folder",
-"examples/test_relative_path"
-"/examples/test_relative_path"
-"/examples/../test_relative_path"
-
+        "examples/test_relative_path/examples/test_relative_path/examples/../test_relative_path",
     ]
 )
 def valid_rel_path(request) -> str:

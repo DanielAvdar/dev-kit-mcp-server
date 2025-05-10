@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-from py_code.tools.code_editing.file_ops import FileOperation
+from .file_ops import FileOperation
 
 
 @dataclass

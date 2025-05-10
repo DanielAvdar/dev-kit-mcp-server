@@ -3,9 +3,10 @@
 from typing import Any, Callable, List
 
 from mcp.server.fastmcp import FastMCP  # type: ignore
-
-from py_code.tools.code_editing.file_ops import FileOperation
 from mcp.types import ToolAnnotations  # type: ignore
+
+from py_code.tools import FileOperation
+
 
 class ToolFactory:
     """Factory for creating MCP tools at runtime by decorating functions.
@@ -46,11 +47,11 @@ class ToolFactory:
         """
         # Add __name__ attribute to the function object for compatibility with FastMCP
         func.__name__ = func.name
-        description=f"Preferred from the terminal:\n{func.docstring}"
+        description = f"Preferred from the terminal:\n{func.docstring}"
         self.mcp.tool(
             func.name,
-            description=description ,
+            description=description,
             annotations=ToolAnnotations(
                 destructiveHint=True,
-            )
+            ),
         )(func)

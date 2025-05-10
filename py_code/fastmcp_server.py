@@ -7,6 +7,7 @@ from pathlib import Path
 from mcp.server.fastmcp import FastMCP  # type: ignore
 
 from .tools import CreateDirOperation, MoveDirOperation, RemoveFileOperation
+from .tools.commands_tool import CommandsTool
 from .tools.tool_factory import ToolFactory
 
 
@@ -43,7 +44,7 @@ def start_server() -> FastMCP:
         MoveDirOperation(root_dir=root_dir),
         CreateDirOperation(root_dir=root_dir),
         RemoveFileOperation(root_dir=root_dir),
-        # authorized_commands,
+        CommandsTool(root_dir=root_dir),
     ])
     return fastmcp
 
