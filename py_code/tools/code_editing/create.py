@@ -23,11 +23,10 @@ class CreateDirOperation(FileOperation):
 
         """
         # Validate that the path is within the root directory
-        if not self._validate_path_in_root(path):
-            raise ValueError(f"Path is not within the root directory: {path}")
+        abs_path = self._validate_path_in_root(path)
 
         # Create the folder
-        folder_path = Path(path)
+        folder_path = Path(abs_path)
         if folder_path.exists():
             raise FileExistsError(f"Path already exists: {path}")
 

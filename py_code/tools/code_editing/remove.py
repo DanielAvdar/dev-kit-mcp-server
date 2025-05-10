@@ -25,11 +25,10 @@ class RemoveFileOperation(FileOperation):
 
         """
         # Validate that the path is within the root directory
-        if not self._validate_path_in_root(path):
-            raise ValueError(f"Path is not within the root directory: {path}")
+        abs_path = self._validate_path_in_root(path)
 
         # Check if path exists
-        file_path = Path(path)
+        file_path = Path(abs_path)
         if not file_path.exists():
             raise FileNotFoundError(f"Path does not exist: {path}")
 

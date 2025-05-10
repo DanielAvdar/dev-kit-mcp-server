@@ -269,3 +269,27 @@ class TestRemoveFileOperation:
             # Clean up
             if os.path.exists(outside_path):
                 os.remove(outside_path)
+
+    @pytest.mark.parametrize(
+        "rel_path",
+        ["/test_file.txt", "./test_file.txt", "new_folder"],
+    )
+    def test_rel_path(
+        self,
+        rel_path: str,
+        remove_operation: RemoveFileOperation,
+        create_operation: CreateDirOperation,
+        move_operation: MoveDirOperation,
+    ) -> None:
+        """Test removing a file using a relative path."""
+        # Arrange
+        abs_path = remove_operation._root_path / rel_path
+        fun_abs_path = remove_operation.get_absolute_path(abs_path.as_posix())
+        fun_path = remove_operation.get_absolute_path(rel_path)
+        assert fun_abs_path == fun_path
+        create_operation(rel_path)
+        assert abs_path.exists()
+        res_remove = remove_operation(rel_path)
+        assert res_remove.get("status") == "success"
+        with pytest.raises(Exception):
+            remove_operation(f"../{rel_path}")

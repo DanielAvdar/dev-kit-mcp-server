@@ -17,10 +17,12 @@ class FileOperation:
         if not self._root_path.is_dir():
             raise Exception(f"Path is neither a file nor a directory: {self.root_dir}")
 
-    def _validate_path_in_root(self, path: str) -> bool:
+    def _validate_path_in_root(self, path: str) -> str:
         """Check if the given path is within the root directory."""
-        abs_path = Path(path).resolve()
-        return abs_path.is_relative_to(self._root_path)
+        abs_path = self.get_absolute_path(path)
+        if self._root_path.as_posix() not in abs_path.as_posix():
+            raise ValueError(f"Path is not within the root directory: {path}")
+        return abs_path.as_posix()
 
     @property
     def docstring(self) -> str:
@@ -39,3 +41,7 @@ class FileOperation:
     @abc.abstractmethod
     def name(self) -> str:
         """Return the name of the operation."""
+
+    def get_absolute_path(self, path: str) -> Path:
+        """Get the absolute path of the given path."""
+        return self._root_path / path

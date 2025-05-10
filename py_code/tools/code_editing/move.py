@@ -26,19 +26,22 @@ class MoveDirOperation(FileOperation):
             OSError: If there's an error moving the file or folder
 
         """
-        # Validate that both paths are within the root directory
-        if not self._validate_path_in_root(path1):
-            raise ValueError(f"Source path is not within the root directory: {path1}")
-        if not self._validate_path_in_root(path2):
-            raise ValueError(f"Destination path is not within the root directory: {path2}")
+        # # Validate that both paths are within the root directory
+        # if not self._validate_path_in_root(path1):
+        #     raise ValueError(f"Source path is not within the root directory: {path1}")
+        # if not self._validate_path_in_root(path2):
+        #     raise ValueError(f"Destination path is not within the root directory: {path2}")
+
+        abs_path1 = self._validate_path_in_root(path1)
+        abs_path2 = self._validate_path_in_root(path2)
 
         # Check if source exists
-        source_path = Path(path1)
+        source_path = Path(abs_path1)
         if not source_path.exists():
             raise FileNotFoundError(f"Source path does not exist: {path1}")
 
         # Check if destination exists
-        dest_path = Path(path2)
+        dest_path = Path(abs_path2)
         if dest_path.exists():
             raise FileExistsError(f"Destination path already exists: {path2}")
 
