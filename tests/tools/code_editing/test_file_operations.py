@@ -2,11 +2,13 @@
 
 import os
 import tempfile
+from pathlib import Path
 from typing import Generator, Tuple
 
 import pytest
 
 from py_code.tools.code_editing import CreateDirOperation, MoveDirOperation, RemoveFileOperation
+from py_code.tools.code_editing.file_ops import FileOperation
 
 
 @pytest.fixture
@@ -32,6 +34,27 @@ def move_operation(temp_root_dir: str) -> MoveDirOperation:
 def remove_operation(temp_root_dir: str) -> RemoveFileOperation:
     """Create a RemoveFileOperation instance with a temporary root directory."""
     return RemoveFileOperation(root_dir=temp_root_dir)
+
+@pytest.fixture(
+    params=[
+        '/test_file.txt',
+        './test_file.txt',
+        'new_folder',
+
+    ]
+)
+def rel_path(request) -> str:
+    """Fixture to provide a relative path for testing."""
+    return request.param
+@pytest.fixture(
+    params=[
+        False,
+        True,
+    ]
+)
+def as_abs(request) -> bool:
+    """Fixture to provide a boolean for absolute path testing."""
+    return request.param
 
 
 @pytest.fixture
@@ -270,26 +293,67 @@ class TestRemoveFileOperation:
             if os.path.exists(outside_path):
                 os.remove(outside_path)
 
-    @pytest.mark.parametrize(
-        "rel_path",
-        ["/test_file.txt", "./test_file.txt", "new_folder"],
-    )
-    def test_rel_path(
+    # @pytest.mark.parametrize(
+    #     "rel_path",
+    #     ["/test_file.txt", "./test_file.txt", "new_folder"],
+    # )
+    # @pytest.mark.parametrize(
+    #     "as_abs",
+    #     [False, True],
+    # )
+    def test_rel_path_conversion(
         self,
         rel_path: str,
+        as_abs: bool,
         remove_operation: RemoveFileOperation,
         create_operation: CreateDirOperation,
         move_operation: MoveDirOperation,
     ) -> None:
         """Test removing a file using a relative path."""
         # Arrange
-        abs_path = remove_operation._root_path / rel_path
-        fun_abs_path = remove_operation.get_absolute_path(abs_path.as_posix())
-        fun_path = remove_operation.get_absolute_path(rel_path)
+        abs_path = Path(remove_operation._root_path.as_posix()+rel_path).resolve()
+        assert remove_operation._root_path.as_posix() in abs_path.as_posix()
+        root_path=remove_operation._root_path
+        if as_abs:
+            rel_path = abs_path.as_posix()
+        fun_abs_path = FileOperation.get_absolute_path(root_path,abs_path.as_posix())
+        fun_path = FileOperation.get_absolute_path(root_path,rel_path)
+
         assert fun_abs_path == fun_path
-        create_operation(rel_path)
-        assert abs_path.exists()
-        res_remove = remove_operation(rel_path)
+
+    def test_invalid_path(
+        self,
+        rel_path: str,
+        as_abs: bool,
+        remove_operation: RemoveFileOperation,
+        create_operation: CreateDirOperation,
+        move_operation: MoveDirOperation,
+    ) -> None:
+        """Test removing a file using an invalid path."""
+        root_path = remove_operation._root_path
+        fun_path = FileOperation.get_absolute_path(root_path,rel_path)
+        if as_abs:
+            rel_path = fun_path.as_posix()
+        res_creat = create_operation(rel_path)
+        assert res_creat.get("status") == "success"
+        res_create_folder = create_operation('some_folder')
+        assert res_create_folder.get("status") == "success"
+        res_move = move_operation(rel_path, 'some_folder')
+        assert res_move.get("status") == "success"
+        assert os.path.exists('some_folder')
+        assert os.path.isdir('some_folder')
+        res_remove = remove_operation('some_folder')
         assert res_remove.get("status") == "success"
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             remove_operation(f"../{rel_path}")
+        with pytest.raises(ValueError):
+            move_operation(f"../{rel_path}", 'some_folder')
+        with pytest.raises(ValueError):
+            create_operation(f"../{rel_path}")
+
+        # res_creat = create_operation(rel_path)
+        # assert res_creat.get("status") == "success"
+        # res_remove = remove_operation(rel_path)
+        # assert res_remove.get("status") == "success"
+        # with pytest.raises(ValueError):
+        #     remove_operation(f"../{rel_path}")

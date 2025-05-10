@@ -19,7 +19,8 @@ class FileOperation:
 
     def _validate_path_in_root(self, path: str) -> str:
         """Check if the given path is within the root directory."""
-        abs_path = self.get_absolute_path(path)
+        root_path = Path(self.root_dir)
+        abs_path = self.get_absolute_path(root_path,path)
         if self._root_path.as_posix() not in abs_path.as_posix():
             raise ValueError(f"Path is not within the root directory: {path}")
         return abs_path.as_posix()
@@ -41,7 +42,9 @@ class FileOperation:
     @abc.abstractmethod
     def name(self) -> str:
         """Return the name of the operation."""
-
-    def get_absolute_path(self, path: str) -> Path:
+    @staticmethod
+    def get_absolute_path(root_path:Path, path: str) -> Path:
         """Get the absolute path of the given path."""
-        return self._root_path / path
+        if Path(path).is_absolute():
+            return Path(path).resolve()
+        return Path(root_path.as_posix()+path).resolve()
