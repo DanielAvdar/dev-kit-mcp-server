@@ -44,6 +44,9 @@ class ToolFactory:
             func: Function to decorate
 
         """
+        # Add __name__ attribute to the function object for compatibility with FastMCP
+        func.__name__ = func.name
+
         self.mcp.tool(
             func.name,
             description=func.docstring or "No description provided",

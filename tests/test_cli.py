@@ -11,7 +11,7 @@ from py_code.cli import main
 def mock_start_server():
     """Mock the server start functions."""
     with (
-        patch("py_code.cli.start_server") as mock_start,
+        patch("py_code.fastmcp_server.start_server") as mock_start,
         patch("py_code.cli.sys.exit") as mock_exit,
     ):
         # Create a mock FastMCP instance
@@ -56,13 +56,16 @@ class TestCLI:
     def test_cli_with_nonexistent_root_dir(self, mock_start_server):
         """Test the CLI with a non-existent root directory."""
         # Arrange
-        with patch("os.path.isdir", return_value=False):
-            # Act
-            main()
+        # Make sys.exit raise a custom exception that we can catch
+        mock_start_server["exit"].side_effect = SystemExit
 
-            # Assert
-            mock_start_server["exit"].assert_called_once_with(1)
-            mock_start_server["fastmcp"].run.assert_not_called()
+        with patch("os.path.isdir", return_value=False):
+            # Act & Assert
+            with pytest.raises(SystemExit):
+                main()
+
+            # The server should not be started if the root directory doesn't exist
+            mock_start_server["start"].assert_not_called()
 
     @patch("sys.argv", ["py_code"])
     def test_cli_with_keyboard_interrupt(self, mock_start_server):

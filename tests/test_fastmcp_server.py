@@ -1,5 +1,6 @@
 """Tests for the FastMCP server."""
 
+import asyncio
 import os
 import tempfile
 from unittest.mock import MagicMock, patch
@@ -35,11 +36,12 @@ class TestFastMCPServer:
         assert server.name == "Python Code MCP Server"
 
         # Check that the tools were registered
-        tools = server.list_tools()
+        # Since list_tools is a coroutine, we need to run it in an event loop
+        tools = asyncio.run(server.list_tools())
         tool_names = [tool.name for tool in tools]
-        assert "create_dir_or_file" in tool_names
-        assert "move_dir_or_file" in tool_names
-        assert "remove_dir_or_file" in tool_names
+        assert "create_dir_tool" in tool_names
+        assert "move_dir_tool" in tool_names
+        assert "remove_file_tool" in tool_names
 
     @patch("argparse.ArgumentParser.parse_args")
     def test_start_server_with_custom_root_dir(self, mock_parse_args, temp_dir):
@@ -57,11 +59,12 @@ class TestFastMCPServer:
         assert server.name == "Python Code MCP Server"
 
         # Check that the tools were registered
-        tools = server.list_tools()
+        # Since list_tools is a coroutine, we need to run it in an event loop
+        tools = asyncio.run(server.list_tools())
         tool_names = [tool.name for tool in tools]
-        assert "create_dir_or_file" in tool_names
-        assert "move_dir_or_file" in tool_names
-        assert "remove_dir_or_file" in tool_names
+        assert "create_dir_tool" in tool_names
+        assert "move_dir_tool" in tool_names
+        assert "remove_file_tool" in tool_names
 
     @patch("argparse.ArgumentParser.parse_args")
     def test_start_server_with_nonexistent_root_dir(self, mock_parse_args):

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP  # type: ignore
 
-from .tools.code_editing import CreateDirOperation, MoveDirOperation, RemoveFileOperation
+from .tools import CreateDirOperation, MoveDirOperation, RemoveFileOperation
 from .tools.tool_factory import ToolFactory
 
 
