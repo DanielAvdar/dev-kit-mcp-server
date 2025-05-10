@@ -6,7 +6,7 @@ from .file_ops import FileOperation
 
 
 @dataclass
-class CommandsTool(FileOperation):
+class MakeCommandsTool(FileOperation):
     """Class to run makefile commands."""
 
     name = "commands_tool"
@@ -51,27 +51,10 @@ class CommandsTool(FileOperation):
             A dictionary containing the command output and status
 
         """
-        malicious_chars = [
-            "&",
-            "|",
-            ";",
-            "`",
-            "$",
-            "<",
-            ">",
-            "(",
-            ")",
-            "{",
-            "}",
-            "[",
-            "]",
-            "\\",
-            '"',
-            "'",
-        ]
+
         for c in commands:
             # Check for malicious characters
-            if any(char in c for char in malicious_chars):
+            if any(char in c for char in self.malicious_chars):
                 return {
                     "error": f"For complex commands please use the Terminal.{c} is not allowed.",
                     "commands": commands,

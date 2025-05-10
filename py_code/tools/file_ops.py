@@ -3,9 +3,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-
 @dataclass
-class FileOperation:
+class _Operation:
     root_dir: str
     _root_path: Path = field(init=False, repr=False)
 
@@ -21,14 +20,6 @@ class FileOperation:
     def docstring(self) -> str:
         """Return the docstring of the class."""
         return self.__call__.__doc__ or "No docstring provided"
-
-    @abc.abstractmethod
-    def __call__(
-        self,
-        *args: Optional[Tuple],
-        **kwargs: Optional[dict],
-    ) -> Dict[str, Any]:
-        """Perform the file operation and return the result."""
 
     @property
     @abc.abstractmethod
@@ -50,3 +41,26 @@ class FileOperation:
         if root_path.as_posix() not in abs_path.as_posix():
             raise ValueError(f"Path is not within the root directory: {root_path.as_posix()}")
         return abs_path.as_posix()
+
+@dataclass
+class FileOperation(_Operation):
+
+
+    @abc.abstractmethod
+    def __call__(
+        self,
+        *args: Optional[Tuple],
+        **kwargs: Optional[dict],
+    ) -> Dict[str, Any]:
+        """Perform the file operation and return the result."""
+
+
+@dataclass
+class AsyncOperation(_Operation):
+    @abc.abstractmethod
+    async def __call__(
+        self,
+        *args: Optional[Tuple],
+        **kwargs: Optional[dict],
+    ) -> Dict[str, Any]:
+        """Perform the file operation and return the result."""
