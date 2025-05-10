@@ -25,7 +25,8 @@ class RemoveFileOperation(FileOperation):
 
         """
         # Validate that the path is within the root directory
-        abs_path = self._validate_path_in_root(path)
+        root_path = self._root_path
+        abs_path = self._validate_path_in_root(root_path, path)
 
         # Check if path exists
         file_path = Path(abs_path)
