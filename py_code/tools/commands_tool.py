@@ -60,29 +60,8 @@ class MakeCommandsTool(_Operation):
         # make_cmd:Dict[str, List[str]] = {}
         result: Dict[str, Any] = {}
         for cmd in commands:
-            shlex_cmd = self._make_shlex_cmds.get(cmd)
-
-            try:
-                # Run the command and capture output
-                shlex_result = subprocess.run(
-                    shlex_cmd,
-                    capture_output=True,
-                    text=True,
-                    check=False,  # Don't raise an exception on non-zero exit code
-                )
-
-                result[cmd] = {
-                    "command": shlex_cmd,
-                    "stdout": shlex_result.stdout,
-                    "stderr": shlex_result.stderr,
-                    "returncode": shlex_result.returncode,
-                }
-            except Exception as e:
-                result[cmd] = {
-                    "error": f"Error running makefile commands: {str(e)}",
-                    "command": shlex_cmd,
-                    "commands": commands,
-                }
+            await self._exec_commands(cmd, commands, result)
+        return result
 
     def self_warpper(
         self,
@@ -98,3 +77,31 @@ class MakeCommandsTool(_Operation):
         self_wrapper.__name__ = self.name
 
         return self_wrapper
+
+    def _parse_makefile_commands(self):
+        makefile_content = self._read_makefile()
+        makefile_lines = makefile_content.splitlines()
+
+    async def _exec_commands(self, cmd, commands, result):
+        shlex_cmd = self._make_shlex_cmds.get(cmd)
+        try:
+            # Run the command and capture output
+            shlex_result = subprocess.run(
+                shlex_cmd,
+                capture_output=True,
+                text=True,
+                check=False,  # Don't raise an exception on non-zero exit code
+            )
+
+            result[cmd] = {
+                "command": shlex_cmd,
+                "stdout": shlex_result.stdout,
+                "stderr": shlex_result.stderr,
+                "returncode": shlex_result.returncode,
+            }
+        except Exception as e:
+            result[cmd] = {
+                "error": f"Error running makefile commands: {str(e)}",
+                "command": shlex_cmd,
+                "commands": commands,
+            }
