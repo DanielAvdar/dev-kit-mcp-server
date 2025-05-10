@@ -1,5 +1,9 @@
 """Python Code MCP Server package."""
 
-from .version import __version__
+from importlib.metadata import version
 
-__all__ = ["__version__"]
+from .fastmcp_server import start_server, run_server
+
+__version__ = version("py-code-mcp-server")
+
+__all__ = [ "run_server"]

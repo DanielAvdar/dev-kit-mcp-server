@@ -33,7 +33,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mcpx = "py_code_mcp_server.__main__:main"
+py-code-mcp-server = "py_code:run_server"
 
 [dependency-groups]
 dev = [
@@ -45,8 +45,10 @@ dev = [
     "mypy==1.15.0",
     "pytest-parametrization>=2022",
     "ruff>=0.8.2",
-    "sybil[pytest]",
-    "pytest-asyncio>=0.23.5"
+    "pytest-asyncio>=0.23.5",
+    "fastmcp>=0.1.0",
+
+
 ]
 docs = [
     "sphinx>=8.2.0; python_version >= '3.11'",
