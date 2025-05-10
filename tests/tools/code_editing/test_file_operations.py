@@ -41,6 +41,10 @@ def remove_operation(temp_root_dir: str) -> RemoveFileOperation:
         "/test_file.txt",
         "./test_file.txt",
         "new_folder",
+"examples/test_relative_path"
+"/examples/test_relative_path"
+"/examples/../test_relative_path"
+
     ]
 )
 def valid_rel_path(request) -> str:
