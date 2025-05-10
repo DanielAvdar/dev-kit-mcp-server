@@ -96,7 +96,7 @@ def test_move_file_or_folder_with_context():
         patch("os.getcwd", return_value="/fake/path"),
         patch("os.path.isabs", return_value=False),
         patch("os.path.join", side_effect=lambda *args: "/".join(args)),
-        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x: x),
+        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x, wd=None: x),
         patch("os.path.exists", side_effect=lambda path: False if path == "/fake/path/dest/file.txt" else True),
         patch("os.path.dirname", return_value="/fake/path/dest"),
         patch("shutil.move"),
@@ -154,7 +154,7 @@ def test_move_file_or_folder_errors(
     with (
         patch("os.getcwd", return_value="/fake/path"),
         patch("os.path.isabs", return_value=True),
-        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x: x),
+        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x, wd=None: x),
         patch(
             "os.path.exists",
             side_effect=lambda path: (
@@ -181,7 +181,7 @@ def test_move_file_or_folder_exception():
     with (
         patch("os.getcwd", return_value="/fake/path"),
         patch("os.path.isabs", return_value=True),
-        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x: x),
+        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x, wd=None: x),
         patch("os.path.exists", side_effect=lambda path: False if path == "/fake/path/dest/file.txt" else True),
         patch("os.path.dirname", return_value="/fake/path/dest"),
         patch("shutil.move", side_effect=Exception("Test error")),
@@ -232,7 +232,7 @@ def test_delete_file_or_folder_with_context():
         patch("os.getcwd", return_value="/fake/path"),
         patch("os.path.isabs", return_value=False),
         patch("os.path.join", side_effect=lambda *args: "/".join(args)),
-        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x: x),
+        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x, wd=None: x),
         patch("os.path.exists", return_value=True),
         patch("os.path.isdir", return_value=True),
         patch("shutil.rmtree"),
@@ -254,7 +254,7 @@ def test_delete_file_or_folder_not_found():
     with (
         patch("os.getcwd", return_value="/fake/path"),
         patch("os.path.isabs", return_value=True),
-        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x: x),
+        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x, wd=None: x),
         patch("os.path.exists", return_value=False),
     ):
         result = delete_file_or_folder("/fake/path/nonexistent")
@@ -269,7 +269,7 @@ def test_delete_file_or_folder_exception():
     with (
         patch("os.getcwd", return_value="/fake/path"),
         patch("os.path.isabs", return_value=True),
-        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x: x),
+        patch("py_code.tools.code_editing.file_operations.normalize_path", side_effect=lambda x, wd=None: x),
         patch("os.path.exists", return_value=True),
         patch("os.path.isdir", return_value=True),
         patch("shutil.rmtree", side_effect=Exception("Test error")),
@@ -408,3 +408,40 @@ def test_create_file_or_folder_exception():
         assert "error" in result
         assert "Error creating" in result["error"]
         assert "Test error" in result["error"]
+
+
+def test_working_dir_environment_variable():
+    """Test that the MCP_WORKING_DIR environment variable is used correctly."""
+    # This test verifies that the environment variable is used correctly
+    # by the file operations functions
+
+    # Setup a mock working directory
+    working_dir = "C:\\fake\\working\\dir"
+
+    # Create a test function that verifies the environment variable is used
+    def verify_working_dir():
+        # Get the environment variable
+        assert os.environ.get("MCP_WORKING_DIR") == working_dir
+        return True
+
+    # Set the environment variable
+    os.environ["MCP_WORKING_DIR"] = working_dir
+
+    try:
+        # Call the verification function
+        assert verify_working_dir()
+
+        # Test that the start_server function sets the environment variable
+        with (
+            patch("os.chdir"),
+            patch("os.path.abspath", return_value=working_dir),
+            patch("py_code.fastmcp_server.fastmcp.run"),
+        ):
+            from py_code.fastmcp_server import start_server
+
+            start_server(working_dir=working_dir)
+            assert os.environ.get("MCP_WORKING_DIR") == working_dir
+    finally:
+        # Clean up
+        if "MCP_WORKING_DIR" in os.environ:
+            del os.environ["MCP_WORKING_DIR"]

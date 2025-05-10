@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from py_code.fastmcp_server import authorized_commands
+from py_code.tools.commands_tool import authorized_commands
 
 
 def test_authorized_commands_success():

@@ -13,9 +13,16 @@ def main() -> None:
     )
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind the server to (default: 0.0.0.0)")
     parser.add_argument("--port", type=int, default=8000, help="Port to bind the server to (default: 8000)")
-    parser.add_argument("--working-dir", type=str, required=True, help="Root directory for the server operations")
+    parser.add_argument(
+        "--working-dir", type=str, help="Root directory for the server operations (defaults to current directory)"
+    )
 
     args = parser.parse_args()
+
+    # Set default working directory if not provided
+    if args.working_dir is None:
+        args.working_dir = os.getcwd()
+        print(f"No working directory specified, using current directory: {args.working_dir}")
 
     # Validate working directory
     if not os.path.isdir(args.working_dir):
@@ -23,8 +30,7 @@ def main() -> None:
         sys.exit(1)
 
     print(f"Starting Python Code MCP Server on {args.host}:{args.port}")
-    if args.working_dir:
-        print(f"Working directory: {args.working_dir}")
+    print(f"Working directory: {args.working_dir}")
 
     try:
         from .fastmcp_server import start_server
