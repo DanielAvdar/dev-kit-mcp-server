@@ -2,11 +2,11 @@ import subprocess
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 
-from .file_ops import FileOperation
+from .file_ops import _Operation
 
 
 @dataclass
-class MakeCommandsTool(FileOperation):
+class MakeCommandsTool(_Operation):
     """Class to run makefile commands."""
 
     name = "commands_tool"
@@ -33,7 +33,13 @@ class MakeCommandsTool(FileOperation):
         "?",
     ]
 
-    def __call__(
+    def __post_init__(self) -> None:
+        """Post-initialization to set the root path."""
+        # Set the root path to the current working directory
+        super().__post_init__()
+        self._make_shlex_cmds: Dict[str, List[str]] = self._parse_makefile_commands()
+
+    async def __call__(
         self,
         commands: List[str],
     ) -> Dict[str, Any]:
@@ -51,48 +57,43 @@ class MakeCommandsTool(FileOperation):
             A dictionary containing the command output and status
 
         """
-        for c in commands:
-            # Check for malicious characters
-            if any(char in c for char in self.malicious_chars):
-                return {
-                    "error": f"For complex commands please use the Terminal.{c} is not allowed.",
+        # make_cmd:Dict[str, List[str]] = {}
+        result: Dict[str, Any] = {}
+        for cmd in commands:
+            shlex_cmd = self._make_shlex_cmds.get(cmd)
+
+            try:
+                # Run the command and capture output
+                shlex_result = subprocess.run(
+                    shlex_cmd,
+                    capture_output=True,
+                    text=True,
+                    check=False,  # Don't raise an exception on non-zero exit code
+                )
+
+                result[cmd] = {
+                    "command": shlex_cmd,
+                    "stdout": shlex_result.stdout,
+                    "stderr": shlex_result.stderr,
+                    "returncode": shlex_result.returncode,
+                }
+            except Exception as e:
+                result[cmd] = {
+                    "error": f"Error running makefile commands: {str(e)}",
+                    "command": shlex_cmd,
                     "commands": commands,
                 }
-        make_cmd = [
-            "make",
-        ] + commands
-
-        try:
-            # Run the command and capture output
-            result = subprocess.run(
-                make_cmd,
-                capture_output=True,
-                text=True,
-                check=False,  # Don't raise an exception on non-zero exit code
-            )
-
-            return {
-                "command": make_cmd,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-                "returncode": result.returncode,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error running makefile commands: {str(e)}",
-                "commands": commands,
-            }
 
     def self_warpper(
         self,
     ) -> Callable:
         """Return the self wrapper."""
 
-        def self_wrapper(
+        async def self_wrapper(
             commands: List[str],
         ) -> Dict[str, Any]:
             """Run makefile commands."""
-            return self.__call__(commands)
+            return await self.__call__(commands)
 
         self_wrapper.__name__ = self.name
 

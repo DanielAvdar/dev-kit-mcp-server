@@ -1,7 +1,9 @@
 """MCP Server implementation using FastMCP."""
 
 import argparse
+import asyncio
 import os
+import sys
 from pathlib import Path
 from typing import Dict
 
@@ -63,7 +65,21 @@ def method_name():
     return root_dir
 
 
-def run_server():
+def run_server(fastmcp: FastMCP = None) -> None:
     """Run the FastMCP server."""
-    fastmcp = start_server()
-    fastmcp.run()
+    fastmcp = fastmcp or start_server()
+    try:
+        fastmcp.run()
+        sys.exit(0)
+    except KeyboardInterrupt:
+        sys.exit(0)
+
+
+def arun_server(fastmcp: FastMCP = None) -> None:
+    """Run the FastMCP server."""
+    fastmcp = fastmcp or start_server()
+    try:
+        asyncio.run(fastmcp.run_stdio_async())
+        sys.exit(0)
+    except KeyboardInterrupt:
+        sys.exit(0)

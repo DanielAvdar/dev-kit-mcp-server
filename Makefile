@@ -45,7 +45,7 @@ check-all: check test mypy doc
 
 
 run:
-	uv run py-code-mcp-server
+	uv run py-code-mcp-server --root-dir=.
 
 run-dev:
-	uv run fastmcp dev py_code/__main__.py
+	npx @modelcontextprotocol/inspector node build/index.js
