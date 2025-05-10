@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict
 
 from py_code.tools.code_editing.file_ops import FileOperation
@@ -6,7 +7,32 @@ from py_code.tools.code_editing.file_ops import FileOperation
 
 @dataclass
 class CreateDirOperation(FileOperation):
-    """Class to create a  folder in the workspace."""
+    name = "create_dir_tool"
+    """Class to create a folder in the workspace."""
+
+    def _create_folder(self, path: str) -> None:
+        """Create a folder at the specified path.
+
+        Args:
+            path: Path to the folder to create
+
+        Raises:
+            ValueError: If the path is not within the root directory
+            FileExistsError: If the path already exists
+            OSError: If there's an error creating the folder
+
+        """
+        # Validate that the path is within the root directory
+        if not self._validate_path_in_root(path):
+            raise ValueError(f"Path is not within the root directory: {path}")
+
+        # Create the folder
+        folder_path = Path(path)
+        if folder_path.exists():
+            raise FileExistsError(f"Path already exists: {path}")
+
+        # Create parent directories if they don't exist
+        folder_path.mkdir(parents=True, exist_ok=False)
 
     def __call__(self, path: str) -> Dict[str, Any]:
         """Create a file or folder in the workspace.
@@ -18,7 +44,12 @@ class CreateDirOperation(FileOperation):
 
         """
         try:
-            self._create_folder(path)  # todo: implement the function
+            self._create_folder(path)
+            return {
+                "status": "success",
+                "message": f"Successfully created folder: {path}",
+                "path": path,
+            }
         except Exception as e:
             return {
                 "error": f"Error creating file or folder: {str(e)}",

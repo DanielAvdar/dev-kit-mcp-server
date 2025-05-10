@@ -22,6 +22,11 @@ class FileOperation:
         abs_path = Path(path).resolve()
         return abs_path.is_relative_to(self._root_path)
 
+    @property
+    def docstring(self) -> str:
+        """Return the docstring of the class."""
+        return self.__call__.__doc__ or "No docstring provided"
+
     @abc.abstractmethod
     def __call__(
         self,
@@ -29,3 +34,8 @@ class FileOperation:
         **kwargs: Optional[dict],
     ) -> Dict[str, Any]:
         """Perform the file operation and return the result."""
+
+    @property
+    @abc.abstractmethod
+    def name(self) -> str:
+        """Return the name of the operation."""

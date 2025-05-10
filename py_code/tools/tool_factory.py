@@ -4,6 +4,8 @@ from typing import Any, Callable, List
 
 from mcp.server.fastmcp import FastMCP  # type: ignore
 
+from py_code.tools.code_editing.file_ops import FileOperation
+
 
 class ToolFactory:
     """Factory for creating MCP tools at runtime by decorating functions.
@@ -23,7 +25,7 @@ class ToolFactory:
         self._pre_hooks: List[Callable[..., Any]] = []
         self._post_hooks: List[Callable[..., Any]] = []
 
-    def __call__(self, obj: List[Callable]) -> None:
+    def __call__(self, obj: List[FileOperation]) -> None:
         """Make the factory callable to directly decorate functions, lists of functions, or classes.
 
         Args:
@@ -35,7 +37,7 @@ class ToolFactory:
         """
         [self._decorate_function(func) for func in obj]
 
-    def _decorate_function(self, func: Callable) -> None:
+    def _decorate_function(self, func: FileOperation) -> None:
         """Decorate a function with MCP tool decorator and hooks.
 
         Args:
@@ -43,6 +45,6 @@ class ToolFactory:
 
         """
         self.mcp.tool(
-            func.__name__,
-            description=func.__doc__ or "No description provided",
+            func.name,
+            description=func.docstring or "No description provided",
         )(func)
