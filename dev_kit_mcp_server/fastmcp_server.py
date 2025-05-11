@@ -30,8 +30,8 @@ def start_server(root_dir: str = None) -> FastMCP:
     # Create a FastMCP instance
     fastmcp = FastMCP(
         name="Dev-Kit MCP Server",
-        instructions="This server provides tools for file operations (create_dir_or_file, move_dir_or_file, "
-        f"remove_dir_or_file) and running authorized makefile commands in root directory: {root_dir}",
+        instructions="This server provides tools for file operations"
+        f" and running authorized makefile commands in root directory: {root_dir}",
     )
 
     tool_factory = ToolFactory(fastmcp)
