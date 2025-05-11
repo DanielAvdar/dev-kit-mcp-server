@@ -5,7 +5,7 @@ from typing import Any, Callable, List
 from mcp.server.fastmcp import FastMCP  # type: ignore
 from mcp.types import ToolAnnotations  # type: ignore
 
-from py_code.tools import FileOperation
+from py_code.tools.file_ops import _Operation
 
 
 class ToolFactory:
@@ -26,27 +26,33 @@ class ToolFactory:
         self._pre_hooks: List[Callable[..., Any]] = []
         self._post_hooks: List[Callable[..., Any]] = []
 
-    def __call__(self, obj: List[FileOperation]) -> None:
+    def __call__(self, obj: List[_Operation]) -> None:
         """Make the factory callable to directly decorate functions, lists of functions, or classes.
 
         Args:
-            obj: Function, list of functions, or class to decorate
+            obj: List of _Operation instances (FileOperation or AsyncOperation) to decorate
 
         Returns:
-            Decorated function, list of decorated functions, or class with decorated methods
+            None
 
         """
-        [self._decorate_function(func) for func in obj]
+        for func in obj:
+            self._decorate_function(func)
 
-    def _decorate_function(self, func: FileOperation) -> None:
+    def _decorate_function(self, func: _Operation) -> None:
         """Decorate a function with MCP tool decorator and hooks.
 
         Args:
-            func: Function to decorate
+            func: _Operation instance (FileOperation or AsyncOperation) to decorate
+
+        Returns:
+            None
 
         """
-        # Add __name__ attribute to the function object for compatibility with FastMCP
-        func.__name__ = func.name
+        # Get the wrapper function from the operation
+        wrapper = func.self_warpper()
+        # Set the name attribute for compatibility with FastMCP
+        wrapper.__name__ = func.name
         description = f"Preferred from the terminal:\n{func.docstring}"
         self.mcp.tool(
             func.name,
@@ -54,4 +60,4 @@ class ToolFactory:
             annotations=ToolAnnotations(
                 destructiveHint=True,
             ),
-        )(func.self_warpper())
+        )(wrapper)

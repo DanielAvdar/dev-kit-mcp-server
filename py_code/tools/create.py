@@ -7,8 +7,9 @@ from .file_ops import FileOperation
 
 @dataclass
 class CreateDirOperation(FileOperation):
-    name = "create_dir_tool"
     """Class to create a folder in the workspace."""
+
+    name = "create_dir_tool"
 
     def _create_folder(self, path: str) -> None:
         """Create a folder at the specified path.

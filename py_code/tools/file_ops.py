@@ -1,7 +1,7 @@
 import abc
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict
 
 
 @dataclass
@@ -9,7 +9,7 @@ class _Operation:
     root_dir: str
     _root_path: Path = field(init=False, repr=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize the root path."""
         self._root_path = Path(self.root_dir)
         if not self._root_path.exists():
@@ -26,6 +26,14 @@ class _Operation:
     @abc.abstractmethod
     def name(self) -> str:
         """Return the name of the operation."""
+
+    @abc.abstractmethod
+    def self_warpper(self) -> Callable:
+        """Return the self wrapper."""
+
+    @abc.abstractmethod
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        """Perform the operation and return the result."""
 
     @classmethod
     def get_absolute_path(cls, root_path: Path, path: str) -> Path:
@@ -47,11 +55,7 @@ class _Operation:
 @dataclass(unsafe_hash=True, slots=True)
 class FileOperation(_Operation):
     @abc.abstractmethod
-    def __call__(
-        self,
-        *args: Optional[Tuple],
-        **kwargs: Optional[dict],
-    ) -> Dict[str, Any]:
+    def __call__(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         """Perform the file operation and return the result."""
 
     # @abc.abstractmethod
@@ -70,7 +74,15 @@ class FileOperation(_Operation):
         def self_wrapper(
             path: str,
         ) -> Dict[str, Any]:
-            """Run makefile commands."""
+            """Run file operations.
+
+            Args:
+                path: Path to the file or folder to operate on
+
+            Returns:
+                A dictionary containing the operation result
+
+            """
             return self.__call__(path)
 
         self_wrapper.__name__ = self.name
@@ -83,8 +95,8 @@ class AsyncOperation(_Operation):
     @abc.abstractmethod
     async def __call__(
         self,
-        *args: Optional[Tuple],
-        **kwargs: Optional[dict],
+        *args: Any,
+        **kwargs: Any,
     ) -> Dict[str, Any]:
         """Perform the file operation and return the result."""
 
@@ -93,7 +105,3 @@ class AsyncOperation(_Operation):
         self,
     ) -> Callable:
         """Wrap the operation in a self-contained function."""
-        # async def w_func(*args: Optional[Tuple], **kwargs: Optional[dict]) -> Dict[str, Any]:
-        #     return await self.__call__(*args, **kwargs)
-        # w_func.__name__ = self.name
-        # return w_func

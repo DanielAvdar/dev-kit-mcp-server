@@ -15,7 +15,7 @@ from .tools.commands_tool import MakeCommandsTool
 from .tools.tool_factory import ToolFactory
 
 
-def start_server(root_dir=None) -> FastMCP:
+def start_server(root_dir: str = None) -> FastMCP:
     """Start the FastMCP server."""
     # Parse command line arguments
     root_dir = root_dir or method_name()
@@ -27,9 +27,9 @@ def start_server(root_dir=None) -> FastMCP:
         "remove_dir_or_file) and running authorized makefile commands.",
     )
 
-    def move_dir_tool(path: str) -> Dict[str, str]:
+    def move_dir_tool(path1: str, path2: str) -> Dict[str, str]:
         """Tool to move directories or files."""
-        return MoveDirOperation(root_dir=root_dir)(path)
+        return MoveDirOperation(root_dir=root_dir)(path1, path2)
 
     # move_dir_tool.name = "move_dir_tool"
     # move_dir_tool.__name__ = "move_dir_tool"
@@ -46,7 +46,7 @@ def start_server(root_dir=None) -> FastMCP:
     return fastmcp
 
 
-def method_name():
+def method_name() -> str:
     parser = argparse.ArgumentParser(description="Start the FastMCP server")
     parser.add_argument(
         "--root-dir",
