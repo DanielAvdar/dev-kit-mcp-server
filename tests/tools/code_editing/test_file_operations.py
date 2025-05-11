@@ -125,7 +125,7 @@ class TestCreateDirOperation:
         assert "error" in result
         assert "already exists" in result.get("error", "")
 
-    pytest.mark.skip(reason="Test for is OS dependent")
+    @pytest.mark.skip(reason="Test for is OS dependent")
 
     def test_create_folder_outside_root(self, create_operation: CreateDirOperation) -> None:
         """Test creating a folder outside the root directory."""
@@ -215,7 +215,7 @@ class TestMoveDirOperation:
         assert os.path.exists(test_dir)
         assert os.path.exists(test_file)
 
-    pytest.mark.skip(reason="Test for is OS dependent")
+    @pytest.mark.skip(reason="Test for is OS dependent")
 
     def test_move_outside_root(self, move_operation: MoveDirOperation, setup_test_files: Tuple[str, str, str]) -> None:
         """Test moving to a destination outside the root directory."""
@@ -278,7 +278,7 @@ class TestRemoveFileOperation:
         assert "error" in result
         assert "does not exist" in result.get("error", "")
 
-    pytest.mark.skip(reason="Test for is OS dependent")
+    @pytest.mark.skip(reason="Test for is OS dependent")
 
     def test_remove_outside_root(self, remove_operation: RemoveFileOperation) -> None:
         """Test removing a path outside the root directory."""

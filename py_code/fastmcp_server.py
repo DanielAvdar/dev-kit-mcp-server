@@ -16,7 +16,14 @@ from .tools.tool_factory import ToolFactory
 
 
 def start_server(root_dir: str = None) -> FastMCP:
-    """Start the FastMCP server."""
+    """Start the FastMCP server.
+
+    Args:
+        root_dir: Root directory for file operations (default: current working directory)
+
+    Returns:
+        A FastMCP instance configured with file operation tools
+    """
     # Parse command line arguments
     root_dir = root_dir or method_name()
 
@@ -28,7 +35,15 @@ def start_server(root_dir: str = None) -> FastMCP:
     )
 
     def move_dir_tool(path1: str, path2: str) -> Dict[str, str]:
-        """Tool to move directories or files."""
+        """Tool to move directories or files.
+
+        Args:
+            path1: Source path
+            path2: Destination path
+
+        Returns:
+            A dictionary containing the status and paths of the moved file or folder
+        """
         return MoveDirOperation(root_dir=root_dir)(path1, path2)
 
     # move_dir_tool.name = "move_dir_tool"
