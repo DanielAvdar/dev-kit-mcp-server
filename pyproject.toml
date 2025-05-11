@@ -1,9 +1,9 @@
 [project]
-name = "my-pkg" # todo: change to your package name
+name = "dev-kit-mcp-server"
 dynamic = ["version"]
-description = ""
+description = "A Model Context Protocol server for turning repositories into navigable MCP systems"
 authors = [
-    { name = "DanielAvdar", email = "66269169+DanielAvdar@users.noreply.github.com" }, # todo: change to your name and email
+    { name = "DanielAvdar", email = "66269169+DanielAvdar@users.noreply.github.com" },
 ]
 license = { text = "MIT" }
 readme = "README.md"
@@ -16,12 +16,26 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 keywords = [
-    "python"
+    "python",
+    "mcp",
+    "repository-navigation",
+    "code-exploration",
+    "code-structure",
+    "ast",
+    "tokenize"
 ]
-dependencies = []
+dependencies = [
+
+    "mcp",
+        "fastmcp>=2.3.3",
+
+]
+
+[project.scripts]
+dev-kit-mcp-server = "dev_kit_mcp_server:run_server"
 
 [dependency-groups]
 dev = [
@@ -33,7 +47,9 @@ dev = [
     "mypy==1.15.0",
     "pytest-parametrization>=2022",
     "ruff>=0.8.2",
-    "sybil[pytest]",
+    "pytest-asyncio>=0.23.5",
+
+
 ]
 docs = [
     "sphinx>=8.2.0; python_version >= '3.11'",
@@ -41,13 +57,12 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 [tool.hatch.build.targets.sdist]
-only-include = ["my_pkg", ] # todo: change to your package name
+only-include = ["dev_kit_mcp_server"]
 source = "."
 
 [tool.hatch.build.targets.wheel]
-only-include = ["my_pkg", ] # todo: change to your package name
+only-include = ["dev_kit_mcp_server"]
 source = "."
-
 
 
 [build-system]
@@ -62,6 +77,7 @@ source = "uv-dynamic-versioning"
 [tool.ruff]
 line-length = 120
 include = ["pyproject.toml", "tests/**", ]
+exclude = ["tests/test_mcp_server.py", "tests/test_server.py"]
 
 [tool.ruff.lint]
 select = ["F", "B", "I", "F", "W", "E", "A", "N", "D","DOC"]
@@ -79,3 +95,16 @@ check_untyped_defs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 strict_optional = false
+
+[[tool.mypy.overrides]]
+module = [
+    "fastapi",
+    "fastapi.responses",
+    "fastapi_mcp",
+    "fastmcp",
+    "pydantic",
+    "starlette",
+    "starlette.responses",
+    "uvicorn"
+]
+ignore_missing_imports = true

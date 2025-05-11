@@ -23,27 +23,29 @@ check:
 	uv run pre-commit run --all-files
 
 coverage:
-	uv run pytest --cov=my_pkg --cov-report=xml # todo: change my_pkg to the actual package name
+	uv run pytest --cov=dev_kit_mcp_server --cov-report=xml
 
 cov:
-	uv run pytest --cov=my_pkg --cov-report=term-missing # todo: change my_pkg to the actual package name
+	uv run pytest --cov=dev_kit_mcp_server --cov-report=term-missing
 
 mypy:
-	uv tool run mypy my_pkg --config-file pyproject.toml
-# todo: chanege my_pkg to the actual package name
+	uv tool run mypy dev_kit_mcp_server --config-file pyproject.toml
 
+# Add doctests target to specifically run doctest validation
+doctest: install-docs doc install
+
+# Update doc target to run doctests as part of documentation build
 doc:
-	uv run sphinx-build -M html docs/source docs/build/
+	uv run --no-project sphinx-build -M doctest docs/source docs/build/ -W --keep-going --fresh-env
+	uv run --no-project sphinx-build -M html docs/source docs/build/ -W --keep-going --fresh-env
 
 
-doctest:
-	uv run sphinx-build -M doctest docs/source docs/build/ -W --keep-going
-
-# Optional target that builds docs but ignores warnings
-doc-build:
-	uv run sphinx-build -M html docs/source docs/build/
-
-
-doc: doctest doc-build
 
 check-all: check test mypy doc
+
+
+run:
+	uv run dev-kit-mcp-server --root-dir=.
+
+run-dev:
+	npx @modelcontextprotocol/inspector@latest node build/index.js

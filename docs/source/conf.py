@@ -13,8 +13,8 @@ sys.path.insert(0, os.path.abspath("../../"))
 # sys.path.insert(0, os.path.abspath("./"))  # in conf.py
 
 
-project = "python-template"  # todo: change this to your project name
-version = version("my-pkg")  # todo: change my-pkg to your package name
+project = "Dev-Kit MCP Server"  # Updated project name
+version = version("dev-kit-mcp-server")  # Updated package name
 release = version
 
 copyright = "2025, DanielAvdar"  # noqa  todo: change this to your name
@@ -28,7 +28,6 @@ extensions = [
     "sphinx.ext.napoleon",  # Support for Google and NumPy style docstrings
     "sphinx.ext.viewcode",  # Add links to source code
     "sphinx.ext.githubpages",  # If deploying to GitHub Pages
-    "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
 ]

@@ -1,43 +1,63 @@
-# Contribution Guidelines
+# Contributing to Dev-Kit MCP Server
 
-Thank you for your interest in contributing to "my-package". **Note:** Remember to update the package name if it
-changes.
+Thank you for your interest in contributing to this project! Here's how you can help.
 
-## Prerequisites
+## Development Setup
 
-Before you start, ensure that **uv** is installed on your machine. You can install it using the following command:
+1. Clone the repository:
+   ```
+   git clone https://github.com/DanielAvdar/dev-kit-mcp-server.git
+   cd dev-kit-mcp-server
+   ```
 
-```bash
-  pipx install uv
-```
+2. Create a virtual environment and install development dependencies:
+   ```
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows, use .venv\Scripts\activate
+   pip install -e ".[dev]"
+   ```
 
-Additionally, make sure you have **forked** the repository and **cloned** your fork to your local machine.
+3. Install pre-commit hooks:
+   ```
+   pre-commit install
+   ```
 
-## Setup
+## Development Workflow
 
-To set up the project, navigate to the project directory and execute the following command to install project
-dependencies:
+1. Create a feature branch:
+   ```
+   git checkout -b feature/your-feature-name
+   ```
 
-```bash
-  make
-```
+2. Make your changes
 
-## Testing and Code Checking
+3. Run the quality checks:
+   ```
+   make check-all
+   ```
 
-To run the tests, use the following command:
+4. Run the test suite:
+   ```
+   make test
+   ```
 
-```bash
-  make test
-```
+5. Submit a pull request
 
-To verify code style and formatting, use this command:
+## Code Standards
 
-```bash
-  make check
-```
+- Follow PEP 8 style guidelines
+- Include type annotations for all functions and methods
+- Include docstrings for all modules, classes, functions, and methods
+- Write tests for new functionality
+- Keep test coverage high
 
-To build the documentation, use this command:
+## Pull Request Process
 
-```bash
-  make doc
-```
+1. Ensure all tests pass
+2. Update documentation if necessary
+3. Add entry to CHANGELOG.md in the "Unreleased" section
+4. Request review from a maintainer
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the project's MIT License.
