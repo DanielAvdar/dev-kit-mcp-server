@@ -21,7 +21,7 @@ async def test_tool_functionality(fastmcp_server):
         assert len(result) == 4
         assert "move_dir_tool" in str(result[0].name)
         make_cmd = result[-1]
-        assert make_cmd.name == "commands_tool"
+        assert make_cmd.name == "exec_make_target"
         res = await client.call_tool(make_cmd.name, dict(commands=["ls"]))
         text = res[0].text
         assert "command is successful" in text

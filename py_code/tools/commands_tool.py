@@ -7,12 +7,16 @@ from .file_ops import AsyncOperation
 
 
 @dataclass
-class MakeCommandsTool(AsyncOperation):
-    """Class to run makefile commands."""
+class ExecMakeTarget(AsyncOperation):
+    """Class to execute Makefile targets.
+
+    This tool executes Makefile targets by running the commands that make would run
+    for the specified targets.
+    """
 
     _make_file_exists: bool = field(init=False, default=False)
 
-    name = "commands_tool"
+    name = "exec_make_target"
 
     def __post_init__(self) -> None:
         """Post-initialization to set the root path."""
@@ -24,13 +28,13 @@ class MakeCommandsTool(AsyncOperation):
         self,
         commands: List[str],
     ) -> Dict[str, Any]:
-        """Run makefile commands.
+        """Execute Makefile targets.
 
         Args:
-            commands: List of makefile commands to run (e.g. ["test", "lint"])
+            commands: List of Makefile targets to execute (e.g. ["test", "lint"])
 
         Returns:
-            A dictionary containing the command output and status
+            A dictionary containing the execution results for each target
 
         """
         if not isinstance(commands, list):
@@ -48,13 +52,13 @@ class MakeCommandsTool(AsyncOperation):
         async def self_wrapper(
             commands: List[str],
         ) -> Dict[str, Any]:
-            """Run makefile commands.
+            """Execute Makefile targets.
 
             Args:
-                commands: List of makefile commands to run (e.g. ["test", "lint"])
+                commands: List of Makefile targets to execute (e.g. ["test", "lint"])
 
             Returns:
-                A dictionary containing the command output and status
+                A dictionary containing the execution results for each target
 
             """
             return await self.__call__(commands)
@@ -63,14 +67,12 @@ class MakeCommandsTool(AsyncOperation):
 
         return self_wrapper
 
-
-
     async def _exec_commands(self, target: str, commands: List[str], result: Dict[str, Any]) -> None:
-        """Execute a makefile command and store the result.
+        """Execute a Makefile target and store the result.
 
         Args:
-            target: The makefile target to execute
-            commands: The list of all commands being executed
+            target: The Makefile target to execute
+            commands: The list of all targets being executed
             result: Dictionary to store the execution results
 
         """
@@ -94,7 +96,7 @@ class MakeCommandsTool(AsyncOperation):
             process_get = await self.create_sub_proccess(f"make {target} --just-print --quiet")
             stdout, stderr = await process_get.communicate()
             cmd = stdout.decode()
-            for  line in cmd.splitlines():
+            for line in cmd.splitlines():
                 process = await self.create_sub_proccess(line)
 
                 stdout, stderr = await process.communicate()
@@ -114,7 +116,16 @@ class MakeCommandsTool(AsyncOperation):
                 "cwd": self._root_path.as_posix(),
             }
 
-    async def create_sub_proccess(self, cmd: str):
+    async def create_sub_proccess(self, cmd: str) -> asyncio.subprocess.Process:
+        """Create a subprocess to execute a shell command.
+
+        Args:
+            cmd: The shell command to execute
+
+        Returns:
+            A subprocess object with stdout and stderr pipes
+
+        """
         process_get = await asyncio.create_subprocess_shell(
             cmd,
             cwd=self._root_path.as_posix(),

@@ -11,7 +11,7 @@ from typing import Dict
 from fastmcp import FastMCP
 
 from .tools import CreateDirOperation, MoveDirOperation, RemoveFileOperation
-from .tools.commands_tool import MakeCommandsTool
+from .tools.commands_tool import ExecMakeTarget
 from .tools.tool_factory import ToolFactory
 
 
@@ -41,7 +41,7 @@ def start_server(root_dir: str = None) -> FastMCP:
         MoveDirOperation(root_dir=root_dir),
         CreateDirOperation(root_dir=root_dir),
         RemoveFileOperation(root_dir=root_dir),
-        MakeCommandsTool(root_dir=root_dir),
+        ExecMakeTarget(root_dir=root_dir),
     ])
     return fastmcp
 
