@@ -36,10 +36,10 @@ pip install dev-kit-mcp-server
 
 ```bash
 # Recommended method (fastest startup)
-uv run python -m dev_kit.mcp_server
+uv run python -m dev_kit_mcp_server.mcp_server
 
 # Alternative method
-python -m dev_kit.mcp_server
+python -m dev_kit_mcp_server.mcp_server
 
 # Traditional method with optional parameters
 dev-kit-mcp-server --host 127.0.0.1 --port 8080

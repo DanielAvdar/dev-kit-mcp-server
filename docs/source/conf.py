@@ -13,8 +13,8 @@ sys.path.insert(0, os.path.abspath("../../"))
 # sys.path.insert(0, os.path.abspath("./"))  # in conf.py
 
 
-project = "py-code-mcp-server"  # Updated project name
-version = version("py-code-mcp-server")  # Updated package name
+project = "Dev-Kit MCP Server"  # Updated project name
+version = version("dev-kit-mcp-server")  # Updated package name
 release = version
 
 copyright = "2025, DanielAvdar"  # noqa  todo: change this to your name

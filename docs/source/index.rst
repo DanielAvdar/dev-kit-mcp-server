@@ -10,6 +10,13 @@ This package provides a fast and efficient way to analyze Python code using Abst
 Features
 --------
 
+- **MCP Integration**: Turn any codebase into an MCP-compliant system
+- **Custom Tools**: Create custom tools for specific repository needs
+- **Repository Navigation**: Navigate and explore code repositories with ease
+- **Code Structure Analysis**: Understand code structure through AST analysis
+- **Code Exploration**: Explore code elements like functions, classes, and imports
+- **Fast API**: Built with FastAPI for high performance
+
 
 Installation
 ------------
