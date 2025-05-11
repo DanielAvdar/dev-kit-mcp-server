@@ -35,7 +35,7 @@ dependencies = [
 ]
 
 [project.scripts]
-py-code-mcp-server = "py_code:arun_server"
+py-code-mcp-server = "py_code:run_server"
 
 [dependency-groups]
 dev = [

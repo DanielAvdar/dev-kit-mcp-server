@@ -48,4 +48,4 @@ run:
 	uv run py-code-mcp-server --root-dir=.
 
 run-dev:
-	npx @modelcontextprotocol/inspector node build/index.js
+	npx @modelcontextprotocol/inspector@latest node build/index.js

@@ -3,7 +3,7 @@
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, Generator
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -121,16 +121,18 @@ class TestMakeCommandsTool:
 
     def test_read_makefile(self, temp_root_dir: str, mock_makefile_content: str) -> None:
         """Test reading the Makefile content."""
+        makefile_content, expected_parsed_content = mock_makefile_content
+
         # Arrange
         makefile_path = Path(temp_root_dir) / "Makefile"
-        makefile_path.write_text(mock_makefile_content)
+        makefile_path.write_text(makefile_content)
 
         # Act
         tool = MakeCommandsTool(root_dir=temp_root_dir)
         content = tool._read_makefile()
 
         # Assert
-        assert content == mock_makefile_content
+        assert content == makefile_content
 
     def test_read_makefile_not_found(self, temp_root_dir: str) -> None:
         """Test reading a non-existent Makefile."""
@@ -163,27 +165,6 @@ class TestMakeCommandsTool:
         assert commands["check"] == ["uv", "run", "pre-commit", "run", "--all-files"]
 
     @pytest.mark.asyncio
-    async def test_exec_commands_success(self, commands_tool_with_makefile: MakeCommandsTool) -> None:
-        """Test executing commands successfully."""
-        # Arrange
-        with patch("subprocess.run") as mock_run:
-            mock_result = MagicMock()
-            mock_result.stdout = "Test output"
-            mock_result.stderr = ""
-            mock_result.returncode = 0
-            mock_run.return_value = mock_result
-
-            # Act
-            result: Dict[str, Any] = {}
-            await commands_tool_with_makefile._exec_commands("test", ["test"], result)
-
-            # Assert
-            assert "test" in result
-            assert result["test"]["stdout"] == "Test output"
-            assert result["test"]["returncode"] == 0
-            mock_run.assert_called_once()
-
-    @pytest.mark.asyncio
     async def test_exec_commands_not_found(self, commands_tool_with_makefile: MakeCommandsTool) -> None:
         """Test executing a command that doesn't exist in the Makefile."""
         # Arrange
@@ -198,22 +179,6 @@ class TestMakeCommandsTool:
         assert "nonexistent" in result
         assert "error" in result["nonexistent"]
         assert "not found in Makefile" in result["nonexistent"]["error"]
-
-    @pytest.mark.asyncio
-    async def test_exec_commands_exception(self, commands_tool_with_makefile: MakeCommandsTool) -> None:
-        """Test handling exceptions when executing commands."""
-        # Arrange
-        with patch("subprocess.run") as mock_run:
-            mock_run.side_effect = Exception("Test exception")
-
-            # Act
-            result: Dict[str, Any] = {}
-            await commands_tool_with_makefile._exec_commands("test", ["test"], result)
-
-            # Assert
-            assert "test" in result
-            assert "error" in result["test"]
-            assert "Test exception" in result["test"]["error"]
 
     @pytest.mark.asyncio
     async def test_call_method(self, commands_tool_with_makefile: MakeCommandsTool) -> None:

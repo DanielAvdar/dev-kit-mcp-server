@@ -8,7 +8,7 @@ from py_code import start_server
 
 @pytest.fixture
 def fastmcp_server():
-    server = start_server(Path(__file__).parent)
+    server = start_server(Path(__file__).parent.as_posix())
 
     return server
 
@@ -23,4 +23,6 @@ async def test_tool_functionality(fastmcp_server):
         make_cmd = result[-1]
         assert make_cmd.name == "commands_tool"
         res = await client.call_tool(make_cmd.name, dict(commands=["ls"]))
-        assert "ls" in res[0].text
+        text = res[0].text
+        assert "command is successful" in text
+        assert "stdout" in text

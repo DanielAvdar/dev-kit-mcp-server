@@ -79,7 +79,7 @@ def arun_server(fastmcp: FastMCP = None) -> None:
     """Run the FastMCP server."""
     fastmcp = fastmcp or start_server()
     try:
-        asyncio.run(fastmcp.run_stdio_async())
+        asyncio.run(fastmcp.run_async())
         sys.exit(0)
     except KeyboardInterrupt:
         sys.exit(0)
