@@ -303,7 +303,8 @@ class TestRemoveFileOperation:
         # Arrange
         root_path = Path(temp_root_dir)
         abs_path = Path(temp_root_dir + "/" + valid_rel_path).resolve()
-        assert abs_path == Path(temp_root_dir + "/" * 5 + valid_rel_path).resolve()
+        assert abs_path.is_relative_to(root_path)
+        assert temp_root_dir in abs_path.as_posix()
         assert root_path.as_posix() in abs_path.as_posix()
         if as_abs:
             valid_rel_path = abs_path.as_posix()
