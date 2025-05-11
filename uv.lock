@@ -223,6 +223,56 @@ toml = [
 ]
 
 [[package]]
+name = "dev-kit-mcp-server"
+source = { editable = "." }
+dependencies = [
+    { name = "fastmcp" },
+    { name = "mcp" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "hypothesis" },
+    { name = "mypy" },
+    { name = "pre-commit" },
+    { name = "pre-commit-uv" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "pytest-parametrization" },
+    { name = "ruff" },
+]
+docs = [
+    { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "sphinx-rtd-theme" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastmcp", specifier = ">=2.3.3" },
+    { name = "mcp" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "hypothesis", specifier = ">=6.23.3" },
+    { name = "mypy", specifier = "==1.15.0" },
+    { name = "pre-commit", specifier = ">=2.20.0" },
+    { name = "pre-commit-uv", specifier = ">=4" },
+    { name = "pytest", specifier = ">=7.1.2" },
+    { name = "pytest-asyncio", specifier = ">=0.23.5" },
+    { name = "pytest-cov", specifier = ">=4.0.0" },
+    { name = "pytest-parametrization", specifier = ">=2022" },
+    { name = "ruff", specifier = ">=0.8.2" },
+]
+docs = [
+    { name = "sphinx", marker = "python_full_version < '3.11'", specifier = ">=7.0.0" },
+    { name = "sphinx", marker = "python_full_version >= '3.11'", specifier = ">=8.2.0" },
+    { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
+]
+
+[[package]]
 name = "distlib"
 version = "0.3.9"
 source = { registry = "https://pypi.org/simple" }
@@ -606,56 +656,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b1/6c/c3c1d01698c8abb0b546defc0304971fa7fb2ba84ad35587b9dad095d73f/pre_commit_uv-4.1.4.tar.gz", hash = "sha256:3db606a79b226127b27dbbd8381b78c0e30de3ac775a8492c576a68e9250535c", size = 6493, upload-time = "2024-10-29T23:07:28.918Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f1/70/1b65f9118ef64f6ffe5d57a67170bbff25d4f4a3d1cb78e8ed3392e16114/pre_commit_uv-4.1.4-py3-none-any.whl", hash = "sha256:7f01fb494fa1caa5097d20a38f71df7cea0209197b2564699cef9b3f3aa9d135", size = 5578, upload-time = "2024-10-29T23:07:27.128Z" },
-]
-
-[[package]]
-name = "py-code-mcp-server"
-source = { editable = "." }
-dependencies = [
-    { name = "fastmcp" },
-    { name = "mcp" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "hypothesis" },
-    { name = "mypy" },
-    { name = "pre-commit" },
-    { name = "pre-commit-uv" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-cov" },
-    { name = "pytest-parametrization" },
-    { name = "ruff" },
-]
-docs = [
-    { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "sphinx-rtd-theme" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastmcp", specifier = ">=2.3.3" },
-    { name = "mcp" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "hypothesis", specifier = ">=6.23.3" },
-    { name = "mypy", specifier = "==1.15.0" },
-    { name = "pre-commit", specifier = ">=2.20.0" },
-    { name = "pre-commit-uv", specifier = ">=4" },
-    { name = "pytest", specifier = ">=7.1.2" },
-    { name = "pytest-asyncio", specifier = ">=0.23.5" },
-    { name = "pytest-cov", specifier = ">=4.0.0" },
-    { name = "pytest-parametrization", specifier = ">=2022" },
-    { name = "ruff", specifier = ">=0.8.2" },
-]
-docs = [
-    { name = "sphinx", marker = "python_full_version < '3.11'", specifier = ">=7.0.0" },
-    { name = "sphinx", marker = "python_full_version >= '3.11'", specifier = ">=8.2.0" },
-    { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
 ]
 
 [[package]]

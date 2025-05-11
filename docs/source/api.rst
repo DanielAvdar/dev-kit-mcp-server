@@ -1,12 +1,12 @@
 API Reference
 =============
 
-This section provides detailed API documentation for the Python Code MCP Server.
+This section provides detailed API documentation for the Dev-Kit MCP Server.
 
 Server Module
 -------------
 
-.. py:module:: py_code.fastmcp_server
+.. py:module:: dev_kit_mcp_server.fastmcp_server
 
 .. py:function:: start_server() -> FastMCP
 
@@ -31,7 +31,7 @@ File Operations
 Base File Operation
 ~~~~~~~~~~~~~~~~~~~~
 
-.. py:module:: py_code.tools.code_editing.file_ops
+.. py:module:: dev_kit_mcp_server.tools.code_editing.file_ops
 
 .. py:class:: FileOperation
 
@@ -53,7 +53,7 @@ Base File Operation
 Create Directory Operation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. py:module:: py_code.tools.code_editing.create
+.. py:module:: dev_kit_mcp_server.tools.code_editing.create
 
 .. py:class:: CreateDirOperation
 
@@ -84,7 +84,7 @@ Create Directory Operation
 Move Directory Operation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. py:module:: py_code.tools.code_editing.move
+.. py:module:: dev_kit_mcp_server.tools.code_editing.move
 
 .. py:class:: MoveDirOperation
 
@@ -120,7 +120,7 @@ Move Directory Operation
 Remove File Operation
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. py:module:: py_code.tools.code_editing.remove
+.. py:module:: dev_kit_mcp_server.tools.code_editing.remove
 
 .. py:class:: RemoveFileOperation
 

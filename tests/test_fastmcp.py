@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from fastmcp import Client
 
-from py_code import start_server
+from dev_kit_mcp_server import start_server
 
 
 @pytest.fixture

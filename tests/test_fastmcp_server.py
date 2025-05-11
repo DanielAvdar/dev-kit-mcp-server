@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from py_code.fastmcp_server import start_server
+from dev_kit_mcp_server.fastmcp_server import start_server
 
 
 @pytest.fixture
@@ -33,7 +33,7 @@ class TestFastMCPServer:
 
         # Assert
         assert server is not None
-        assert server.name == "Python Code MCP Server"
+        assert server.name == "Dev-Kit MCP Server"
 
         # Check that the tools were registered
         # Since list_tools is a coroutine, we need to run it in an event loop
@@ -56,7 +56,7 @@ class TestFastMCPServer:
 
         # Assert
         assert server is not None
-        assert server.name == "Python Code MCP Server"
+        assert server.name == "Dev-Kit MCP Server"
 
         # Check that the tools were registered
         # Since list_tools is a coroutine, we need to run it in an event loop

@@ -5,13 +5,13 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from py_code.tools.commands_tool import ExecMakeTarget
+from dev_kit_mcp_server.tools.commands_tool import ExecMakeTarget
 
 
 @pytest.fixture
 def mock_subprocess():
     """Mock the subprocess functionality."""
-    with patch("py_code.tools.commands_tool.asyncio.create_subprocess_shell") as mock_subprocess:
+    with patch("dev_kit_mcp_server.tools.commands_tool.asyncio.create_subprocess_shell") as mock_subprocess:
         # Create a mock process
         mock_process = AsyncMock()
         mock_process.communicate = AsyncMock(return_value=(b"command output", b""))

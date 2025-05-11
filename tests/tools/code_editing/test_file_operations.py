@@ -6,7 +6,7 @@ from typing import Tuple
 
 import pytest
 
-from py_code.tools import CreateDirOperation, FileOperation, MoveDirOperation, RemoveFileOperation
+from dev_kit_mcp_server.tools import CreateDirOperation, FileOperation, MoveDirOperation, RemoveFileOperation
 
 
 @pytest.fixture

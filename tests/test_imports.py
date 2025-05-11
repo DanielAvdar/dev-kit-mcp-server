@@ -1,4 +1,4 @@
 def test_imports():
-    from py_code import run_server  # noqa
+    from dev_kit_mcp_server import run_server  # noqa
 
     assert True

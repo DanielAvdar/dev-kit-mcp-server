@@ -4,15 +4,15 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from py_code.cli import main
+from dev_kit_mcp_server.cli import main
 
 
 @pytest.fixture
 def mock_start_server():
     """Mock the server start functions."""
     with (
-        patch("py_code.fastmcp_server.start_server") as mock_start,
-        patch("py_code.cli.sys.exit") as mock_exit,
+        patch("dev_kit_mcp_server.fastmcp_server.start_server") as mock_start,
+        patch("dev_kit_mcp_server.cli.sys.exit") as mock_exit,
     ):
         # Create a mock FastMCP instance
         mock_fastmcp = MagicMock()
@@ -28,7 +28,7 @@ def mock_start_server():
 class TestCLI:
     """Tests for the command-line interface."""
 
-    @patch("sys.argv", ["py_code", "--host", "127.0.0.1", "--port", "9000"])
+    @patch("sys.argv", ["dev_kit_mcp_server", "--host", "127.0.0.1", "--port", "9000"])
     def test_cli_with_custom_host_and_port(self, mock_start_server):
         """Test the CLI with custom host and port."""
         # Act
@@ -40,7 +40,7 @@ class TestCLI:
         assert mock_fastmcp.port == 9000
         mock_fastmcp.run.assert_called_once()
 
-    @patch("sys.argv", ["py_code"])
+    @patch("sys.argv", ["dev_kit_mcp_server"])
     def test_cli_with_defaults(self, mock_start_server):
         """Test the CLI with default values."""
         # Act
@@ -52,7 +52,7 @@ class TestCLI:
         assert mock_fastmcp.port == 8000
         mock_fastmcp.run.assert_called_once()
 
-    @patch("sys.argv", ["py_code", "--root-dir", "/nonexistent/directory"])
+    @patch("sys.argv", ["dev_kit_mcp_server", "--root-dir", "/nonexistent/directory"])
     def test_cli_with_nonexistent_root_dir(self, mock_start_server):
         """Test the CLI with a non-existent root directory."""
         # Arrange
@@ -67,7 +67,7 @@ class TestCLI:
             # The server should not be started if the root directory doesn't exist
             mock_start_server["start"].assert_not_called()
 
-    @patch("sys.argv", ["py_code"])
+    @patch("sys.argv", ["dev_kit_mcp_server"])
     def test_cli_with_keyboard_interrupt(self, mock_start_server):
         """Test the CLI with a keyboard interrupt."""
         # Arrange

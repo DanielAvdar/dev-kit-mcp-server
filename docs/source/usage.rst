@@ -1,7 +1,7 @@
 Usage
 =====
 
-This section provides information on how to use the Python Code MCP Server.
+This section provides information on how to use the Dev-Kit MCP Server.
 
 Command-Line Arguments
 -----------------------
@@ -10,7 +10,7 @@ The server supports the following command-line arguments:
 
 .. code-block:: bash
 
-   python -m py_code.mcp_server [--root-dir ROOT_DIR]
+   python -m dev_kit_mcp_server.mcp_server [--root-dir ROOT_DIR]
 
 Arguments:
 
@@ -20,7 +20,7 @@ Example:
 
 .. code-block:: bash
 
-   python -m py_code.mcp_server --root-dir C:\path\to\project
+   python -m dev_kit_mcp_server.mcp_server --root-dir C:\path\to\project
 
 File Operations
 ----------------

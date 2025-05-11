@@ -1,5 +1,5 @@
 [project]
-name = "py-code-mcp-server"
+name = "dev-kit-mcp-server"
 dynamic = ["version"]
 description = "A Model Context Protocol server for turning repositories into navigable MCP systems"
 authors = [
@@ -35,7 +35,7 @@ dependencies = [
 ]
 
 [project.scripts]
-py-code-mcp-server = "py_code:run_server"
+dev-kit-mcp-server = "dev_kit_mcp_server:run_server"
 
 [dependency-groups]
 dev = [
@@ -57,11 +57,11 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 [tool.hatch.build.targets.sdist]
-only-include = ["py_code", "py_code_mcp_server"]
+only-include = ["dev_kit_mcp_server"]
 source = "."
 
 [tool.hatch.build.targets.wheel]
-only-include = ["py_code", "py_code_mcp_server"]
+only-include = ["dev_kit_mcp_server"]
 source = "."
 
 

@@ -5,7 +5,7 @@ from typing import Any, Callable, List
 from mcp.server.fastmcp import FastMCP  # type: ignore
 from mcp.types import ToolAnnotations  # type: ignore
 
-from py_code.tools.file_ops import _Operation
+from dev_kit_mcp_server.tools.file_ops import _Operation
 
 
 class ToolFactory:

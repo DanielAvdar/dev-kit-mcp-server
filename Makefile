@@ -23,13 +23,13 @@ check:
 	uv run pre-commit run --all-files
 
 coverage:
-	uv run pytest --cov=py_code_mcp_server --cov-report=xml
+	uv run pytest --cov=dev_kit_mcp_server --cov-report=xml
 
 cov:
-	uv run pytest --cov=py_code --cov-report=term-missing
+	uv run pytest --cov=dev_kit_mcp_server --cov-report=term-missing
 
 mypy:
-	uv tool run mypy py_code --config-file pyproject.toml
+	uv tool run mypy dev_kit_mcp_server --config-file pyproject.toml
 
 # Add doctests target to specifically run doctest validation
 doctest: install-docs doc install
@@ -45,7 +45,7 @@ check-all: check test mypy doc
 
 
 run:
-	uv run py-code-mcp-server --root-dir=.
+	uv run dev-kit-mcp-server --root-dir=.
 
 run-dev:
 	npx @modelcontextprotocol/inspector@latest node build/index.js
