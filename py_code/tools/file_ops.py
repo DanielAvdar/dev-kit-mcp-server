@@ -80,7 +80,7 @@ class _Operation:
         """
         root_path = root_dir
         abs_path = cls.get_absolute_path(root_path, path)
-        if root_path.as_posix() not in abs_path.as_posix():
+        if not abs_path.is_relative_to(root_path):
             raise ValueError(f"Path {path} is not within the root directory: {root_path.as_posix()}")
         return abs_path.as_posix()
 
