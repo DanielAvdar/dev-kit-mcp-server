@@ -61,7 +61,7 @@ class _Operation:
         """
         if Path(path).is_absolute():
             return Path(path).resolve()
-        return Path(root_path.as_posix() + path).resolve()
+        return Path(root_path.as_posix() + "/" + path).resolve()
 
     @classmethod
     def _validate_path_in_root(cls, root_dir: Path, path: str) -> str:
