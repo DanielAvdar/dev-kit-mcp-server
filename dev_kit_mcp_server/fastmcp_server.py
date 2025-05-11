@@ -5,7 +5,6 @@ import asyncio
 import os
 import sys
 from pathlib import Path
-from typing import Dict
 
 # from mcp.server.fastmcp import FastMCP  # type: ignore
 from fastmcp import FastMCP
@@ -32,26 +31,9 @@ def start_server(root_dir: str = None) -> FastMCP:
     fastmcp = FastMCP(
         name="Dev-Kit MCP Server",
         instructions="This server provides tools for file operations (create_dir_or_file, move_dir_or_file, "
-        "remove_dir_or_file) and running authorized makefile commands.",
+        f"remove_dir_or_file) and running authorized makefile commands in root directory: {root_dir}",
     )
 
-    def move_dir_tool(path1: str, path2: str) -> Dict[str, str]:
-        """Tool to move directories or files.
-
-        Args:
-            path1: Source path
-            path2: Destination path
-
-        Returns:
-            A dictionary containing the status and paths of the moved file or folder
-
-        """
-        return MoveDirOperation(root_dir=root_dir)(path1, path2)
-
-    # move_dir_tool.name = "move_dir_tool"
-    # move_dir_tool.__name__ = "move_dir_tool"
-    # Create a tool factory instance
-    # fastmcp.add_tool(move_dir_tool)
     tool_factory = ToolFactory(fastmcp)
     tool_factory([
         # move_dir_tool,

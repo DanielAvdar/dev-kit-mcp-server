@@ -28,16 +28,14 @@ def mock_start_server():
 class TestCLI:
     """Tests for the command-line interface."""
 
-    @patch("sys.argv", ["dev_kit_mcp_server", "--host", "127.0.0.1", "--port", "9000"])
-    def test_cli_with_custom_host_and_port(self, mock_start_server):
-        """Test the CLI with custom host and port."""
+    @patch("sys.argv", ["dev_kit_mcp_server", "--root-dir", "."])
+    def test_cli_with_root_dir(self, mock_start_server):
+        """Test the CLI with root directory specified."""
         # Act
         main()
 
         # Assert
         mock_fastmcp = mock_start_server["fastmcp"]
-        assert mock_fastmcp.host == "127.0.0.1"
-        assert mock_fastmcp.port == 9000
         mock_fastmcp.run.assert_called_once()
 
     @patch("sys.argv", ["dev_kit_mcp_server"])
@@ -48,8 +46,6 @@ class TestCLI:
 
         # Assert
         mock_fastmcp = mock_start_server["fastmcp"]
-        assert mock_fastmcp.host == "0.0.0.0"
-        assert mock_fastmcp.port == 8000
         mock_fastmcp.run.assert_called_once()
 
     @patch("sys.argv", ["dev_kit_mcp_server", "--root-dir", "/nonexistent/directory"])

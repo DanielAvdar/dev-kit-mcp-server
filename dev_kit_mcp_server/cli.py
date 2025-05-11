@@ -8,11 +8,9 @@ import sys
 def main() -> None:
     """Parse command line arguments and start the server."""
     parser = argparse.ArgumentParser(
-        description="Python Code MCP Server",
+        description="Dev-Kit MCP Server",
         epilog="Provides tools for file operations and running makefile commands",
     )
-    parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind the server to (default: 0.0.0.0)")
-    parser.add_argument("--port", type=int, default=8000, help="Port to bind the server to (default: 8000)")
     parser.add_argument(
         "--root-dir", type=str, help="Root directory for file operations (defaults to current directory)"
     )
@@ -29,7 +27,7 @@ def main() -> None:
         print(f"Error: Root directory '{args.root_dir}' does not exist or is not a directory")
         sys.exit(1)
 
-    print(f"Starting Python Code MCP Server on {args.host}:{args.port}")
+    print("Starting Dev-Kit MCP Server")
     print(f"Root directory: {args.root_dir}")
 
     try:
@@ -43,10 +41,6 @@ def main() -> None:
 
         # Get the server instance
         fastmcp = start_server()
-
-        # Configure host and port
-        fastmcp.host = args.host
-        fastmcp.port = args.port
 
         # Run the server
         fastmcp.run()

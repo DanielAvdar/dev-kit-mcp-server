@@ -1,4 +1,4 @@
-"""Python Code MCP Server package."""
+"""Dev-Kit MCP Server package."""
 
 from importlib.metadata import version
 

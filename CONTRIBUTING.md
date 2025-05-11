@@ -1,4 +1,4 @@
-# Contributing to Python Code MCP Server
+# Contributing to Dev-Kit MCP Server
 
 Thank you for your interest in contributing to this project! Here's how you can help.
 
@@ -6,8 +6,8 @@ Thank you for your interest in contributing to this project! Here's how you can 
 
 1. Clone the repository:
    ```
-   git clone https://github.com/DanielAvdar/py-code-mcp-server.git
-   cd py-code-mcp-server
+   git clone https://github.com/DanielAvdar/dev-kit-mcp-server.git
+   cd dev-kit-mcp-server
    ```
 
 2. Create a virtual environment and install development dependencies:

@@ -6,21 +6,27 @@ This section provides information on how to use the Dev-Kit MCP Server.
 Command-Line Arguments
 -----------------------
 
-The server supports the following command-line arguments:
+The recommended way to use the Dev-Kit MCP Server is with the ``--root-dir`` parameter:
 
 .. code-block:: bash
 
-   python -m dev_kit_mcp_server.mcp_server [--root-dir ROOT_DIR]
+   dev-kit-mcp-server --root-dir=workdir
 
-Arguments:
+The server supports the following command-line argument:
 
 * ``--root-dir ROOT_DIR``: Specifies the root directory for file operations. This is the directory that file operations will be restricted to for security reasons. If not specified, the current working directory is used.
 
-Example:
+Examples:
 
 .. code-block:: bash
 
-   python -m dev_kit_mcp_server.mcp_server --root-dir C:\path\to\project
+   # Recommended method (with root directory specified)
+   dev-kit-mcp-server --root-dir=workdir
+
+   # Alternative method
+   python -m dev_kit_mcp_server.mcp_server --root-dir=workdir
+
+The ``--root-dir`` parameter is important for security reasons, as it restricts file operations to the specified directory only.
 
 File Operations
 ----------------

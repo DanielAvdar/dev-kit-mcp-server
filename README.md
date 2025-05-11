@@ -35,15 +35,15 @@ pip install dev-kit-mcp-server
 ### Running the Server
 
 ```bash
-# Recommended method (fastest startup)
-uv run python -m dev_kit_mcp_server.mcp_server
+# Recommended method (with root directory specified)
+dev-kit-mcp-server --root-dir=workdir
 
-# Alternative method
-python -m dev_kit_mcp_server.mcp_server
-
-# Traditional method with optional parameters
-dev-kit-mcp-server --host 127.0.0.1 --port 8080
+# Alternative methods
+uv run python -m dev_kit_mcp_server.mcp_server --root-dir=workdir
+python -m dev_kit_mcp_server.mcp_server --root-dir=workdir
 ```
+
+The `--root-dir` parameter specifies the directory where file operations will be performed. This is important for security reasons, as it restricts file operations to this directory only.
 
 ### API Endpoints
 
