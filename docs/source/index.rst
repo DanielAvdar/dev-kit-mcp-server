@@ -3,19 +3,21 @@
 Dev-Kit MCP Server
 ===================
 
-A Model Context Protocol (MCP) server for Python code analysis.
+A Model Context Protocol (MCP) server targeted for agent development tools, providing scoped authorized operations in the root project directory.
 
-This package provides a fast and efficient way to analyze Python code using Abstract Syntax Trees (AST) and tokenization.
+This package enables secure execution of operations such as running makefile commands, moving and deleting files, with future plans to include more tools for code editing.
+It serves as an excellent MCP server for VS-Code copilot and other AI-assisted development tools.
 
 Features
 --------
 
+- **Secure Operations**: Execute operations within a scoped, authorized root directory
+- **Makefile Command Execution**: Run makefile commands securely within the project
+- **File Operations**: Move, create, and delete files within the authorized directory
 - **MCP Integration**: Turn any codebase into an MCP-compliant system
-- **Custom Tools**: Create custom tools for specific repository needs
-- **Repository Navigation**: Navigate and explore code repositories with ease
-- **Code Structure Analysis**: Understand code structure through AST analysis
-- **Code Exploration**: Explore code elements like functions, classes, and imports
-- **Fast API**: Built with FastAPI for high performance
+- **AI-Assisted Development**: Excellent integration with VS-Code copilot and other AI tools
+- **Extensible Framework**: Easily add new tools for code editing and other operations
+- **Fast Performance**: Built with FastMCP for high performance
 
 
 Installation

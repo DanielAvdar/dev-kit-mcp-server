@@ -12,17 +12,19 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Last Commit](https://img.shields.io/github/last-commit/DanielAvdar/dev-kit-mcp-server/main)
 
-A Model Context Protocol (MCP) server for interacting with codebases.
-This package provides tools for turning any repository or code base into an MCP system.
+A Model Context Protocol (MCP) server targeted for agent development tools, providing scoped authorized operations in the root project directory.
+This package enables secure execution of operations such as running makefile commands, moving and deleting files, with future plans to include more tools for code editing.
+It serves as an excellent MCP server for VS-Code copilot and other AI-assisted development tools.
 
 ## Features
 
+- 🔒 **Secure Operations**: Execute operations within a scoped, authorized root directory
+- 🛠️ **Makefile Command Execution**: Run makefile commands securely within the project
+- 📁 **File Operations**: Move, create, and delete files within the authorized directory
 - 🔌 **MCP Integration**: Turn any codebase into an MCP-compliant system
-- 🛠️ **Custom Tools**: Create custom tools for specific repository needs
-- 🔍 **Repository Navigation**: Navigate and explore code repositories with ease
-- 🧩 **Code Structure Analysis**: Understand code structure through AST analysis
-- 🔢 **Code Exploration**: Explore code elements like functions, classes, and imports
-- 🚀 **Fast API**: Built with FastAPI for high performance
+- 🤖 **AI-Assisted Development**: Excellent integration with VS-Code copilot and other AI tools
+- 🔄 **Extensible Framework**: Easily add new tools for code editing and other operations
+- 🚀 **Fast Performance**: Built with FastMCP for high performance
 
 ## Installation
 
@@ -45,26 +47,35 @@ python -m dev_kit_mcp_server.mcp_server --root-dir=workdir
 
 The `--root-dir` parameter specifies the directory where file operations will be performed. This is important for security reasons, as it restricts file operations to this directory only.
 
-### API Endpoints
+### Available Tools
 
-- `GET /`: Repository navigation server information
-- `POST /analyze`: Comprehensive repository structure analysis
-- `POST /ast`: Code structure extraction for navigation
-- `POST /tokenize`: Detailed code element identification
-- `POST /count`: Repository component summarization
+The server provides the following tools:
 
+- **exec_make_target**: Run makefile commands securely within the project
+- **create_dir**: Create directories within the authorized root directory
+- **move_dir**: Move files and directories within the authorized root directory
+- **remove_file**: Delete files within the authorized root directory
 
+### Example Usage with MCP Client
 
-# Get repository structure for navigation
-response = requests.post(
-    "http://localhost:8000/analyze",
-    json={"code": code, "path": "src/data/navigator.py"}
-)
+```python
+from fastmcp import Client
 
-# Use the structure for repository navigation
-structure = response.json()
-print(f"Repository components found: {len(structure['result']['ast_analysis']['functions'])} functions, "
-      f"{len(structure['result']['ast_analysis']['classes'])} classes")
+async with Client() as client:
+    # List available tools
+    tools = await client.list_tools()
+
+    # Run a makefile command
+    result = await client.call_tool("exec_make_target", {"commands": ["test"]})
+
+    # Create a directory
+    result = await client.call_tool("create_dir", {"path": "new_directory"})
+
+    # Move a file
+    result = await client.call_tool("move_dir", {"path1": "source.txt", "path2": "destination.txt"})
+
+    # Remove a file
+    result = await client.call_tool("remove_file", {"path": "file_to_remove.txt"})
 ```
 
 ## Development
