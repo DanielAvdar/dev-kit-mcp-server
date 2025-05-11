@@ -23,6 +23,7 @@ def start_server(root_dir: str = None) -> FastMCP:
 
     Returns:
         A FastMCP instance configured with file operation tools
+
     """
     # Parse command line arguments
     root_dir = root_dir or method_name()
@@ -43,6 +44,7 @@ def start_server(root_dir: str = None) -> FastMCP:
 
         Returns:
             A dictionary containing the status and paths of the moved file or folder
+
         """
         return MoveDirOperation(root_dir=root_dir)(path1, path2)
 
@@ -62,6 +64,15 @@ def start_server(root_dir: str = None) -> FastMCP:
 
 
 def method_name() -> str:
+    """Parse command line arguments and validate the root directory.
+
+    Returns:
+        The validated root directory path as a string
+
+    Raises:
+        ValueError: If the root directory does not exist or is not a directory
+
+    """
     parser = argparse.ArgumentParser(description="Start the FastMCP server")
     parser.add_argument(
         "--root-dir",
@@ -81,7 +92,12 @@ def method_name() -> str:
 
 
 def run_server(fastmcp: FastMCP = None) -> None:
-    """Run the FastMCP server."""
+    """Run the FastMCP server.
+
+    Args:
+        fastmcp: Optional FastMCP instance to run. If None, a new instance will be created.
+
+    """
     fastmcp = fastmcp or start_server()
     try:
         fastmcp.run()
@@ -91,7 +107,12 @@ def run_server(fastmcp: FastMCP = None) -> None:
 
 
 def arun_server(fastmcp: FastMCP = None) -> None:
-    """Run the FastMCP server."""
+    """Run the FastMCP server asynchronously.
+
+    Args:
+        fastmcp: Optional FastMCP instance to run. If None, a new instance will be created.
+
+    """
     fastmcp = fastmcp or start_server()
     try:
         asyncio.run(fastmcp.run_async())

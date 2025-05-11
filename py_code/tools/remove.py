@@ -3,7 +3,7 @@
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 from .file_ops import FileOperation
 
@@ -43,9 +43,10 @@ class RemoveFileOperation(FileOperation):
         """Remove a file or folder.
 
         Args:
-            path: (str) Path to the file or folder to remove
+            path: Path to the file or folder to remove
+
         Returns:
-            A dictionary containing the status and path of the removed file or folder.
+            A dictionary containing the status and path of the removed file or folder
 
         """
         try:
@@ -60,3 +61,31 @@ class RemoveFileOperation(FileOperation):
                 "error": f"Error removing file or folder: {str(e)}",
                 "path": path,
             }
+
+    def self_warpper(
+        self,
+    ) -> Callable:
+        """Return the self wrapper function.
+
+        Returns:
+            A callable function that wraps the __call__ method
+
+        """
+
+        def self_wrapper(
+            path: str,
+        ) -> Dict[str, Any]:
+            """Remove a file or folder.
+
+            Args:
+                path: Path to the file or folder to remove
+
+            Returns:
+                A dictionary containing the status and path of the removed file or folder
+
+            """
+            return self.__call__(path)
+
+        self_wrapper.__name__ = self.name
+
+        return self_wrapper

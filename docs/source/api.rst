@@ -4,7 +4,7 @@ API Reference
 This section provides detailed API documentation for the Python Code MCP Server.
 
 Server Module
-------------
+-------------
 
 .. py:module:: py_code.fastmcp_server
 
@@ -26,10 +26,10 @@ Server Module
    This function starts the server and begins listening for client connections.
 
 File Operations
---------------
+----------------
 
 Base File Operation
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. py:module:: py_code.tools.code_editing.file_ops
 
@@ -51,7 +51,7 @@ Base File Operation
       :rtype: bool
 
 Create Directory Operation
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. py:module:: py_code.tools.code_editing.create
 
@@ -82,7 +82,7 @@ Create Directory Operation
       :rtype: Dict[str, Any]
 
 Move Directory Operation
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. py:module:: py_code.tools.code_editing.move
 
@@ -118,7 +118,7 @@ Move Directory Operation
       :rtype: Dict[str, Any]
 
 Remove File Operation
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. py:module:: py_code.tools.code_editing.remove
 

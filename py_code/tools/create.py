@@ -39,9 +39,10 @@ class CreateDirOperation(FileOperation):
         """Create a file or folder in the workspace.
 
         Args:
-            path: (str) to the folder to create
+            path: Path to the folder to create
+
         Returns:
-            A dictionary containing the status and path of the created file or folder.
+            A dictionary containing the status and path of the created file or folder
 
         """
         try:

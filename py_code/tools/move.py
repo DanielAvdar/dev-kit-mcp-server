@@ -3,7 +3,7 @@
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 from .file_ops import FileOperation
 
@@ -50,10 +50,11 @@ class MoveDirOperation(FileOperation):
         """Move a file or folder from path1 to path2.
 
         Args:
-            path1: (str) Source path
-            path2: (str) Destination path
+            path1: Source path
+            path2: Destination path
+
         Returns:
-            A dictionary containing the status and paths of the moved file or folder.
+            A dictionary containing the status and paths of the moved file or folder
 
         """
         try:
@@ -70,3 +71,33 @@ class MoveDirOperation(FileOperation):
                 "path1": path1,
                 "path2": path2,
             }
+
+    def self_warpper(
+        self,
+    ) -> Callable:
+        """Return the self wrapper function.
+
+        Returns:
+            A callable function that wraps the __call__ method
+
+        """
+
+        def self_wrapper(
+            path1: str,
+            path2: str,
+        ) -> Dict[str, Any]:
+            """Move a file or folder from one location to another.
+
+            Args:
+                path1: Source path
+                path2: Destination path
+
+            Returns:
+                A dictionary containing the status and paths of the moved file or folder
+
+            """
+            return self.__call__(path1, path2)
+
+        self_wrapper.__name__ = self.name
+
+        return self_wrapper

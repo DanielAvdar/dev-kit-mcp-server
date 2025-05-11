@@ -4,7 +4,7 @@ Usage
 This section provides information on how to use the Python Code MCP Server.
 
 Command-Line Arguments
----------------------
+-----------------------
 
 The server supports the following command-line arguments:
 
@@ -23,12 +23,12 @@ Example:
    python -m py_code.mcp_server --root-dir C:\path\to\project
 
 File Operations
---------------
+----------------
 
 The server provides several tools for file operations:
 
 Create Directory
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Creates a directory at the specified path.
 
@@ -43,7 +43,7 @@ The operation will fail if:
 * The path already exists
 
 Move File or Directory
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 Moves a file or directory from one path to another.
 
@@ -59,7 +59,7 @@ The operation will fail if:
 * The destination path already exists
 
 Remove File or Directory
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Removes a file or directory at the specified path.
 
@@ -74,6 +74,6 @@ The operation will fail if:
 * The path does not exist
 
 Security Considerations
-----------------------
+------------------------
 
 All file operations are restricted to the specified root directory for security reasons. Any attempt to perform operations outside this directory will fail with an error message.
