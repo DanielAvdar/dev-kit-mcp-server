@@ -1,3 +1,9 @@
+"""Module for executing Makefile targets.
+
+This module provides a tool for executing Makefile targets by running the commands
+that make would run for the specified targets.
+"""
+
 import asyncio
 import re
 from dataclasses import dataclass, field
@@ -36,6 +42,9 @@ class ExecMakeTarget(AsyncOperation):
         Returns:
             A dictionary containing the execution results for each target
 
+        Raises:
+            ValueError: If commands is not a list
+
         """
         if not isinstance(commands, list):
             raise ValueError("Expected a list of commands as the argument")
@@ -47,7 +56,12 @@ class ExecMakeTarget(AsyncOperation):
     def self_warpper(
         self,
     ) -> Callable:
-        """Return the self wrapper."""
+        """Return the self wrapper function.
+
+        Returns:
+            A callable function that wraps the __call__ method
+
+        """
 
         async def self_wrapper(
             commands: List[str],

@@ -39,9 +39,9 @@ class TestFastMCPServer:
         # Since list_tools is a coroutine, we need to run it in an event loop
         tools = asyncio.run(server.get_tools())
         tool_names = [tool.name for tool in tools.values()]
-        assert "create_dir_tool" in tool_names
-        assert "move_dir_tool" in tool_names
-        assert "remove_file_tool" in tool_names
+        assert "create_dir" in tool_names
+        assert "move_dir" in tool_names
+        assert "remove_file" in tool_names
 
     @patch("argparse.ArgumentParser.parse_args")
     def test_start_server_with_custom_root_dir(self, mock_parse_args, temp_dir):
@@ -62,9 +62,9 @@ class TestFastMCPServer:
         # Since list_tools is a coroutine, we need to run it in an event loop
         tools = asyncio.run(server.get_tools())
         tool_names = [tool.name for tool in tools.values()]
-        assert "create_dir_tool" in tool_names
-        assert "move_dir_tool" in tool_names
-        assert "remove_file_tool" in tool_names
+        assert "create_dir" in tool_names
+        assert "move_dir" in tool_names
+        assert "remove_file" in tool_names
 
     @patch("argparse.ArgumentParser.parse_args")
     def test_start_server_with_nonexistent_root_dir(self, mock_parse_args):

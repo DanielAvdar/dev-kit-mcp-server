@@ -32,9 +32,6 @@ class ToolFactory:
         Args:
             obj: List of _Operation instances (FileOperation or AsyncOperation) to decorate
 
-        Returns:
-            None
-
         """
         for func in obj:
             self._decorate_function(func)
@@ -44,9 +41,6 @@ class ToolFactory:
 
         Args:
             func: _Operation instance (FileOperation or AsyncOperation) to decorate
-
-        Returns:
-            None
 
         """
         # Get the wrapper function from the operation

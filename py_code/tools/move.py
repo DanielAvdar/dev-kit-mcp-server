@@ -1,3 +1,5 @@
+"""Module for moving files and directories in the workspace."""
+
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -8,10 +10,9 @@ from .file_ops import FileOperation
 
 @dataclass(unsafe_hash=True, slots=True)
 class MoveDirOperation(FileOperation):
-    # __slots__ = ("_root_path",)
     """Class to move a file or folder in the workspace."""
 
-    name = "move_dir_tool"
+    name = "move_dir"
 
     def _move_folder(self, path1: str, path2: str) -> None:
         """Move a file or folder from path1 to path2.
@@ -21,10 +22,8 @@ class MoveDirOperation(FileOperation):
             path2: Destination path
 
         Raises:
-            ValueError: If either path is not within the root directory
             FileNotFoundError: If the source path does not exist
             FileExistsError: If the destination path already exists
-            OSError: If there's an error moving the file or folder
 
         """
         root_path = self._root_path

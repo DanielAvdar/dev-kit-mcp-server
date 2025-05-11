@@ -1,3 +1,5 @@
+"""Module for removing files and directories in the workspace."""
+
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,7 +12,7 @@ from .file_ops import FileOperation
 class RemoveFileOperation(FileOperation):
     """Class to Remove a file or folder."""
 
-    name = "remove_file_tool"
+    name = "remove_file"
 
     def _remove_folder(self, path: str) -> None:
         """Remove a file or folder at the specified path.
@@ -19,9 +21,7 @@ class RemoveFileOperation(FileOperation):
             path: Path to the file or folder to remove
 
         Raises:
-            ValueError: If the path is not within the root directory
             FileNotFoundError: If the path does not exist
-            OSError: If there's an error removing the file or folder
 
         """
         # Validate that the path is within the root directory

@@ -1,3 +1,5 @@
+"""Module for creating directories in the workspace."""
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict
@@ -9,7 +11,7 @@ from .file_ops import FileOperation
 class CreateDirOperation(FileOperation):
     """Class to create a folder in the workspace."""
 
-    name = "create_dir_tool"
+    name = "create_dir"
 
     def _create_folder(self, path: str) -> None:
         """Create a folder at the specified path.
@@ -18,9 +20,7 @@ class CreateDirOperation(FileOperation):
             path: Path to the folder to create
 
         Raises:
-            ValueError: If the path is not within the root directory
             FileExistsError: If the path already exists
-            OSError: If there's an error creating the folder
 
         """
         # Validate that the path is within the root directory
@@ -60,12 +60,25 @@ class CreateDirOperation(FileOperation):
     def self_warpper(
         self,
     ) -> Callable:
-        """Return the self wrapper."""
+        """Return the self wrapper function.
+
+        Returns:
+            A callable function that wraps the __call__ method
+
+        """
 
         def self_wrapper(
             path: str,
         ) -> Dict[str, Any]:
-            """Run makefile commands."""
+            """Create a directory in the workspace.
+
+            Args:
+                path: Path to the directory to create
+
+            Returns:
+                A dictionary containing the status and path of the created directory
+
+            """
             return self.__call__(path)
 
         self_wrapper.__name__ = self.name

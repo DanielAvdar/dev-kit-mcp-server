@@ -1,9 +1,8 @@
 """Tests for file operations."""
 
 import os
-import tempfile
 from pathlib import Path
-from typing import Generator, Tuple
+from typing import Tuple
 
 import pytest
 
@@ -11,10 +10,9 @@ from py_code.tools import CreateDirOperation, FileOperation, MoveDirOperation, R
 
 
 @pytest.fixture
-def temp_root_dir() -> Generator[str, None, None]:
+def temp_root_dir(tmp_path) -> str:
     """Create a temporary directory for testing."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        yield temp_dir
+    return Path(tmp_path).as_posix()
 
 
 @pytest.fixture
