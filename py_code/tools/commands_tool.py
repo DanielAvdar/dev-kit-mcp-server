@@ -63,12 +63,7 @@ class MakeCommandsTool(AsyncOperation):
 
         return self_wrapper
 
-    def _read_makefile(self) -> str:
-        """Read the Makefile content from the root directory."""
-        makefile_path = self._root_path / "Makefile"
-        if not makefile_path.exists():
-            raise FileNotFoundError(f"Makefile not found at {makefile_path}")
-        return makefile_path.read_text()
+
 
     async def _exec_commands(self, target: str, commands: List[str], result: Dict[str, Any]) -> None:
         """Execute a makefile command and store the result.
@@ -81,7 +76,8 @@ class MakeCommandsTool(AsyncOperation):
         """
         if not self._make_file_exists:
             result[target] = {
-                "error": f"Makefile not found at {self._root_path.as_posix()}",
+                "error": "'Makefile' not found",
+                "directory": self._root_path.as_posix(),
             }
             return
         valid_cmd_regex = r"^[a-zA-Z0-9_-]+$"
