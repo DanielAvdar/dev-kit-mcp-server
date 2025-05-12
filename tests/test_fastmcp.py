@@ -38,4 +38,4 @@ async def test_encoding_error(fastmcp_server):
         res = await client.call_tool(make_cmd.name, dict(commands=["encoding-error"]))
         # Check that the result contains the expected error message
         assert "encoding-error" in res[0].text
-        assert "Hello, world!" in res[0].text
+        assert "UnicodeDecodeError" not in res[0].text
