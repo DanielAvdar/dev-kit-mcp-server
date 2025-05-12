@@ -147,3 +147,39 @@ Remove File Operation
       :type path: str
       :return: A dictionary containing the status and path of the removed file or folder
       :rtype: Dict[str, Any]
+
+Rename Operation
+~~~~~~~~~~~~~~~~~~~~~
+
+.. py:module:: dev_kit_mcp_server.tools.rename
+
+.. py:class:: RenameOperation
+
+   Class to rename a file or folder in the workspace.
+
+   :param root_dir: The root directory for file operations
+   :type root_dir: str
+
+   .. py:method:: _rename_file_or_folder(path: str, new_name: str) -> None
+
+      Rename a file or folder.
+
+      :param path: Path to the file or folder to rename
+      :type path: str
+      :param new_name: New name for the file or folder (not a full path, just the name)
+      :type new_name: str
+      :raises ValueError: If the path is not within the root directory
+      :raises FileNotFoundError: If the path does not exist
+      :raises FileExistsError: If a file or folder with the new name already exists
+      :raises OSError: If there's an error renaming the file or folder
+
+   .. py:method:: __call__(path: str, new_name: str) -> Dict[str, Any]
+
+      Rename a file or folder.
+
+      :param path: Path to the file or folder to rename
+      :type path: str
+      :param new_name: New name for the file or folder (not a full path, just the name)
+      :type new_name: str
+      :return: A dictionary containing the status and paths of the renamed file or folder
+      :rtype: Dict[str, Any]
