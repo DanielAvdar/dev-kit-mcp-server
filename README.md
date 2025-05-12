@@ -20,7 +20,7 @@ It serves as an excellent MCP server for VS-Code copilot and other AI-assisted d
 
 - 🔒 **Secure Operations**: Execute operations within a scoped, authorized root directory
 - 🛠️ **Makefile Command Execution**: Run makefile commands securely within the project
-- 📁 **File Operations**: Move, create, and delete files within the authorized directory
+- 📁 **File Operations**: Move, Create, Rename and Delete files within the authorized directory
 - 🔌 **MCP Integration**: Turn any codebase into an MCP-compliant system
 - 🤖 **AI-Assisted Development**: Excellent integration with VS-Code copilot and other AI tools
 - 🔄 **Extensible Framework**: Easily add new tools for code editing and other operations
@@ -60,22 +60,25 @@ The server provides the following tools:
 
 ```python
 from fastmcp import Client
+async def example()
+    async with Client() as client:
+        # List available tools
+        tools = await client.list_tools()
 
-async with Client() as client:
-    # List available tools
-    tools = await client.list_tools()
+        # Run a makefile command
+        result = await client.call_tool("exec_make_target", {"commands": ["test"]})
 
-    # Run a makefile command
-    result = await client.call_tool("exec_make_target", {"commands": ["test"]})
+        # Create a directory
+        result = await client.call_tool("create_dir", {"path": "new_directory"})
 
-    # Create a directory
-    result = await client.call_tool("create_dir", {"path": "new_directory"})
+        # Move a file
+        result = await client.call_tool("move_dir", {"path1": "source.txt", "path2": "destination.txt"})
 
-    # Move a file
-    result = await client.call_tool("move_dir", {"path1": "source.txt", "path2": "destination.txt"})
+        # Remove a file
+        result = await client.call_tool("remove_file", {"path": "file_to_remove.txt"})
 
-    # Remove a file
-    result = await client.call_tool("remove_file", {"path": "file_to_remove.txt"})
+        # Rename a file
+        result = await client.call_tool("rename_file", {"path1": "old_name.txt", "path2": "new_name.txt"})
 ```
 
 ## Development
