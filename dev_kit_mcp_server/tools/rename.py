@@ -22,10 +22,8 @@ class RenameOperation(FileOperation):
             new_name: New name for the file or folder (not a full path, just the name)
 
         Raises:
-            ValueError: If the path is not within the root directory
             FileNotFoundError: If the path does not exist
             FileExistsError: If a file or folder with the new name already exists
-            OSError: If there's an error renaming the file or folder
 
         """
         root_path = self._root_path
