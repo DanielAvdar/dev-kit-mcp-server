@@ -117,8 +117,8 @@ class ExecMakeTarget(AsyncOperation):
 
                 res = {
                     "command": line,
-                    "stdout": stdout.decode(),
-                    "stderr": stderr.decode(),
+                    "stdout": stdout.decode(errors="replace"),
+                    "stderr": stderr.decode(errors="replace"),
                     "cwd": self._root_path.as_posix(),
                 }
                 result[target].append(res)
