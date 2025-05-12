@@ -6,7 +6,13 @@ from typing import Tuple
 
 import pytest
 
-from dev_kit_mcp_server.tools import CreateDirOperation, FileOperation, MoveDirOperation, RemoveFileOperation
+from dev_kit_mcp_server.tools import (
+    CreateDirOperation,
+    FileOperation,
+    MoveDirOperation,
+    RemoveFileOperation,
+    RenameOperation,
+)
 
 
 @pytest.fixture
@@ -31,6 +37,12 @@ def move_operation(temp_root_dir: str) -> MoveDirOperation:
 def remove_operation(temp_root_dir: str) -> RemoveFileOperation:
     """Create a RemoveFileOperation instance with a temporary root directory."""
     return RemoveFileOperation(root_dir=temp_root_dir)
+
+
+@pytest.fixture
+def rename_operation(temp_root_dir: str) -> RenameOperation:
+    """Create a RenameOperation instance with a temporary root directory."""
+    return RenameOperation(root_dir=temp_root_dir)
 
 
 @pytest.fixture(
@@ -367,3 +379,115 @@ class TestRemoveFileOperation:
         assert "error" in invalid_res
         invalid_res = move_operation(invalid, "some_folder")
         assert "error" in invalid_res
+
+
+class TestRenameOperation:
+    """Tests for RenameOperation."""
+
+    def test_rename_file_success(
+        self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
+        """Test renaming a file successfully."""
+        # Arrange
+        _, test_file, _ = setup_test_files
+        new_name = "renamed_file.txt"
+
+        # Get the parent directory
+        parent_dir = os.path.dirname(test_file)
+        expected_new_path = os.path.join(parent_dir, new_name)
+
+        # Act
+        result = rename_operation(test_file, new_name)
+
+        # Assert
+        assert result.get("status") == "success"
+        assert not os.path.exists(test_file)
+        assert os.path.exists(expected_new_path)
+        assert os.path.isfile(expected_new_path)
+
+        # Check content
+        with open(expected_new_path, "r") as f:
+            content = f.read()
+        assert content == "Test content"
+
+    def test_rename_folder_success(
+        self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
+        """Test renaming a folder successfully."""
+        # Arrange
+        test_dir, _, _ = setup_test_files
+        new_name = "renamed_dir"
+
+        # Get the parent directory
+        parent_dir = os.path.dirname(test_dir)
+        expected_new_path = os.path.join(parent_dir, new_name)
+
+        # Act
+        result = rename_operation(test_dir, new_name)
+
+        # Assert
+        assert result.get("status") == "success"
+        assert not os.path.exists(test_dir)
+        assert os.path.exists(expected_new_path)
+        assert os.path.isdir(expected_new_path)
+
+    def test_rename_non_existent(
+        self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
+        """Test renaming a non-existent path."""
+        # Arrange
+        _, _, non_existent = setup_test_files
+        new_name = "should_not_exist"
+
+        # Act
+        result = rename_operation(non_existent, new_name)
+
+        # Assert
+        assert "error" in result
+        assert "does not exist" in result.get("error", "")
+
+    def test_rename_to_existing_name(
+        self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str], temp_root_dir: str
+    ) -> None:
+        """Test renaming to a name that already exists."""
+        # Arrange
+        _, test_file, _ = setup_test_files
+
+        # Create another file with the target name
+        existing_name = "existing_file.txt"
+        existing_path = os.path.join(os.path.dirname(test_file), existing_name)
+        with open(existing_path, "w") as f:
+            f.write("Existing content")
+
+        # Act
+        result = rename_operation(test_file, existing_name)
+
+        # Assert
+        assert "error" in result
+        assert "already exists" in result.get("error", "")
+        assert os.path.exists(test_file)
+        assert os.path.exists(existing_path)
+
+    @pytest.mark.skip(reason="Test is OS dependent")
+    def test_rename_outside_root(self, rename_operation: RenameOperation) -> None:
+        """Test renaming a path outside the root directory."""
+        # Arrange
+        outside_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "outside_file.txt"))
+        new_name = "renamed_outside_file.txt"
+
+        # Create the file temporarily to ensure it exists
+        try:
+            with open(outside_path, "w") as f:
+                f.write("Should not be renamed")
+
+            # Act
+            result = rename_operation(outside_path, new_name)
+
+            # Assert
+            assert "error" in result
+            assert "not within the root directory" in result.get("error", "")
+            assert os.path.exists(outside_path)
+        finally:
+            # Clean up
+            if os.path.exists(outside_path):
+                os.remove(outside_path)

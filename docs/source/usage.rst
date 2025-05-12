@@ -79,6 +79,22 @@ The operation will fail if:
 * The path is outside the root directory
 * The path does not exist
 
+Rename File or Directory
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Renames a file or directory to a new name within the same directory.
+
+.. code-block:: python
+
+   # Using the MCP client
+   result = await client.call_tool("rename_file", {"path": "path/to/file.txt", "new_name": "new_file_name.txt"})
+
+The operation will fail if:
+
+* The path is outside the root directory
+* The path does not exist
+* A file or folder with the new name already exists in the same directory
+
 Security Considerations
 ------------------------
 
