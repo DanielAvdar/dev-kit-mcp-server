@@ -12,16 +12,16 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Last Commit](https://img.shields.io/github/last-commit/DanielAvdar/dev-kit-mcp-server/main)
 
-A Model Context Protocol (MCP) server for interacting with codebases.
-This package provides tools for turning any repository or code base into an MCP system.
+A Model Context Protocol (MCP) server for agent development tools.
+This package provides scoped authorized operations in the root project directory such as running makefile commands, moving and deleting files, and renaming files. It's a great MCP for VS-Code Copilot and other AI-assisted development tools.
 
 ## Features
 
 - 🔌 **MCP Integration**: Turn any codebase into an MCP-compliant system
-- 🛠️ **Custom Tools**: Create custom tools for specific repository needs
-- 🔍 **Repository Navigation**: Navigate and explore code repositories with ease
-- 🧩 **Code Structure Analysis**: Understand code structure through AST analysis
-- 🔢 **Code Exploration**: Explore code elements like functions, classes, and imports
+- 🛠️ **File Operations**: Create, move, delete, and rename files and directories
+- 🔧 **Makefile Integration**: Execute makefile commands securely within the root directory
+- 🔒 **Scoped Authorization**: All operations are restricted to the specified root directory
+- 🔄 **VS-Code Copilot Integration**: Works seamlessly with VS-Code Copilot
 - 🚀 **Fast API**: Built with FastAPI for high performance
 
 ## Installation
@@ -45,26 +45,30 @@ python -m dev_kit_mcp_server.mcp_server --root-dir=workdir
 
 The `--root-dir` parameter specifies the directory where file operations will be performed. This is important for security reasons, as it restricts file operations to this directory only.
 
-### API Endpoints
+### Available Tools
 
-- `GET /`: Repository navigation server information
-- `POST /analyze`: Comprehensive repository structure analysis
-- `POST /ast`: Code structure extraction for navigation
-- `POST /tokenize`: Detailed code element identification
-- `POST /count`: Repository component summarization
+The server provides the following tools:
 
+- **create_dir**: Create directories and files
+- **move_dir**: Move files and directories
+- **remove_file**: Remove files and directories
+- **rename_file**: Rename files and directories
+- **exec_make_target**: Execute makefile targets
 
+### Example Usage
 
-# Get repository structure for navigation
-response = requests.post(
-    "http://localhost:8000/analyze",
-    json={"code": code, "path": "src/data/navigator.py"}
-)
+```python
+from fastmcp import Client
 
-# Use the structure for repository navigation
-structure = response.json()
-print(f"Repository components found: {len(structure['result']['ast_analysis']['functions'])} functions, "
-      f"{len(structure['result']['ast_analysis']['classes'])} classes")
+async with Client("http://localhost:8000") as client:
+    # List available tools
+    tools = await client.list_tools()
+
+    # Create a directory
+    result = await client.call_tool("create_dir", {"path": "new_directory"})
+
+    # Execute a makefile target
+    result = await client.call_tool("exec_make_target", {"commands": ["test"]})
 ```
 
 ## Development
