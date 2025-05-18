@@ -1,9 +1,16 @@
-"""Tests for the FastMCP server."""
+"""Tests for the Git operations."""
 
 from pathlib import Path
+from typing import Any, Callable
 
 import pytest
 from git import Repo
+
+from dev_kit_mcp_server.tools.git import (
+    GitAddOperation,
+    GitCheckoutOperation,
+    GitCreateBranchOperation,
+)
 
 
 @pytest.fixture(scope="function")
@@ -15,6 +22,40 @@ def temp_dir_git(temp_dir: str) -> str:
     repo.index.add([dummy_file])
     repo.index.commit("Add dummy file")
     return Path(temp_dir).as_posix()
+
+
+@pytest.fixture
+def git_checkout_operation(temp_dir_git: str) -> GitCheckoutOperation:
+    """Create a GitCheckoutOperation instance for testing."""
+    return GitCheckoutOperation(root_dir=temp_dir_git)
+
+
+@pytest.fixture
+def git_create_branch_operation(temp_dir_git: str) -> GitCreateBranchOperation:
+    """Create a GitCreateBranchOperation instance for testing."""
+    return GitCreateBranchOperation(root_dir=temp_dir_git)
+
+
+@pytest.fixture
+def git_add_operation(temp_dir_git: str) -> GitAddOperation:
+    """Create a GitAddOperation instance for testing."""
+    return GitAddOperation(root_dir=temp_dir_git)
+
+
+@pytest.fixture
+def mock_repo_error() -> Callable[[Any], None]:
+    """Create a mock repository that raises an exception when accessing git attribute."""
+
+    class MockRepo:
+        def __getattr__(self, name):
+            if name == "git":
+                raise Exception("Simulated error")
+            return None
+
+    def _apply_mock(operation: Any) -> None:
+        operation._repo = MockRepo()
+
+    return _apply_mock
 
 
 def test_temp_dir_git(temp_dir_git):

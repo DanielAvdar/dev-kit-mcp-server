@@ -1,5 +1,7 @@
 """Tests for the GitCheckoutOperation class."""
 
+from typing import Any, Dict
+
 import pytest
 from git import Repo
 
@@ -7,98 +9,101 @@ from dev_kit_mcp_server.tools.git import GitCheckoutOperation
 
 
 @pytest.mark.asyncio
-async def test_git_checkout_operation(temp_dir_git):
-    """Test the GitCheckoutOperation class with an existing branch."""
-    # Create a test branch in the repository
+@pytest.mark.parametrize(
+    "branch_name,create,setup_branch,expected_result,expected_branch_exists",
+    [
+        # Test case 1: Checkout existing branch
+        (
+            "test-branch",  # branch_name
+            False,  # create
+            True,  # setup_branch
+            {
+                "status": "success",
+                "branch": "test-branch",
+                "created": False,
+                "message_contains": "Successfully checked out branch 'test-branch'",
+            },
+            True,  # expected_branch_exists
+        ),
+        # Test case 2: Create and checkout new branch
+        (
+            "feature-branch",  # branch_name
+            True,  # create
+            False,  # setup_branch
+            {
+                "status": "success",
+                "branch": "feature-branch",
+                "created": True,
+                "message_contains": "Successfully created and checked out branch 'feature-branch'",
+            },
+            True,  # expected_branch_exists
+        ),
+        # Test case 3: Attempt to checkout nonexistent branch
+        (
+            "nonexistent-branch",  # branch_name
+            False,  # create
+            False,  # setup_branch
+            {
+                "error_contains": "Branch 'nonexistent-branch' does not exist",
+                "branch": "nonexistent-branch",
+            },
+            False,  # expected_branch_exists
+        ),
+    ],
+    ids=["existing_branch", "create_branch", "nonexistent_branch"],
+)
+async def test_git_checkout_operation(
+    git_checkout_operation: GitCheckoutOperation,
+    temp_dir_git: str,
+    branch_name: str,
+    create: bool,
+    setup_branch: bool,
+    expected_result: Dict[str, Any],
+    expected_branch_exists: bool,
+):
+    """Test the GitCheckoutOperation class with various scenarios."""
+    # Setup: Create a branch if needed
     repo = Repo(temp_dir_git)
-    # Create a branch
-    repo.git.branch("test-branch")
+    if setup_branch:
+        repo.git.branch(branch_name)
 
-    # Create the operation
-    operation = GitCheckoutOperation(root_dir=temp_dir_git)
+    # Execute: Checkout the branch
+    result = await git_checkout_operation(branch_name, create=create)
 
-    # Checkout the branch
-    result = await operation("test-branch")
+    # Verify: Check the result
+    if "status" in expected_result:
+        assert result["status"] == expected_result["status"]
+        assert expected_result["message_contains"] in result["message"]
+        assert result["branch"] == expected_result["branch"]
+        assert result["created"] == expected_result["created"]
+    else:
+        assert "error" in result
+        assert expected_result["error_contains"] in result["error"]
+        assert result["branch"] == expected_result["branch"]
 
-    # Check the result
-    assert result["status"] == "success"
-    assert "Successfully checked out branch 'test-branch'" in result["message"]
-    assert result["branch"] == "test-branch"
-    assert not result["created"]
-
-    # Verify the branch was checked out
-    assert repo.active_branch.name == "test-branch"
+    # Verify: Check if the branch exists and is checked out
+    branches = [b.name for b in repo.branches]
+    assert (branch_name in branches) == expected_branch_exists
+    if expected_branch_exists and "status" in expected_result:
+        assert repo.active_branch.name == branch_name
 
 
 @pytest.mark.asyncio
-async def test_git_checkout_operation_create_branch(temp_dir_git):
-    """Test the GitCheckoutOperation class creating a new branch."""
-    # Create the operation
-    operation = GitCheckoutOperation(root_dir=temp_dir_git)
-
-    # Checkout a new branch
-    result = await operation("feature-branch", create=True)
-
-    # Check the result
-    assert result["status"] == "success"
-    assert "Successfully created and checked out branch 'feature-branch'" in result["message"]
-    assert result["branch"] == "feature-branch"
-    assert result["created"]
-
-    # Verify the branch was created and checked out
-    repo = Repo(temp_dir_git)
-    assert "feature-branch" in [b.name for b in repo.branches]
-    assert repo.active_branch.name == "feature-branch"
-
-
-@pytest.mark.asyncio
-async def test_git_checkout_operation_nonexistent_branch(temp_dir_git):
-    """Test the GitCheckoutOperation class with a nonexistent branch."""
-    # Create the operation
-    operation = GitCheckoutOperation(root_dir=temp_dir_git)
-
-    # Checkout a nonexistent branch
-    result = await operation("nonexistent-branch")
-
-    # Check the result
-    assert "error" in result
-    assert "Branch 'nonexistent-branch' does not exist" in result["error"]
-    assert result["branch"] == "nonexistent-branch"
-
-    # Verify the branch was not created
-    repo = Repo(temp_dir_git)
-    assert "nonexistent-branch" not in [b.name for b in repo.branches]
-
-
-@pytest.mark.asyncio
-async def test_git_checkout_operation_empty_branch(temp_dir_git):
+async def test_git_checkout_operation_empty_branch(git_checkout_operation: GitCheckoutOperation):
     """Test the GitCheckoutOperation class with an empty branch name."""
-    # Create the operation
-    operation = GitCheckoutOperation(root_dir=temp_dir_git)
-
     # Checkout with an empty branch name
     with pytest.raises(ValueError, match="Branch name must be provided"):
-        await operation("")
+        await git_checkout_operation("")
 
 
 @pytest.mark.asyncio
-async def test_git_checkout_operation_exception(temp_dir_git):
+async def test_git_checkout_operation_exception(git_checkout_operation: GitCheckoutOperation, mock_repo_error):
     """Test the GitCheckoutOperation class when an exception occurs."""
-    # Create a valid operation first
-    operation = GitCheckoutOperation(root_dir=temp_dir_git)
-
-    # Mock the _repo attribute to simulate an error during checkout
-    class MockRepo:
-        def __getattr__(self, name):
-            if name == "git":
-                raise Exception("Simulated error")
-            return None
-
-    # Replace the repo with our mock
-    operation._repo = MockRepo()
+    # Apply the mock to simulate an error
+    mock_repo_error(git_checkout_operation)
 
     # Attempt to checkout a branch
-    result = await operation("main")
+    result = await git_checkout_operation("main")
 
     # Check the result
     assert "error" in result
