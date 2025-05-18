@@ -5,7 +5,7 @@ from typing import Any, Callable, List
 from fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 
-from dev_kit_mcp_server.tools.file_ops import _Operation
+from .tools.core import _Operation
 
 
 class ToolFactory:
