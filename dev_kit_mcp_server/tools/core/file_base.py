@@ -3,18 +3,15 @@
 import abc
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, TypeVar
+from typing import Any
 
 from git import Repo
 
-from .models import BaseToolParams, ToolModelMixin
-
 # Type variable for the model
-T = TypeVar("T", bound=BaseToolParams)
 
 
 @dataclass
-class _Operation(ToolModelMixin[T]):
+class _Operation:
     root_dir: str
     _root_path: Path = field(init=False, repr=False)
     _repo: Repo = field(init=False, repr=False)
@@ -45,15 +42,6 @@ class _Operation(ToolModelMixin[T]):
     @abc.abstractmethod
     def name(self) -> str:
         """Return the name of the operation."""
-
-    @abc.abstractmethod
-    def self_warpper(self) -> Callable:
-        """Return the self wrapper function.
-
-        Returns:
-            A callable function that wraps the __call__ method
-
-        """
 
     @abc.abstractmethod
     def __call__(self, *args: Any, **kwargs: Any) -> Any:

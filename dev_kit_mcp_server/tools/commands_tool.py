@@ -9,19 +9,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
-from pydantic import Field
-
 from .core import AsyncOperation
-from .core.models import BaseToolParams
-
-
-class ExecMakeTargetParams(BaseToolParams):
-    """Parameters for executing Makefile targets."""
-
-    commands: List[str] = Field(
-        ...,
-        description="List of Makefile targets to execute (e.g. ['test', 'lint'])",
-    )
 
 
 @dataclass
@@ -35,7 +23,6 @@ class ExecMakeTarget(AsyncOperation):
     _make_file_exists: bool = field(init=False, default=False)
 
     name = "exec_make_target"
-    model_class = ExecMakeTargetParams
 
     def __post_init__(self) -> None:
         """Post-initialization to set the root path."""
@@ -46,12 +33,12 @@ class ExecMakeTarget(AsyncOperation):
     def _repo_init(self) -> None: ...
     async def __call__(
         self,
-        model_or_commands: ExecMakeTargetParams | List[str] | Any,
+        commands: List[str],
     ) -> Dict[str, Any]:
         """Execute Makefile targets.
 
         Args:
-            model_or_commands: Parameters for executing Makefile targets or a list of commands
+            commands: List of Makefile targets to execute
 
         Returns:
             A dictionary containing the execution results for each target
@@ -61,20 +48,16 @@ class ExecMakeTarget(AsyncOperation):
 
         """
         # Handle both model and direct list input for backward compatibility
-        if isinstance(model_or_commands, list):
-            commands = model_or_commands
-        elif hasattr(model_or_commands, "commands"):
-            commands = model_or_commands.commands
-        else:
-            # For tests that pass invalid input
+        if not isinstance(commands, list):
             raise ValueError("Expected a list of commands as the argument")
 
         result: Dict[str, Any] = {}
+
         for cmd in commands:
-            await self._exec_commands(cmd, commands, result)
+            await self._exec_commands(cmd, result)
         return result
 
-    async def _exec_commands(self, target: str, commands: List[str], result: Dict[str, Any]) -> None:
+    async def _exec_commands(self, target: str, result: Dict[str, Any]) -> None:
         """Execute a Makefile target and store the result.
 
         Args:
@@ -94,7 +77,6 @@ class ExecMakeTarget(AsyncOperation):
         if not re.match(valid_cmd_regex, target):
             result[target] = {
                 "error": f"Target '{target}' is invalid.",
-                "commands": commands,
             }
             return
 
@@ -116,7 +98,6 @@ class ExecMakeTarget(AsyncOperation):
             result[target] = {
                 "error": f"Error running makefile command: {str(e)}",
                 "make-target": target,
-                "commands": commands,
                 "cwd": self._root_path.as_posix(),
             }
 

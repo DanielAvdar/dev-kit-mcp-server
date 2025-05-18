@@ -134,25 +134,3 @@ async def test_exec_make_target_exception_handling(exec_make_target):
         assert "error" in result["test"]
         assert "Error running makefile command: Command failed" == result["test"]["error"]
         assert result["test"]["make-target"] == "test"
-
-
-@pytest.mark.asyncio
-async def test_self_wrapper(exec_make_target):
-    """Test the self_wrapper method."""
-    # Mock the __call__ method
-    exec_make_target.__call__ = AsyncMock(return_value={"test": "result"})
-
-    # Get the wrapper function
-    wrapper = exec_make_target.self_warpper()
-
-    # Check the wrapper name
-    assert wrapper.__name__ == "exec_make_target"
-
-    # Call the wrapper
-    result = await wrapper(["test"])
-
-    # Check that __call__ was called
-    assert exec_make_target.__call__.called
-
-    # Check the result
-    assert result == {"test": "result"}
