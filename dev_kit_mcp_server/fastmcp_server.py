@@ -10,7 +10,16 @@ from pathlib import Path
 from fastmcp import FastMCP
 
 from .tool_factory import ToolFactory
-from .tools import CreateDirOperation, MoveDirOperation, RemoveFileOperation, RenameOperation
+from .tools import (
+    CreateDirOperation,
+    GitCommitOperation,
+    GitPullOperation,
+    GitPushOperation,
+    GitStatusOperation,
+    MoveDirOperation,
+    RemoveFileOperation,
+    RenameOperation,
+)
 from .tools.commands_tool import ExecMakeTarget
 
 
@@ -36,11 +45,17 @@ def start_server(root_dir: str = None) -> FastMCP:
 
     tool_factory = ToolFactory(fastmcp)
     tool_factory([
-        # move_dir_tool,
+        # File system operations
         MoveDirOperation(root_dir=root_dir),
         CreateDirOperation(root_dir=root_dir),
         RemoveFileOperation(root_dir=root_dir),
         RenameOperation(root_dir=root_dir),
+        # Git operations
+        GitStatusOperation(root_dir=root_dir),
+        GitCommitOperation(root_dir=root_dir),
+        GitPushOperation(root_dir=root_dir),
+        GitPullOperation(root_dir=root_dir),
+        # Make operations
         ExecMakeTarget(root_dir=root_dir),
     ])
     return fastmcp

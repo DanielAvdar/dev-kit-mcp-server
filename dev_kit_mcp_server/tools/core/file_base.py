@@ -28,7 +28,7 @@ class _Operation:
             raise Exception(f"Path is neither a file nor a directory: {self.root_dir}")
         self._repo_init()
 
-    def _repo_init(self):
+    def _repo_init(self) -> None:
         self._repo = Repo(self._root_path)
 
     @property
