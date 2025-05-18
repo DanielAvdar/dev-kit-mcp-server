@@ -8,11 +8,11 @@ import pytest
 
 from dev_kit_mcp_server.tools import (
     CreateDirOperation,
-    FileOperation,
     MoveDirOperation,
     RemoveFileOperation,
     RenameOperation,
 )
+from dev_kit_mcp_server.tools.core import FileOperation
 
 
 @pytest.fixture
