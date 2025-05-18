@@ -3,9 +3,18 @@
 from typing import Any, Callable, List
 
 from fastmcp import FastMCP
+from fastmcp.tools import Tool
 from mcp.types import ToolAnnotations
 
 from .tools.core import _Operation
+
+
+class RepoFastMCPServerError(FastMCP):
+    """Extended FastMCP class with additional tool management functionality."""
+
+    def add_fast_tool(self, tool: Tool) -> None:
+        """Add a tool to the server."""
+        self._tool_manager.add_tool(tool)
 
 
 class ToolFactory:
@@ -15,7 +24,7 @@ class ToolFactory:
     decorator, optionally adding behavior before and after the function execution.
     """
 
-    def __init__(self, mcp_instance: FastMCP):
+    def __init__(self, mcp_instance: RepoFastMCPServerError):
         """Initialize the tool factory with an MCP instance.
 
         Args:
@@ -44,14 +53,16 @@ class ToolFactory:
 
         """
         # Get the wrapper function from the operation
-        wrapper = func.self_warpper()
         # Set the name attribute for compatibility with FastMCP
-        wrapper.__name__ = func.name
-        description = f"Preferred from the terminal:\n{func.docstring}"
-        self.mcp.tool(
-            func.name,
+        description = f"Use instead of terminal:\n{func.docstring}"
+        tool = Tool.from_function(
+            fn=func.__call__,
+            name=func.name,
             description=description,
             annotations=ToolAnnotations(
                 destructiveHint=True,
             ),
-        )(wrapper)
+        )
+        self.mcp.add_fast_tool(
+            tool=tool,
+        )

@@ -1,19 +1,9 @@
 """Module for getting the status of a git repository."""
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict
+from typing import Any, Dict
 
 from ..core import AsyncOperation
-from ..core.models import BaseToolParams
-
-
-class GitStatusParams(BaseToolParams):
-    """Parameters for getting the status of a git repository.
-
-    This class doesn't have any parameters as the git status operation doesn't require any.
-    """
-
-    pass
 
 
 @dataclass
@@ -21,9 +11,10 @@ class GitStatusOperation(AsyncOperation):
     """Class to get the status of a git repository."""
 
     name = "git_status"
-    model_class = GitStatusParams
 
-    async def __call__(self, model: GitStatusParams = None) -> Dict[str, Any]:
+    async def __call__(
+        self,
+    ) -> Dict[str, Any]:
         """Get the status of the git repository.
 
         Args:
@@ -73,28 +64,3 @@ class GitStatusOperation(AsyncOperation):
             return {
                 "error": f"Error getting git status: {str(e)}",
             }
-
-    def self_warpper(
-        self,
-    ) -> Callable:
-        """Return the self wrapper function.
-
-        Returns:
-            A callable function that wraps the __call__ method
-
-        """
-
-        async def self_wrapper() -> Dict[str, Any]:
-            """Get the status of the git repository.
-
-            Returns:
-                A dictionary containing the status of the git repository
-
-            """
-            # Create a model with no parameters
-            model = self.model_class()
-            return await self.__call__(model)
-
-        self_wrapper.__name__ = self.name
-
-        return self_wrapper
