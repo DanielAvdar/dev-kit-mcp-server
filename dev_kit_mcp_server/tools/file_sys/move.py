@@ -5,7 +5,23 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict
 
+from pydantic import Field
+
 from ..core import FileOperation
+from ..core.models import BaseToolParams
+
+
+class MoveDirParams(BaseToolParams):
+    """Parameters for moving a file or directory."""
+
+    path1: str = Field(
+        ...,
+        description="Source path",
+    )
+    path2: str = Field(
+        ...,
+        description="Destination path",
+    )
 
 
 @dataclass(unsafe_hash=True, slots=True)
@@ -13,6 +29,7 @@ class MoveDirOperation(FileOperation):
     """Class to move a file or folder in the workspace."""
 
     name = "move_dir"
+    model_class = MoveDirParams
 
     def _move_folder(self, path1: str, path2: str) -> None:
         """Move a file or folder from path1 to path2.
@@ -46,17 +63,29 @@ class MoveDirOperation(FileOperation):
         # Move the file or folder
         shutil.move(str(source_path), str(dest_path))
 
-    def __call__(self, path1: str, path2: str) -> Dict[str, Any]:
+    def __call__(self, model_or_path1: MoveDirParams | str, path2: str = None) -> Dict[str, Any]:
         """Move a file or folder from path1 to path2.
 
         Args:
-            path1: Source path
-            path2: Destination path
+            model_or_path1: Parameters for moving a file or directory or a source path string
+            path2: Destination path (only used if model_or_path1 is a string)
 
         Returns:
             A dictionary containing the status and paths of the moved file or folder
 
+        Raises:
+            ValueError: If path2 is not provided when model_or_path1 is a string
+
         """
+        # Handle both model and direct path input for backward compatibility
+        if isinstance(model_or_path1, str):
+            if path2 is None:
+                raise ValueError("path2 must be provided when path1 is a string")
+            path1 = model_or_path1
+        else:
+            path1 = model_or_path1.path1
+            path2 = model_or_path1.path2
+
         try:
             self._move_folder(path1, path2)
             return {
@@ -96,7 +125,9 @@ class MoveDirOperation(FileOperation):
                 A dictionary containing the status and paths of the moved file or folder
 
             """
-            return self.__call__(path1, path2)
+            # Create a model with the parameters
+            model = self.model_class(path1=path1, path2=path2)
+            return self.__call__(model)
 
         self_wrapper.__name__ = self.name
 

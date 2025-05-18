@@ -4,6 +4,16 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict
 
 from ..core import AsyncOperation
+from ..core.models import BaseToolParams
+
+
+class GitStatusParams(BaseToolParams):
+    """Parameters for getting the status of a git repository.
+
+    This class doesn't have any parameters as the git status operation doesn't require any.
+    """
+
+    pass
 
 
 @dataclass
@@ -11,9 +21,13 @@ class GitStatusOperation(AsyncOperation):
     """Class to get the status of a git repository."""
 
     name = "git_status"
+    model_class = GitStatusParams
 
-    async def __call__(self) -> Dict[str, Any]:
+    async def __call__(self, model: GitStatusParams = None) -> Dict[str, Any]:
         """Get the status of the git repository.
+
+        Args:
+            model: Parameters for getting the status (not used as this operation doesn't require any parameters)
 
         Returns:
             A dictionary containing the status of the git repository
@@ -77,7 +91,9 @@ class GitStatusOperation(AsyncOperation):
                 A dictionary containing the status of the git repository
 
             """
-            return await self.__call__()
+            # Create a model with no parameters
+            model = self.model_class()
+            return await self.__call__(model)
 
         self_wrapper.__name__ = self.name
 
