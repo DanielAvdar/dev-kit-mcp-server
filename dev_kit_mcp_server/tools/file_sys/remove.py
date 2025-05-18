@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict
 
-from ..core.file_ops import FileOperation
+from ..core import FileOperation
 
 
 @dataclass
