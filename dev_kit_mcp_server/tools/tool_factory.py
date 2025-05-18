@@ -2,8 +2,8 @@
 
 from typing import Any, Callable, List
 
-from mcp.server.fastmcp import FastMCP  # type: ignore
-from mcp.types import ToolAnnotations  # type: ignore
+from fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 
 from dev_kit_mcp_server.tools.file_ops import _Operation
 

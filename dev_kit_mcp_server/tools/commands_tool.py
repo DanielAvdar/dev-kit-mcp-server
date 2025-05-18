@@ -128,11 +128,11 @@ class ExecMakeTarget(AsyncOperation):
                 "cwd": self._root_path.as_posix(),
             }
 
-    async def create_sub_proccess(self, cmd: str) -> asyncio.subprocess.Process:
+    async def create_sub_proccess(self, cmd: List[str]) -> asyncio.subprocess.Process:
         """Create a subprocess to execute a shell command.
 
         Args:
-            cmd: The shell command to execute
+            cmd: The shell command to execute as a list of strings
 
         Returns:
             A subprocess object with stdout and stderr pipes
