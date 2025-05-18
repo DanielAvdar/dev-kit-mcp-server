@@ -5,47 +5,41 @@ default: install
 
 install:
 	uv sync --all-extras --all-groups --frozen
-	uv tool install pre-commit --with pre-commit-uv --force-reinstall
-	uv run pre-commit install
+	uvx pre-commit install
 
 install-docs:
 	uv sync --group docs --frozen --no-group dev
 
 update:
-	uv lock
+	uv lock -n
 	uvx pre-commit autoupdate
 	$(MAKE) install
 
-test:
+test: install
 	uv run pytest
 
-check:
-	uv run pre-commit run --all-files
+check: install
+	uvx  pre-commit run --all-files
 
-coverage:
+coverage: install
 	uv run pytest --cov=dev_kit_mcp_server --cov-report=xml
 
-cov:
+cov: install
 	uv run pytest --cov=dev_kit_mcp_server --cov-report=term-missing
 
-mypy:
-	uv tool run mypy dev_kit_mcp_server --config-file pyproject.toml
+mypy: install
+	uv run mypy dev_kit_mcp_server --config-file pyproject.toml
 
-# Add doctests target to specifically run doctest validation
-doctest: install-docs doc install
+doctest: install-docs doc
 
-# Update doc target to run doctests as part of documentation build
 doc:
-	uv run --no-project sphinx-build -M doctest docs/source docs/build/ -W --keep-going --fresh-env
-	uv run --no-project sphinx-build -M html docs/source docs/build/ -W --keep-going --fresh-env
-
-
+	uv run --no-sync sphinx-build -M doctest docs/source docs/build/ -W --keep-going --fresh-env
+	uv run --no-sync sphinx-build -M html docs/source docs/build/ -W --keep-going --fresh-env
 
 check-all: check test mypy doc
 
-
 run:
-	uv run dev-kit-mcp-server --root-dir=.
+	uvx --from pyproject.toml dev-kit-mcp-server
 
-run-dev:
+dev:
 	npx @modelcontextprotocol/inspector@latest node build/index.js

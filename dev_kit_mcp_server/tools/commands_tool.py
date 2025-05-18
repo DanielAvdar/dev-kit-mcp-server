@@ -106,22 +106,19 @@ class ExecMakeTarget(AsyncOperation):
             return
 
         try:
-            result[target] = []
-            process_get = await self.create_sub_proccess(f"make {target} --just-print --quiet")
-            stdout, stderr = await process_get.communicate()
-            cmd = stdout.decode()
-            for line in cmd.splitlines():
-                process = await self.create_sub_proccess(line)
+            line = ["make", target, "--quiet"]
+            process = await self.create_sub_proccess(line)
 
-                stdout, stderr = await process.communicate()
+            stdout, stderr = await process.communicate()
 
-                res = {
-                    "command": line,
-                    "stdout": stdout.decode(errors="replace"),
-                    "stderr": stderr.decode(errors="replace"),
-                    "cwd": self._root_path.as_posix(),
-                }
-                result[target].append(res)
+            res = {
+                # "command": line,
+                "stdout": stdout.decode(errors="replace"),
+                "stderr": stderr.decode(errors="replace"),
+                "exitcode": process.returncode,
+                "cwd": self._root_path.as_posix(),
+            }
+            result[target] = res
         except Exception as e:
             result[target] = {
                 "error": f"Error running makefile command: {str(e)}",
@@ -130,18 +127,18 @@ class ExecMakeTarget(AsyncOperation):
                 "cwd": self._root_path.as_posix(),
             }
 
-    async def create_sub_proccess(self, cmd: str) -> asyncio.subprocess.Process:
+    async def create_sub_proccess(self, cmd: List[str]) -> asyncio.subprocess.Process:
         """Create a subprocess to execute a shell command.
 
         Args:
-            cmd: The shell command to execute
+            cmd: The shell command to execute as a list of strings
 
         Returns:
             A subprocess object with stdout and stderr pipes
 
         """
-        process_get = await asyncio.create_subprocess_shell(
-            cmd,
+        process_get = await asyncio.create_subprocess_exec(
+            *cmd,
             cwd=self._root_path.as_posix(),
             stdin=asyncio.subprocess.DEVNULL,
             stdout=asyncio.subprocess.PIPE,

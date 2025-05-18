@@ -29,9 +29,8 @@ keywords = [
 ]
 dependencies = [
 
-    "mcp",
-        "fastmcp>=2.3.3",
-
+    "mcp>=1.8.1",
+    "fastmcp>=2.3.3",
 ]
 
 [project.scripts]
@@ -48,8 +47,6 @@ dev = [
     "pytest-parametrization>=2022",
     "ruff>=0.8.2",
     "pytest-asyncio>=0.23.5",
-
-
 ]
 docs = [
     "sphinx>=8.2.0; python_version >= '3.11'",
@@ -80,7 +77,7 @@ include = ["pyproject.toml", "tests/**", ]
 exclude = ["tests/test_mcp_server.py", "tests/test_server.py"]
 
 [tool.ruff.lint]
-select = ["F", "B", "I", "F", "W", "E", "A", "N", "D","DOC"]
+select = ["F", "B", "I", "F", "W", "E", "A", "N", "D", "DOC"]
 
 fixable = ["ALL"]
 [tool.ruff.lint.per-file-ignores]

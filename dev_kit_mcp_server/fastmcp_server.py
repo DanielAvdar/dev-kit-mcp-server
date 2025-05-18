@@ -28,7 +28,7 @@ def start_server(root_dir: str = None) -> FastMCP:
     root_dir = root_dir or method_name()
 
     # Create a FastMCP instance
-    fastmcp = FastMCP(
+    fastmcp: FastMCP = FastMCP(
         name="Dev-Kit MCP Server",
         instructions="This server provides tools for file operations"
         f" and running authorized makefile commands in root directory: {root_dir}",
@@ -102,3 +102,6 @@ def arun_server(fastmcp: FastMCP = None) -> None:
         sys.exit(0)
     except KeyboardInterrupt:
         sys.exit(0)
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
