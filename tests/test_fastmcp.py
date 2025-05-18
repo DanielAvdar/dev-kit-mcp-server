@@ -7,8 +7,13 @@ from dev_kit_mcp_server import start_server
 
 
 @pytest.fixture
-def fastmcp_server():
-    server = start_server(Path(__file__).parent.as_posix())
+def fastmcp_server(temp_dir):
+    """Fixture to start the FastMCP server."""
+    with open(Path(__file__).parent / "Makefile", "r") as f:
+        make_content = f.read()
+    with open(Path(temp_dir) / "Makefile", "w") as f:
+        f.write(make_content)
+    server = start_server(temp_dir)
 
     return server
 

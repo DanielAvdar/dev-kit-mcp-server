@@ -15,10 +15,10 @@ from dev_kit_mcp_server.tools import (
 from dev_kit_mcp_server.tools.core import FileOperation
 
 
-@pytest.fixture
-def temp_root_dir(tmp_path) -> str:
+@pytest.fixture(scope="function")
+def temp_root_dir(temp_dir) -> str:
     """Create a temporary directory for testing."""
-    return Path(tmp_path).as_posix()
+    return temp_dir
 
 
 @pytest.fixture
