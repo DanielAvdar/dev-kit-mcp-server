@@ -2,19 +2,17 @@
 
 import asyncio
 import os
-import tempfile
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from dev_kit_mcp_server.fastmcp_server import start_server
 
-
-@pytest.fixture
-def temp_dir():
-    """Create a temporary directory for testing."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        yield temp_dir
+# @pytest.fixture
+# def temp_dir(tmp_path) -> str:
+#     """Create a temporary directory for testing."""
+#     Repo.init(tmp_path)
+#     return Path(tmp_path).as_posix()
 
 
 class TestFastMCPServer:
@@ -25,7 +23,7 @@ class TestFastMCPServer:
         """Test starting the server with the default root directory."""
         # Arrange
         mock_args = MagicMock()
-        mock_args.root_dir = os.getcwd()
+        mock_args.root_dir = temp_dir
         mock_parse_args.return_value = mock_args
 
         # Act

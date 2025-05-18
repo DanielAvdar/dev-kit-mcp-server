@@ -5,11 +5,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
+from git import Repo
+
 
 @dataclass
 class _Operation:
     root_dir: str
     _root_path: Path = field(init=False, repr=False)
+    _repo: Repo = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize the root path.
@@ -23,6 +26,10 @@ class _Operation:
             raise Exception(f"Path does not exist: {self.root_dir}")
         if not self._root_path.is_dir():
             raise Exception(f"Path is neither a file nor a directory: {self.root_dir}")
+        self._repo_init()
+
+    def _repo_init(self):
+        self._repo = Repo(self._root_path)
 
     @property
     def docstring(self) -> str:
