@@ -11,7 +11,10 @@ from pathlib import Path
 from .tool_factory import RepoFastMCPServerError as FastMCP, ToolFactory
 from .tools import (
     CreateDirOperation,
+    GitAddOperation,
+    GitCheckoutOperation,
     GitCommitOperation,
+    GitPullOperation,
     GitPushOperation,
     GitStatusOperation,
     MoveDirOperation,
@@ -52,7 +55,9 @@ def start_server(root_dir: str = None) -> FastMCP:
         GitStatusOperation(root_dir=root_dir),
         GitCommitOperation(root_dir=root_dir),
         GitPushOperation(root_dir=root_dir),
-        # GitPullOperation(root_dir=root_dir),
+        GitPullOperation(root_dir=root_dir),
+        GitAddOperation(root_dir=root_dir),
+        GitCheckoutOperation(root_dir=root_dir),
         # Make operations
         ExecMakeTarget(root_dir=root_dir),
     ])
