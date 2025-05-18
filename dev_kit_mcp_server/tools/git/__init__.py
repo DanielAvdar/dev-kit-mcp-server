@@ -3,6 +3,7 @@
 from .add import GitAddOperation
 from .checkout import GitCheckoutOperation
 from .commit import GitCommitOperation
+from .create_branch import GitCreateBranchOperation
 from .pull import GitPullOperation
 from .push import GitPushOperation
 from .status import GitStatusOperation
@@ -14,4 +15,5 @@ __all__ = [
     "GitAddOperation",
     "GitPullOperation",
     "GitCheckoutOperation",
+    "GitCreateBranchOperation",
 ]
