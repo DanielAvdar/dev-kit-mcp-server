@@ -106,20 +106,19 @@ class ExecMakeTarget(AsyncOperation):
             return
 
         try:
-            result[target] = []
-
             line = ["make", target, "--quiet"]
             process = await self.create_sub_proccess(line)
 
             stdout, stderr = await process.communicate()
 
             res = {
-                "command": line,
+                # "command": line,
                 "stdout": stdout.decode(errors="replace"),
                 "stderr": stderr.decode(errors="replace"),
+                "exitcode": process.returncode,
                 "cwd": self._root_path.as_posix(),
             }
-            result[target].append(res)
+            result[target] = res
         except Exception as e:
             result[target] = {
                 "error": f"Error running makefile command: {str(e)}",
