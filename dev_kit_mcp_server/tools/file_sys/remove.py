@@ -5,7 +5,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict
 
+from pydantic import Field
+
 from ..core import FileOperation
+from ..core.models import BaseToolParams
+
+
+class RemoveFileParams(BaseToolParams):
+    """Parameters for removing a file or directory."""
+
+    path: str = Field(
+        ...,
+        description="Path to the file or folder to remove",
+    )
 
 
 @dataclass
@@ -13,6 +25,7 @@ class RemoveFileOperation(FileOperation):
     """Class to Remove a file or folder."""
 
     name = "remove_file"
+    model_class = RemoveFileParams
 
     def _remove_folder(self, path: str) -> None:
         """Remove a file or folder at the specified path.
@@ -39,16 +52,22 @@ class RemoveFileOperation(FileOperation):
         else:
             file_path.unlink()
 
-    def __call__(self, path: str) -> Dict[str, Any]:
+    def __call__(self, model_or_path: RemoveFileParams | str) -> Dict[str, Any]:
         """Remove a file or folder.
 
         Args:
-            path: Path to the file or folder to remove
+            model_or_path: Parameters for removing a file or directory or a path string
 
         Returns:
             A dictionary containing the status and path of the removed file or folder
 
         """
+        # Handle both model and direct path input for backward compatibility
+        if isinstance(model_or_path, str):
+            path = model_or_path
+        else:
+            path = model_or_path.path
+
         try:
             self._remove_folder(path)
             return {
@@ -84,7 +103,9 @@ class RemoveFileOperation(FileOperation):
                 A dictionary containing the status and path of the removed file or folder
 
             """
-            return self.__call__(path)
+            # Create a model with the parameter
+            model = self.model_class(path=path)
+            return self.__call__(model)
 
         self_wrapper.__name__ = self.name
 

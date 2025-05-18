@@ -3,13 +3,18 @@
 import abc
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar
 
 from git import Repo
 
+from .models import BaseToolParams, ToolModelMixin
+
+# Type variable for the model
+T = TypeVar("T", bound=BaseToolParams)
+
 
 @dataclass
-class _Operation:
+class _Operation(ToolModelMixin[T]):
     root_dir: str
     _root_path: Path = field(init=False, repr=False)
     _repo: Repo = field(init=False, repr=False)
@@ -52,7 +57,16 @@ class _Operation:
 
     @abc.abstractmethod
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        """Perform the operation and return the result."""
+        """Perform the operation and return the result.
+
+        Args:
+            *args: Variable length argument list
+            **kwargs: Arbitrary keyword arguments
+
+        Returns:
+            A dictionary containing the result of the operation, or a coroutine that will return such a dictionary
+
+        """
 
     @classmethod
     def get_absolute_path(cls, root_path: Path, path: str) -> Path:

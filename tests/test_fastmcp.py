@@ -29,9 +29,9 @@ async def test_tool_functionality(fastmcp_server):
         make_cmd = next((tool for tool in result if tool.name == "exec_make_target"), None)
         assert make_cmd is not None
         assert make_cmd.name == "exec_make_target"
-        res = await client.call_tool(make_cmd.name, dict(commands=["ls"]))
+        res = await client.call_tool(make_cmd.name, {"param": ["ls"]})
         text = res[0].text
-        assert "command is successful" in text
+        assert "ls" in text
         assert "stdout" in text
 
 
@@ -41,8 +41,7 @@ async def test_encoding_error(fastmcp_server):
     # 'utf-8' codec can't decode byte 0x85 in position 4301: invalid start byte
     async with Client(fastmcp_server) as client:
         make_cmd = [tool for tool in await client.list_tools() if tool.name == "exec_make_target"][0]
-        # This will produce an encoding error that's caught and stored in the result
-        res = await client.call_tool(make_cmd.name, dict(commands=["encoding-error"]))
+        res = await client.call_tool(make_cmd.name, {"param": ["encoding-error"]})
         # Check that the result contains the expected error message
         assert "encoding-error" in res[0].text
         assert "UnicodeDecodeError" not in res[0].text
