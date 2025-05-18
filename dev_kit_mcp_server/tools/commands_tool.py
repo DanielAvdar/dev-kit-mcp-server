@@ -107,21 +107,19 @@ class ExecMakeTarget(AsyncOperation):
 
         try:
             result[target] = []
-            process_get = await self.create_sub_proccess(f"make {target} --just-print --quiet")
-            stdout, stderr = await process_get.communicate()
-            cmd = stdout.decode()
-            for line in cmd.splitlines():
-                process = await self.create_sub_proccess(line)
 
-                stdout, stderr = await process.communicate()
+            line = ["make", target, "--quiet"]
+            process = await self.create_sub_proccess(line)
 
-                res = {
-                    "command": line,
-                    "stdout": stdout.decode(errors="replace"),
-                    "stderr": stderr.decode(errors="replace"),
-                    "cwd": self._root_path.as_posix(),
-                }
-                result[target].append(res)
+            stdout, stderr = await process.communicate()
+
+            res = {
+                "command": line,
+                "stdout": stdout.decode(errors="replace"),
+                "stderr": stderr.decode(errors="replace"),
+                "cwd": self._root_path.as_posix(),
+            }
+            result[target].append(res)
         except Exception as e:
             result[target] = {
                 "error": f"Error running makefile command: {str(e)}",
@@ -140,8 +138,8 @@ class ExecMakeTarget(AsyncOperation):
             A subprocess object with stdout and stderr pipes
 
         """
-        process_get = await asyncio.create_subprocess_shell(
-            cmd,
+        process_get = await asyncio.create_subprocess_exec(
+            *cmd,
             cwd=self._root_path.as_posix(),
             stdin=asyncio.subprocess.DEVNULL,
             stdout=asyncio.subprocess.PIPE,

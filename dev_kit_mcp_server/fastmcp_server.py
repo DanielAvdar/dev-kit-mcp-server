@@ -102,3 +102,6 @@ def arun_server(fastmcp: FastMCP = None) -> None:
         sys.exit(0)
     except KeyboardInterrupt:
         sys.exit(0)
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
