@@ -9,7 +9,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List
 
-from .file_ops import AsyncOperation
+from .core import AsyncOperation
 
 
 @dataclass
