@@ -21,6 +21,5 @@ jobs:
         with:
           enable-cache: true
       - run: uv python install ${{ matrix.python-version }}
-      - run: uv sync --all-extras --frozen
       - run: make test
     continue-on-error: true
