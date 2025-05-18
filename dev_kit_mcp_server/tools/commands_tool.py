@@ -30,7 +30,7 @@ class ExecMakeTarget(AsyncOperation):
         super().__post_init__()
         self._make_file_exists = (self._root_path / "Makefile").exists()
 
-    def _repo_init(self): ...
+    def _repo_init(self) -> None: ...
     async def __call__(
         self,
         commands: List[str],
