@@ -32,27 +32,21 @@ class GitAddOperation(AsyncOperation):
         if not isinstance(paths, list):
             raise ValueError("Expected a list of file paths as the argument")
 
-        try:
-            # Get the repository
-            repo = self._repo
+        # Get the repository
+        repo = self._repo
 
-            # Add the files to the index
-            added_files = []
-            for path in paths:
-                # Validate that the path is within the root directory
-                abs_path = self._validate_path_in_root(self._root_path, path)
+        # Add the files to the index
+        added_files = []
+        for path in paths:
+            # Validate that the path is within the root directory
+            abs_path = self._validate_path_in_root(self._root_path, path)
 
-                # Add the file to the index
-                repo.git.add(abs_path)
-                added_files.append(path)
+            # Add the file to the index
+            repo.git.add(abs_path)
+            added_files.append(path)
 
-            return {
-                "status": "success",
-                "message": f"Successfully added {len(added_files)} files to the index",
-                "added_files": added_files,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error adding files to the index: {str(e)}",
-                "paths": paths,
-            }
+        return {
+            "status": "success",
+            "message": f"Successfully added {len(added_files)} files to the index",
+            "added_files": added_files,
+        }

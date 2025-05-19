@@ -130,12 +130,8 @@ class TestCreateDirOperation:
         # Arrange
         test_dir, _, _ = setup_test_files
 
-        # Act
-        result = create_operation(test_dir)
-
-        # Assert
-        assert "error" in result
-        assert "already exists" in result.get("error", "")
+        with pytest.raises(FileExistsError):
+            create_operation(test_dir)
 
     @pytest.mark.skip(reason="Test for is OS dependent")
     def test_create_folder_outside_root(self, create_operation: CreateDirOperation) -> None:

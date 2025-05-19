@@ -27,56 +27,49 @@ class GitPullOperation(AsyncOperation):
             A dictionary containing the status of the pull operation
 
         """
+        # Get the repository
+        repo = self._repo
+
+        # Get the remote (default to 'origin' if not specified)
+        remote_name = remote or "origin"
+
+        # Check if the remote exists
         try:
-            # Get the repository
-            repo = self._repo
+            repo_remote = repo.remote(remote_name)
+        except ValueError:
+            return {
+                "error": f"Remote '{remote_name}' does not exist",
+                "remote": remote_name,
+            }
 
-            # Get the remote (default to 'origin' if not specified)
-            remote_name = remote or "origin"
-
-            # Check if the remote exists
+        # Get the branch (default to current branch if not specified)
+        branch_name = branch
+        if not branch_name:
             try:
-                repo_remote = repo.remote(remote_name)
-            except ValueError:
+                branch_name = repo.active_branch.name
+            except TypeError:
                 return {
-                    "error": f"Remote '{remote_name}' does not exist",
+                    "error": "Cannot pull when HEAD is detached. Please specify a branch.",
                     "remote": remote_name,
                 }
 
-            # Get the branch (default to current branch if not specified)
-            branch_name = branch
-            if not branch_name:
-                try:
-                    branch_name = repo.active_branch.name
-                except TypeError:
-                    return {
-                        "error": "Cannot pull when HEAD is detached. Please specify a branch.",
-                        "remote": remote_name,
-                    }
+        # Pull the changes
+        pull_info = repo_remote.pull(branch_name)
 
-            # Pull the changes
-            pull_info = repo_remote.pull(branch_name)
+        # Process the pull results
+        results = []
+        for info in pull_info:
+            results.append({
+                "ref": info.ref,
+                "flags": info.flags,
+                "note": info.note,
+                "summary": str(info.commit),
+            })
 
-            # Process the pull results
-            results = []
-            for info in pull_info:
-                results.append({
-                    "ref": info.ref,
-                    "flags": info.flags,
-                    "note": info.note,
-                    "summary": str(info.commit),
-                })
-
-            return {
-                "status": "success",
-                "message": f"Successfully pulled from {remote_name}/{branch_name}",
-                "remote": remote_name,
-                "branch": branch_name,
-                "results": results,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error pulling changes: {str(e)}",
-                "remote": remote or "origin",
-                "branch": branch,
-            }
+        return {
+            "status": "success",
+            "message": f"Successfully pulled from {remote_name}/{branch_name}",
+            "remote": remote_name,
+            "branch": branch_name,
+            "results": results,
+        }

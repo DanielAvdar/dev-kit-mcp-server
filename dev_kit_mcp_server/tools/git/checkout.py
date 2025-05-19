@@ -34,38 +34,32 @@ class GitCheckoutOperation(AsyncOperation):
         if not branch:
             raise ValueError("Branch name must be provided")
 
-        try:
-            # Get the repository
-            repo = self._repo
+        # Get the repository
+        repo = self._repo
 
-            # Check if the branch exists
-            branch_exists = branch in [b.name for b in repo.branches]
+        # Check if the branch exists
+        branch_exists = branch in [b.name for b in repo.branches]
 
-            # If the branch doesn't exist and create is False, return an error
-            if not branch_exists and not create:
-                return {
-                    "error": f"Branch '{branch}' does not exist. Use create=True to create it.",
-                    "branch": branch,
-                }
-
-            # Checkout the branch
-            if branch_exists:
-                # Checkout existing branch
-                repo.git.checkout(branch)
-                message = f"Successfully checked out branch '{branch}'"
-            else:
-                # Create and checkout new branch
-                repo.git.checkout("-b", branch)
-                message = f"Successfully created and checked out branch '{branch}'"
-
+        # If the branch doesn't exist and create is False, return an error
+        if not branch_exists and not create:
             return {
-                "status": "success",
-                "message": message,
-                "branch": branch,
-                "created": not branch_exists and create,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error checking out branch: {str(e)}",
+                "error": f"Branch '{branch}' does not exist. Use create=True to create it.",
                 "branch": branch,
             }
+
+        # Checkout the branch
+        if branch_exists:
+            # Checkout existing branch
+            repo.git.checkout(branch)
+            message = f"Successfully checked out branch '{branch}'"
+        else:
+            # Create and checkout new branch
+            repo.git.checkout("-b", branch)
+            message = f"Successfully created and checked out branch '{branch}'"
+
+        return {
+            "status": "success",
+            "message": message,
+            "branch": branch,
+            "created": not branch_exists and create,
+        }

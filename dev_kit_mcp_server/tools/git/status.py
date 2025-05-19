@@ -24,43 +24,38 @@ class GitStatusOperation(AsyncOperation):
             A dictionary containing the status of the git repository
 
         """
+        # Get the status of the repository
+        repo = self._repo
+
+        # Get the current branch
         try:
-            # Get the status of the repository
-            repo = self._repo
+            branch = repo.active_branch.name
+        except TypeError:
+            branch = "DETACHED_HEAD"
 
-            # Get the current branch
-            try:
-                branch = repo.active_branch.name
-            except TypeError:
-                branch = "DETACHED_HEAD"
+        # Get the status
+        changed_files = []
+        for item in repo.index.diff(None):
+            changed_files.append({
+                "path": item.a_path,
+                "change_type": item.change_type,
+            })
 
-            # Get the status
-            changed_files = []
-            for item in repo.index.diff(None):
-                changed_files.append({
-                    "path": item.a_path,
-                    "change_type": item.change_type,
-                })
+        # Get untracked files
+        untracked_files = repo.untracked_files
 
-            # Get untracked files
-            untracked_files = repo.untracked_files
+        # Get staged files
+        staged_files = []
+        for item in repo.index.diff("HEAD"):
+            staged_files.append({
+                "path": item.a_path,
+                "change_type": item.change_type,
+            })
 
-            # Get staged files
-            staged_files = []
-            for item in repo.index.diff("HEAD"):
-                staged_files.append({
-                    "path": item.a_path,
-                    "change_type": item.change_type,
-                })
-
-            return {
-                "status": "success",
-                "branch": branch,
-                "changed_files": changed_files,
-                "untracked_files": untracked_files,
-                "staged_files": staged_files,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error getting git status: {str(e)}",
-            }
+        return {
+            "status": "success",
+            "branch": branch,
+            "changed_files": changed_files,
+            "untracked_files": untracked_files,
+            "staged_files": staged_files,
+        }

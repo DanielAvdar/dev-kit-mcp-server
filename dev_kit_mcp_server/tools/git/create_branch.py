@@ -34,47 +34,40 @@ class GitCreateBranchOperation(AsyncOperation):
         if not new_branch:
             raise ValueError("New branch name must be provided")
 
-        try:
-            # Get the repository
-            repo = self._repo
+        # Get the repository
+        repo = self._repo
 
-            # Get the current branch if source_branch is not provided
-            if not source_branch:
-                source_branch = repo.active_branch.name
+        # Get the current branch if source_branch is not provided
+        if not source_branch:
+            source_branch = repo.active_branch.name
 
-            # Check if the new branch already exists
-            branch_exists = new_branch in [b.name for b in repo.branches]
-            if branch_exists:
-                return {
-                    "error": f"Branch '{new_branch}' already exists.",
-                    "new_branch": new_branch,
-                    "source_branch": source_branch,
-                }
-
-            # Check if the source branch exists
-            source_exists = source_branch in [b.name for b in repo.branches]
-            if not source_exists:
-                return {
-                    "error": f"Source branch '{source_branch}' does not exist.",
-                    "new_branch": new_branch,
-                    "source_branch": source_branch,
-                }
-
-            # Create a new branch from the source branch
-            # First, checkout the source branch
-            repo.git.checkout(source_branch)
-            # Then create and checkout the new branch
-            repo.git.checkout("-b", new_branch)
-
+        # Check if the new branch already exists
+        branch_exists = new_branch in [b.name for b in repo.branches]
+        if branch_exists:
             return {
-                "status": "success",
-                "message": f"Successfully created and checked out branch '{new_branch}' from '{source_branch}'",
+                "error": f"Branch '{new_branch}' already exists.",
                 "new_branch": new_branch,
                 "source_branch": source_branch,
             }
-        except Exception as e:
+
+        # Check if the source branch exists
+        source_exists = source_branch in [b.name for b in repo.branches]
+        if not source_exists:
             return {
-                "error": f"Error creating branch: {str(e)}",
+                "error": f"Source branch '{source_branch}' does not exist.",
                 "new_branch": new_branch,
                 "source_branch": source_branch,
             }
+
+        # Create a new branch from the source branch
+        # First, checkout the source branch
+        repo.git.checkout(source_branch)
+        # Then create and checkout the new branch
+        repo.git.checkout("-b", new_branch)
+
+        return {
+            "status": "success",
+            "message": f"Successfully created and checked out branch '{new_branch}' from '{source_branch}'",
+            "new_branch": new_branch,
+            "source_branch": source_branch,
+        }
