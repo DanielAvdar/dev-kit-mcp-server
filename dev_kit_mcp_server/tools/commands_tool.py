@@ -57,7 +57,7 @@ class ExecMakeTarget(AsyncOperation):
             await self._exec_commands(cmd, result)
         return result
 
-    async def _exec_commands(self, target, result: Dict[str, Any]) -> None:
+    async def _exec_commands(self, target: str, result: Dict[str, Any]) -> None:
         """Execute a Makefile target and store the result.
 
         Args:
