@@ -74,11 +74,25 @@ def mock_github():
         mock_pr.merged = False
         mock_pr.html_url = "https://github.com/test-owner/test-repo/pull/1"
 
+        # Set up the mock review
+        mock_review = MagicMock()
+        mock_review.id = 1
+        mock_review.user = mock_user
+        mock_review.body = "This is a test review"
+        mock_review.state = "APPROVED"
+        mock_review.submitted_at = None
+        mock_review.commit_id = "abcdef123456"
+        mock_review.html_url = "https://github.com/test-owner/test-repo/pull/1#pullrequestreview-1"
+
         # Set up the mock issue and PR retrieval
         mock_repo.get_issue.return_value = mock_issue
         mock_repo.get_issues.return_value = [mock_issue]
         mock_repo.get_pull.return_value = mock_pr
         mock_repo.get_pulls.return_value = [mock_pr]
+
+        # Set up the mock PR review retrieval
+        mock_pr.get_review.return_value = mock_review
+        mock_pr.get_reviews.return_value = [mock_review]
 
         yield mock_github
 
