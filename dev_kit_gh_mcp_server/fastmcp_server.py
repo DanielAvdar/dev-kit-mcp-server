@@ -6,12 +6,10 @@ import os
 import sys
 from pathlib import Path
 
-import dev_kit_mcp_server.tools as tools_module  # Import the tools module
-
 # from mcp.server.fastmcp import FastMCP  # type: ignore
 # from fastmcp import FastMCP
-from .tool_factory import RepoFastMCPServerError as FastMCP, ToolFactory
-from .tools import (
+from dev_kit_mcp_server.tool_factory import RepoFastMCPServerError as FastMCP, ToolFactory
+from dev_kit_mcp_server.tools import (
     CreateDirOperation,
     GitAddOperation,
     GitCheckoutOperation,
@@ -22,11 +20,7 @@ from .tools import (
     MoveDirOperation,
     RemoveFileOperation,
     RenameOperation,
-    __all__ as tools_names,  # Import all tools for registration
 )
-from .tools.commands_tool import ExecMakeTarget
-
-# from importlib import import_module
 
 
 def start_server(root_dir: str = None) -> FastMCP:
@@ -64,15 +58,13 @@ def start_server(root_dir: str = None) -> FastMCP:
         GitAddOperation(root_dir=root_dir),
         GitCheckoutOperation(root_dir=root_dir),
         # Make operations
-        ExecMakeTarget(root_dir=root_dir),
     ]
-    [getattr(tools_module, tool_name)(root_dir=root_dir) for tool_name in tools_names]
+
+    # Check if GitHub tools should be registered
 
     # Register all tools
     tool_factory = ToolFactory(fastmcp)
-    tool_factory(
-        tools,
-    )
+    tool_factory(tools)
     return fastmcp
 
 

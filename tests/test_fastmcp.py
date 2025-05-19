@@ -4,6 +4,7 @@ import pytest
 from fastmcp import Client
 
 from dev_kit_mcp_server import start_server
+from dev_kit_mcp_server.tools import __all__
 
 
 @pytest.fixture
@@ -23,7 +24,7 @@ async def test_tool_functionality(fastmcp_server):
     # Pass the server directly to the Client constructor
     async with Client(fastmcp_server) as client:
         result = await client.list_tools()
-        assert len(result) == 11  # 4 file system tools + 7 git tools + 1 make tool
+        assert len(result) == len(__all__)
         assert "move_dir" in str(result[0].name)
         # Find the make command by name
         make_cmd = next((tool for tool in result if tool.name == "exec_make_target"), None)
