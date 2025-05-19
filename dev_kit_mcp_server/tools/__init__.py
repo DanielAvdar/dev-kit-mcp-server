@@ -3,7 +3,6 @@
 import importlib.util
 
 from .commands_tool import ExecMakeTarget
-from .core import FileOperation
 from .file_sys.create import CreateDirOperation
 from .file_sys.move import MoveDirOperation
 from .file_sys.remove import RemoveFileOperation
@@ -30,5 +29,4 @@ __all__ = [
     "GitPullOperation",
     "GitCheckoutOperation",
     "ExecMakeTarget",
-    "FileOperation",
 ]
