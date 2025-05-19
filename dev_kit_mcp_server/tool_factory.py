@@ -6,7 +6,7 @@ from fastmcp import FastMCP
 from fastmcp.tools import Tool
 from mcp.types import ToolAnnotations
 
-from .tools.core import _Operation
+from .tools.core import AsyncOperation
 
 
 class RepoFastMCPServerError(FastMCP):
@@ -35,21 +35,21 @@ class ToolFactory:
         self._pre_hooks: List[Callable[..., Any]] = []
         self._post_hooks: List[Callable[..., Any]] = []
 
-    def __call__(self, obj: Sequence[_Operation]) -> None:
+    def __call__(self, obj: Sequence[AsyncOperation]) -> None:
         """Make the factory callable to directly decorate functions, lists of functions, or classes.
 
         Args:
-            obj: Sequence of _Operation instances (FileOperation or AsyncOperation) to decorate
+            obj: Sequence of AsyncOperation instances (FileOperation or AsyncOperation) to decorate
 
         """
         for func in obj:
             self._decorate_function(func)
 
-    def _decorate_function(self, func: _Operation) -> None:
+    def _decorate_function(self, func: AsyncOperation) -> None:
         """Decorate a function with MCP tool decorator and hooks.
 
         Args:
-            func: _Operation instance (FileOperation or AsyncOperation) to decorate
+            func: AsyncOperation instance (FileOperation or AsyncOperation) to decorate
 
         """
         # Get the wrapper function from the operation

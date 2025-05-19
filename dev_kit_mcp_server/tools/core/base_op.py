@@ -3,15 +3,19 @@
 import abc
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 from git import Repo
 
-# Type variable for the model
-
 
 @dataclass
-class _Operation:
+class AsyncOperation:
+    """Base class for asynchronous operations.
+
+    This class provides a foundation for operations that need to be executed asynchronously.
+    It inherits from _Operation and adds specific functionality for async operations.
+    """
+
     root_dir: str
     _root_path: Path = field(init=False, repr=False)
     _repo: Repo = field(init=False, repr=False)
@@ -42,19 +46,6 @@ class _Operation:
     @abc.abstractmethod
     def name(self) -> str:
         """Return the name of the operation."""
-
-    @abc.abstractmethod
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        """Perform the operation and return the result.
-
-        Args:
-            *args: Variable length argument list
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            A dictionary containing the result of the operation, or a coroutine that will return such a dictionary
-
-        """
 
     @classmethod
     def get_absolute_path(cls, root_path: Path, path: str) -> Path:
@@ -92,3 +83,20 @@ class _Operation:
         if not abs_path.is_relative_to(root_path):
             raise ValueError(f"Path {path} is not within the root directory: {root_path.as_posix()}")
         return abs_path.as_posix()
+
+    @abc.abstractmethod
+    async def __call__(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """Perform the file operation and return the result.
+
+        Args:
+            *args: Variable length argument list
+            **kwargs: Arbitrary keyword arguments
+
+        Returns:
+            A dictionary containing the result of the operation
+
+        """
