@@ -67,6 +67,7 @@ The server provides the following tools:
 - **git_push**: Push changes to a remote Git repository
 - **git_pull**: Pull changes from a remote Git repository
 - **git_checkout**: Checkout or create a branch in the Git repository
+- **git_diff**: Show diffs between commits, commit and working tree, etc.
 
 #### Makefile Operations
 - **exec_make_target**: Run makefile commands securely within the project

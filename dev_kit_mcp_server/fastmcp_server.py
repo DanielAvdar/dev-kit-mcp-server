@@ -17,6 +17,7 @@ from .tools import (
     GitCheckoutOperation,
     GitCommitOperation,
     GitCreateBranchOperation,
+    GitDiffOperation,
     GitPullOperation,
     GitPushOperation,
     GitStatusOperation,
@@ -65,6 +66,7 @@ def start_server(root_dir: str = None) -> FastMCP:
         GitAddOperation(root_dir=root_dir),
         GitCheckoutOperation(root_dir=root_dir),
         GitCreateBranchOperation(root_dir=root_dir),
+        GitDiffOperation(root_dir=root_dir),
         # Make operations
         ExecMakeTarget(root_dir=root_dir),
     ]

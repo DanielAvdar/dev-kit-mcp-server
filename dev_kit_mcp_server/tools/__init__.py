@@ -11,6 +11,7 @@ from .git.add import GitAddOperation
 from .git.checkout import GitCheckoutOperation
 from .git.commit import GitCommitOperation
 from .git.create_branch import GitCreateBranchOperation
+from .git.diff import GitDiffOperation
 from .git.pull import GitPullOperation
 from .git.push import GitPushOperation
 from .git.status import GitStatusOperation
@@ -30,5 +31,6 @@ __all__ = [
     "GitPullOperation",
     "GitCheckoutOperation",
     "GitCreateBranchOperation",
+    "GitDiffOperation",
     "ExecMakeTarget",
 ]

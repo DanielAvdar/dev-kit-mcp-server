@@ -178,6 +178,24 @@ The operation will fail if:
 * The branch name is empty
 * The branch doesn't exist and create is False
 
+Git Diff
+~~~~~~~~
+
+Shows diffs between commits, commit and working tree, etc.
+
+.. code-block:: python
+
+   # Using the MCP client
+   # Show diff for a specific file
+   result = await client.call_tool("git_diff", {"path_or_commit": "file.txt"})
+
+   # Show diff with options
+   result = await client.call_tool("git_diff", {"path_or_commit": "file.txt", "options": "--stat"})
+
+The operation will fail if:
+
+* The path or commit is empty
+
 Makefile Operations
 -------------------
 
