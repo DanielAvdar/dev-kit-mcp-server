@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-from ..core import FileOperation
+from ..core import AsyncOperation
 
 
 @dataclass
-class CreateDirOperation(FileOperation):
+class CreateDirOperation(AsyncOperation):
     """Class to create a folder in the workspace."""
 
     name = "create_dir"
@@ -35,7 +35,7 @@ class CreateDirOperation(FileOperation):
         # Create parent directories if they don't exist
         folder_path.mkdir(parents=True, exist_ok=False)
 
-    def __call__(self, path: str) -> Dict[str, Any]:
+    async def __call__(self, path: str) -> Dict[str, Any]:
         """Create a file or folder in the workspace.
 
         Args:

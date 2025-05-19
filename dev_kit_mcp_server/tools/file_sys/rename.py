@@ -5,11 +5,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-from ..core import FileOperation
+from ..core import AsyncOperation
 
 
 @dataclass(unsafe_hash=True, slots=True)
-class RenameOperation(FileOperation):
+class RenameOperation(AsyncOperation):
     """Class to rename a file or folder in the workspace."""
 
     name = "rename_file"
@@ -45,7 +45,7 @@ class RenameOperation(FileOperation):
         # Rename the file or folder
         os.rename(str(source_path), str(new_path))
 
-    def __call__(self, path: str, new_name: str = None) -> Dict[str, Any]:
+    async def __call__(self, path: str, new_name: str = None) -> Dict[str, Any]:
         """Rename a file or folder.
 
         Args:

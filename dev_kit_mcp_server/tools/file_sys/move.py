@@ -5,11 +5,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-from ..core import FileOperation
+from ..core import AsyncOperation
 
 
 @dataclass(unsafe_hash=True, slots=True)
-class MoveDirOperation(FileOperation):
+class MoveDirOperation(AsyncOperation):
     """Class to move a file or folder in the workspace."""
 
     name = "move_dir"
@@ -46,7 +46,7 @@ class MoveDirOperation(FileOperation):
         # Move the file or folder
         shutil.move(str(source_path), str(dest_path))
 
-    def __call__(self, path1: str = None, path2: str = None) -> Dict[str, Any]:
+    async def __call__(self, path1: str = None, path2: str = None) -> Dict[str, Any]:
         """Move a file or folder from path1 to path2.
 
         Args:

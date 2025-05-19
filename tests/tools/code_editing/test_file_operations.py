@@ -13,7 +13,7 @@ from dev_kit_mcp_server.tools import (
     RemoveFileOperation,
     RenameOperation,
 )
-from dev_kit_mcp_server.tools.core import FileOperation
+from dev_kit_mcp_server.tools.core import AsyncOperation
 
 
 @pytest.fixture(scope="function")
@@ -104,33 +104,36 @@ def setup_test_files(temp_root_dir: str) -> Tuple[str, str, str]:
 class TestCreateDirOperation:
     """Tests for CreateDirOperation."""
 
-    def test_create_folder_success(self, create_operation: CreateDirOperation, temp_root_dir: str) -> None:
+    @pytest.mark.asyncio
+    async def test_create_folder_success(self, create_operation: CreateDirOperation, temp_root_dir: str) -> None:
         """Test creating a folder successfully."""
         # Arrange
         new_folder = os.path.join(temp_root_dir, "new_folder")
 
         # Act
-        result = create_operation(new_folder)
+        result = await create_operation(new_folder)
 
         # Assert
         assert result.get("status") == "success"
         assert os.path.exists(new_folder)
         assert os.path.isdir(new_folder)
 
-    def test_create_folder_nested(self, create_operation: CreateDirOperation, temp_root_dir: str) -> None:
+    @pytest.mark.asyncio
+    async def test_create_folder_nested(self, create_operation: CreateDirOperation, temp_root_dir: str) -> None:
         """Test creating a nested folder successfully."""
         # Arrange
         nested_folder = os.path.join(temp_root_dir, "parent", "child", "grandchild")
 
         # Act
-        result = create_operation(nested_folder)
+        result = await create_operation(nested_folder)
 
         # Assert
         assert result.get("status") == "success"
         assert os.path.exists(nested_folder)
         assert os.path.isdir(nested_folder)
 
-    def test_create_folder_already_exists(
+    @pytest.mark.asyncio
+    async def test_create_folder_already_exists(
         self, create_operation: CreateDirOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test creating a folder that already exists."""
@@ -138,16 +141,17 @@ class TestCreateDirOperation:
         test_dir, _, _ = setup_test_files
 
         with pytest.raises(FileExistsError):
-            create_operation(test_dir)
+            await create_operation(test_dir)
 
     @pytest.mark.skip(reason="Test for is OS dependent")
-    def test_create_folder_outside_root(self, create_operation: CreateDirOperation) -> None:
+    @pytest.mark.asyncio
+    async def test_create_folder_outside_root(self, create_operation: CreateDirOperation) -> None:
         """Test creating a folder outside the root directory."""
         # Arrange
         outside_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "outside_folder"))
 
         # Act
-        result = create_operation(outside_folder)
+        result = await create_operation(outside_folder)
 
         # Assert
         assert "error" in result
@@ -158,7 +162,8 @@ class TestCreateDirOperation:
 class TestMoveDirOperation:
     """Tests for MoveDirOperation."""
 
-    def test_move_folder_success(
+    @pytest.mark.asyncio
+    async def test_move_folder_success(
         self, move_operation: MoveDirOperation, setup_test_files: Tuple[str, str, str], temp_root_dir: str
     ) -> None:
         """Test moving a folder successfully."""
@@ -167,7 +172,7 @@ class TestMoveDirOperation:
         new_location = os.path.join(temp_root_dir, "moved_dir")
 
         # Act
-        result = move_operation(test_dir, new_location)
+        result = await move_operation(test_dir, new_location)
 
         # Assert
         assert result.get("status") == "success"
@@ -175,7 +180,8 @@ class TestMoveDirOperation:
         assert os.path.exists(new_location)
         assert os.path.isdir(new_location)
 
-    def test_move_file_success(
+    @pytest.mark.asyncio
+    async def test_move_file_success(
         self, move_operation: MoveDirOperation, setup_test_files: Tuple[str, str, str], temp_root_dir: str
     ) -> None:
         """Test moving a file successfully."""
@@ -184,7 +190,7 @@ class TestMoveDirOperation:
         new_location = os.path.join(temp_root_dir, "moved_file.txt")
 
         # Act
-        result = move_operation(test_file, new_location)
+        result = await move_operation(test_file, new_location)
 
         # Assert
         assert result.get("status") == "success"
@@ -197,7 +203,8 @@ class TestMoveDirOperation:
             content = f.read()
         assert content == "Test content"
 
-    def test_move_source_not_exists(
+    @pytest.mark.asyncio
+    async def test_move_source_not_exists(
         self, move_operation: MoveDirOperation, setup_test_files: Tuple[str, str, str], temp_root_dir: str
     ) -> None:
         """Test moving a non-existent source."""
@@ -207,12 +214,13 @@ class TestMoveDirOperation:
 
         # Act & Assert
         with pytest.raises(FileNotFoundError, match="Source path does not exist"):
-            move_operation(non_existent, new_location)
+            await move_operation(non_existent, new_location)
 
         # Verify destination was not created
         assert not os.path.exists(new_location)
 
-    def test_move_destination_exists(
+    @pytest.mark.asyncio
+    async def test_move_destination_exists(
         self, move_operation: MoveDirOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test moving to a destination that already exists."""
@@ -221,21 +229,24 @@ class TestMoveDirOperation:
 
         # Act & Assert
         with pytest.raises(FileExistsError, match="Destination path already exists"):
-            move_operation(test_dir, test_file)
+            await move_operation(test_dir, test_file)
 
         # Verify both paths still exist
         assert os.path.exists(test_dir)
         assert os.path.exists(test_file)
 
     @pytest.mark.skip(reason="Test for is OS dependent")
-    def test_move_outside_root(self, move_operation: MoveDirOperation, setup_test_files: Tuple[str, str, str]) -> None:
+    @pytest.mark.asyncio
+    async def test_move_outside_root(
+        self, move_operation: MoveDirOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
         """Test moving to a destination outside the root directory."""
         # Arrange
         test_dir, _, _ = setup_test_files
         outside_location = os.path.abspath(os.path.join(os.path.dirname(__file__), "outside_folder"))
 
         # Act
-        result = move_operation(test_dir, outside_location)
+        result = await move_operation(test_dir, outside_location)
 
         # Assert
         assert "error" in result
@@ -247,7 +258,8 @@ class TestMoveDirOperation:
 class TestRemoveFileOperation:
     """Tests for RemoveFileOperation."""
 
-    def test_remove_folder_success(
+    @pytest.mark.asyncio
+    async def test_remove_folder_success(
         self, remove_operation: RemoveFileOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test removing a folder successfully."""
@@ -255,13 +267,14 @@ class TestRemoveFileOperation:
         test_dir, _, _ = setup_test_files
 
         # Act
-        result = remove_operation(test_dir)
+        result = await remove_operation(test_dir)
 
         # Assert
         assert result.get("status") == "success"
         assert not os.path.exists(test_dir)
 
-    def test_remove_file_success(
+    @pytest.mark.asyncio
+    async def test_remove_file_success(
         self, remove_operation: RemoveFileOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test removing a file successfully."""
@@ -269,13 +282,14 @@ class TestRemoveFileOperation:
         _, test_file, _ = setup_test_files
 
         # Act
-        result = remove_operation(test_file)
+        result = await remove_operation(test_file)
 
         # Assert
         assert result.get("status") == "success"
         assert not os.path.exists(test_file)
 
-    def test_remove_non_existent(
+    @pytest.mark.asyncio
+    async def test_remove_non_existent(
         self, remove_operation: RemoveFileOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test removing a non-existent path."""
@@ -284,10 +298,11 @@ class TestRemoveFileOperation:
 
         # Act & Assert
         with pytest.raises(FileNotFoundError, match="Path does not exist"):
-            remove_operation(non_existent)
+            await remove_operation(non_existent)
 
     @pytest.mark.skip(reason="Test for is OS dependent")
-    def test_remove_outside_root(self, remove_operation: RemoveFileOperation) -> None:
+    @pytest.mark.asyncio
+    async def test_remove_outside_root(self, remove_operation: RemoveFileOperation) -> None:
         """Test removing a path outside the root directory."""
         # Arrange
         outside_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "outside_file.txt"))
@@ -298,7 +313,7 @@ class TestRemoveFileOperation:
                 f.write("Should not be removed")
 
             # Act
-            result = remove_operation(outside_path)
+            result = await remove_operation(outside_path)
 
             # Assert
             assert "error" in result
@@ -309,7 +324,8 @@ class TestRemoveFileOperation:
             if os.path.exists(outside_path):
                 os.remove(outside_path)
 
-    def test_valid_rel_path_conversion(
+    @pytest.mark.asyncio
+    async def test_valid_rel_path_conversion(
         self,
         valid_rel_path: str,
         as_abs: bool,
@@ -324,12 +340,13 @@ class TestRemoveFileOperation:
         assert root_path.as_posix() in abs_path.as_posix()
         if as_abs:
             valid_rel_path = abs_path.as_posix()
-        fun_abs_path = FileOperation.get_absolute_path(root_path, abs_path.as_posix())
-        fun_path = FileOperation.get_absolute_path(root_path, valid_rel_path)
+        fun_abs_path = AsyncOperation.get_absolute_path(root_path, abs_path.as_posix())
+        fun_path = AsyncOperation.get_absolute_path(root_path, valid_rel_path)
 
         assert fun_abs_path == fun_path
 
-    def test_invalid_path(
+    @pytest.mark.asyncio
+    async def test_invalid_path(
         self,
         valid_rel_path: str,
         temp_root_dir: str,
@@ -337,11 +354,12 @@ class TestRemoveFileOperation:
         """Test removing a file using an invalid path."""
         root_path = Path(temp_root_dir)
         invalid = f"./../{valid_rel_path}"
-        valid_rel_path = FileOperation._validate_path_in_root(root_path, valid_rel_path)
+        valid_rel_path = AsyncOperation._validate_path_in_root(root_path, valid_rel_path)
         with pytest.raises(ValueError):
-            FileOperation._validate_path_in_root(root_path, invalid)
+            AsyncOperation._validate_path_in_root(root_path, invalid)
 
-    def test_tools_path(
+    @pytest.mark.asyncio
+    async def test_tools_path(
         self,
         valid_rel_path: str,
         as_abs: bool,
@@ -353,35 +371,36 @@ class TestRemoveFileOperation:
         root_path = remove_operation._root_path
         assert remove_operation._root_path == create_operation._root_path
         assert remove_operation._root_path == move_operation._root_path
-        fun_path = FileOperation.get_absolute_path(root_path, valid_rel_path)
+        fun_path = AsyncOperation.get_absolute_path(root_path, valid_rel_path)
         path = valid_rel_path
         if as_abs:
             path = fun_path.as_posix()
-        res_creat = create_operation(path)
+        res_creat = await create_operation(path)
         assert res_creat.get("status") == "success"
         assert fun_path.exists()
-        res_create_folder = create_operation("some_folder")
+        res_create_folder = await create_operation("some_folder")
         assert res_create_folder.get("status") == "success"
-        res_move = move_operation(path, f"some_folder/{valid_rel_path}")
+        res_move = await move_operation(path, f"some_folder/{valid_rel_path}")
         assert not fun_path.exists()
         assert res_move.get("status") == "success"
 
-        res_remove = remove_operation("some_folder")
+        res_remove = await remove_operation("some_folder")
         assert res_remove.get("status") == "success"
         assert not fun_path.exists()
         invalid = f"./../{valid_rel_path}"
         with pytest.raises(ValueError):
-            remove_operation(invalid)
+            await remove_operation(invalid)
         with pytest.raises(ValueError):
-            create_operation(invalid)
+            await create_operation(invalid)
         with pytest.raises(ValueError):
-            move_operation(invalid, "some_folder")
+            await move_operation(invalid, "some_folder")
 
 
 class TestEditFileOperation:
     """Tests for EditFileOperation."""
 
-    def test_edit_file_success(
+    @pytest.mark.asyncio
+    async def test_edit_file_success(
         self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str], temp_root_dir: str
     ) -> None:
         """Test editing a file successfully."""
@@ -393,7 +412,7 @@ class TestEditFileOperation:
             f.write("Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n")
 
         # Act
-        result = edit_operation(test_file, 2, 4, "New Line 2\nNew Line 3")
+        result = await edit_operation(test_file, 2, 4, "New Line 2\nNew Line 3")
 
         # Assert
         assert result["status"] == "success"
@@ -408,7 +427,10 @@ class TestEditFileOperation:
             content = f.read()
         assert content == "Line 1\nNew Line 2\nNew Line 3\nLine 5\n"
 
-    def test_edit_file_append(self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]) -> None:
+    @pytest.mark.asyncio
+    async def test_edit_file_append(
+        self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
         """Test appending to a file by setting start_line beyond the end of the file."""
         # Arrange
         _, test_file, _ = setup_test_files
@@ -418,7 +440,7 @@ class TestEditFileOperation:
             f.write("Line 1\nLine 2\nLine 3\n")
 
         # Act
-        result = edit_operation(test_file, 4, 4, "Line 4\nLine 5")
+        result = await edit_operation(test_file, 4, 4, "Line 4\nLine 5")
 
         # Assert
         assert result["status"] == "success"
@@ -428,7 +450,8 @@ class TestEditFileOperation:
             content = f.read()
         assert content == "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n"
 
-    def test_edit_file_invalid_start_line(
+    @pytest.mark.asyncio
+    async def test_edit_file_invalid_start_line(
         self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test editing a file with an invalid start line."""
@@ -441,9 +464,10 @@ class TestEditFileOperation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Start line must be at least 1"):
-            edit_operation(test_file, 0, 2, "New content")
+            await edit_operation(test_file, 0, 2, "New content")
 
-    def test_edit_file_invalid_end_line(
+    @pytest.mark.asyncio
+    async def test_edit_file_invalid_end_line(
         self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test editing a file with an invalid end line."""
@@ -456,9 +480,10 @@ class TestEditFileOperation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="End line must be greater than or equal to start line"):
-            edit_operation(test_file, 3, 1, "New content")
+            await edit_operation(test_file, 3, 1, "New content")
 
-    def test_edit_file_start_line_beyond_file(
+    @pytest.mark.asyncio
+    async def test_edit_file_start_line_beyond_file(
         self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test editing a file with a start line beyond the end of the file."""
@@ -471,9 +496,10 @@ class TestEditFileOperation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Start line .* is beyond the end of the file"):
-            edit_operation(test_file, 10, 12, "New content")
+            await edit_operation(test_file, 10, 12, "New content")
 
-    def test_edit_file_end_line_beyond_file(
+    @pytest.mark.asyncio
+    async def test_edit_file_end_line_beyond_file(
         self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test editing a file with an end line beyond the end of the file."""
@@ -485,7 +511,7 @@ class TestEditFileOperation:
             f.write("Line 1\nLine 2\nLine 3\n")
 
         # Act
-        result = edit_operation(test_file, 2, 10, "New Line 2")
+        result = await edit_operation(test_file, 2, 10, "New Line 2")
 
         # Assert
         assert result["status"] == "success"
@@ -495,7 +521,8 @@ class TestEditFileOperation:
             content = f.read()
         assert content == "Line 1\nNew Line 2\n"
 
-    def test_edit_nonexistent_file(
+    @pytest.mark.asyncio
+    async def test_edit_nonexistent_file(
         self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test editing a non-existent file."""
@@ -504,19 +531,23 @@ class TestEditFileOperation:
 
         # Act & Assert
         with pytest.raises(FileNotFoundError, match="Path does not exist"):
-            edit_operation(non_existent, 1, 2, "New content")
+            await edit_operation(non_existent, 1, 2, "New content")
 
-    def test_edit_directory(self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]) -> None:
+    @pytest.mark.asyncio
+    async def test_edit_directory(
+        self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
         """Test editing a directory."""
         # Arrange
         test_dir, _, _ = setup_test_files
 
         # Act & Assert
         with pytest.raises(IsADirectoryError, match="Path is a directory, not a file"):
-            edit_operation(test_dir, 1, 2, "New content")
+            await edit_operation(test_dir, 1, 2, "New content")
 
     @pytest.mark.skip(reason="Test is OS dependent")
-    def test_edit_outside_root(self, edit_operation: EditFileOperation) -> None:
+    @pytest.mark.asyncio
+    async def test_edit_outside_root(self, edit_operation: EditFileOperation) -> None:
         """Test editing a file outside the root directory."""
         # Arrange
         outside_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "outside_file.txt"))
@@ -528,7 +559,7 @@ class TestEditFileOperation:
 
             # Act & Assert
             with pytest.raises(ValueError, match="not within the root directory"):
-                edit_operation(outside_path, 1, 1, "New content")
+                await edit_operation(outside_path, 1, 1, "New content")
 
             # Verify the file was not edited
             with open(outside_path, "r") as f:
@@ -543,7 +574,8 @@ class TestEditFileOperation:
 class TestRenameOperation:
     """Tests for RenameOperation."""
 
-    def test_rename_file_success(
+    @pytest.mark.asyncio
+    async def test_rename_file_success(
         self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test renaming a file successfully."""
@@ -556,7 +588,7 @@ class TestRenameOperation:
         expected_new_path = os.path.join(parent_dir, new_name)
 
         # Act
-        result = rename_operation(test_file, new_name)
+        result = await rename_operation(test_file, new_name)
 
         # Assert
         assert result.get("status") == "success"
@@ -569,7 +601,8 @@ class TestRenameOperation:
             content = f.read()
         assert content == "Test content"
 
-    def test_rename_folder_success(
+    @pytest.mark.asyncio
+    async def test_rename_folder_success(
         self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test renaming a folder successfully."""
@@ -582,7 +615,7 @@ class TestRenameOperation:
         expected_new_path = os.path.join(parent_dir, new_name)
 
         # Act
-        result = rename_operation(test_dir, new_name)
+        result = await rename_operation(test_dir, new_name)
 
         # Assert
         assert result.get("status") == "success"
@@ -590,7 +623,8 @@ class TestRenameOperation:
         assert os.path.exists(expected_new_path)
         assert os.path.isdir(expected_new_path)
 
-    def test_rename_non_existent(
+    @pytest.mark.asyncio
+    async def test_rename_non_existent(
         self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str]
     ) -> None:
         """Test renaming a non-existent path."""
@@ -600,9 +634,10 @@ class TestRenameOperation:
 
         # Act & Assert
         with pytest.raises(FileNotFoundError, match="Path does not exist"):
-            rename_operation(non_existent, new_name)
+            await rename_operation(non_existent, new_name)
 
-    def test_rename_to_existing_name(
+    @pytest.mark.asyncio
+    async def test_rename_to_existing_name(
         self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str], temp_root_dir: str
     ) -> None:
         """Test renaming to a name that already exists."""
@@ -617,14 +652,15 @@ class TestRenameOperation:
 
         # Act & Assert
         with pytest.raises(FileExistsError, match="A file or folder with the name .* already exists"):
-            rename_operation(test_file, existing_name)
+            await rename_operation(test_file, existing_name)
 
         # Verify files still exist
         assert os.path.exists(test_file)
         assert os.path.exists(existing_path)
 
     @pytest.mark.skip(reason="Test is OS dependent")
-    def test_rename_outside_root(self, rename_operation: RenameOperation) -> None:
+    @pytest.mark.asyncio
+    async def test_rename_outside_root(self, rename_operation: RenameOperation) -> None:
         """Test renaming a path outside the root directory."""
         # Arrange
         outside_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "outside_file.txt"))
@@ -636,7 +672,7 @@ class TestRenameOperation:
                 f.write("Should not be renamed")
 
             # Act
-            result = rename_operation(outside_path, new_name)
+            result = await rename_operation(outside_path, new_name)
 
             # Assert
             assert "error" in result

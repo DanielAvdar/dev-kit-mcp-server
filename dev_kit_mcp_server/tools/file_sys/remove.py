@@ -5,11 +5,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-from ..core import FileOperation
+from ..core import AsyncOperation
 
 
 @dataclass
-class RemoveFileOperation(FileOperation):
+class RemoveFileOperation(AsyncOperation):
     """Class to Remove a file or folder."""
 
     name = "remove_file"
@@ -39,7 +39,7 @@ class RemoveFileOperation(FileOperation):
         else:
             file_path.unlink()
 
-    def __call__(self, path: str) -> Dict[str, Any]:
+    async def __call__(self, path: str) -> Dict[str, Any]:
         """Remove a file or folder.
 
         Args:

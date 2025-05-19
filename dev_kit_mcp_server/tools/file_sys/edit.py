@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-from ..core import FileOperation
+from ..core import AsyncOperation
 
 
 @dataclass
-class EditFileOperation(FileOperation):
+class EditFileOperation(AsyncOperation):
     """Class to edit a file in the workspace by replacing lines between start and end with new text."""
 
     name = "edit_file"
@@ -70,7 +70,7 @@ class EditFileOperation(FileOperation):
         with open(file_path, "w", encoding="utf-8") as f:
             f.writelines(new_content)
 
-    def __call__(self, path: str, start_line: int, end_line: int, text: str) -> Dict[str, Any]:
+    async def __call__(self, path: str, start_line: int, end_line: int, text: str) -> Dict[str, Any]:
         """Edit a file by replacing lines between start and end with new text.
 
         Args:
