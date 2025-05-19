@@ -1,7 +1,6 @@
 """Base class for GitHub operations."""
 
 import abc
-import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
@@ -43,56 +42,65 @@ class GitHubOperation(AsyncOperation):
 
         """
         try:
-            # Get the repository
-            repo = self._repo
+            # Get the remotes from the git repository
+            remotes = self._repo.remotes
+            if not remotes:
+                return None
 
-            # Get the origin remote
-            try:
-                origin = repo.remote("origin")
+            # Try to find a GitHub remote (origin or any other)
+            github_remote = None
+            for remote in remotes:
+                if "github.com" in remote.url:
+                    github_remote = remote
+                    break
 
-                # Get the URL of the remote
-                url = origin.url
+            if not github_remote:
+                return None
 
-                # Extract owner and repo name from the URL
-                # Handle different URL formats:
-                # - https://github.com/owner/repo.git
-                # - git@github.com:owner/repo.git
-                if "github.com" in url:
-                    if url.startswith("https://"):
-                        match = re.search(r"github\.com/([^/]+)/([^/.]+)", url)
-                    else:  # SSH format
-                        match = re.search(r"github\.com:([^/]+)/([^/.]+)", url)
+            # Extract owner and repo name from the remote URL
+            url = github_remote.url
+            if url.startswith("git@github.com:"):
+                # SSH URL format: git@github.com:owner/repo.git
+                path = url.split("git@github.com:")[1]
+            elif url.startswith("https://github.com/"):
+                # HTTPS URL format: https://github.com/owner/repo.git
+                path = url.split("https://github.com/")[1]
+            else:
+                return None
 
-                    if match:
-                        owner = match.group(1)
-                        repo_name = match.group(2)
+            # Remove .git suffix if present
+            if path.endswith(".git"):
+                path = path[:-4]
 
-                        # Initialize GitHub instance if not already initialized
-                        if self.github_instance is None:
-                            try:
-                                from github import Github
+            # Split into owner and repo name
+            parts = path.split("/")
+            if len(parts) >= 2:
+                owner = parts[0]
+                repo_name = parts[1]
 
-                                if self.token:
-                                    self.github_instance = Github(self.token)
-                                else:
-                                    self.github_instance = Github()
-                            except ImportError:
-                                # If PyGithub is not installed, fall back to regex extraction
-                                return owner, repo_name
+                # Initialize GitHub instance if not already initialized
+                if self.github_instance is None:
+                    try:
+                        from github import Github
 
-                        try:
-                            # Get the repository using PyGithub
-                            full_name = f"{owner}/{repo_name}"
-                            github_repo = self.github_instance.get_repo(full_name)
+                        if self.token:
+                            self.github_instance = Github(self.token)
+                        else:
+                            self.github_instance = Github()
+                    except ImportError:
+                        # If PyGithub is not installed, fall back to the extracted info
+                        return (owner, repo_name)
 
-                            # Use Repository class to extract owner and repo_name
-                            return github_repo.owner.login, github_repo.name
-                        except Exception:
-                            # If there's an error getting the repository, fall back to regex extraction
-                            return owner, repo_name
-            except ValueError:
-                # Remote doesn't exist
-                pass
+                try:
+                    # Get the repository using PyGithub
+                    full_name = f"{owner}/{repo_name}"
+                    repo = self.github_instance.get_repo(full_name)
+
+                    # Use the Repository object to get owner and repo name
+                    return (repo.owner.login, repo.name)
+                except Exception:
+                    # If there's an error getting the repository, fall back to the extracted info
+                    return (owner, repo_name)
 
             return None
         except Exception:
