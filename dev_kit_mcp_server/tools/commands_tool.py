@@ -57,7 +57,7 @@ class ExecMakeTarget(AsyncOperation):
             await self._exec_commands(cmd, result)
         return result
 
-    async def _exec_commands(self, target: str, result: Dict[str, Any]) -> None:
+    async def _exec_commands(self, target, result: Dict[str, Any]) -> None:
         """Execute a Makefile target and store the result.
 
         Args:
@@ -80,26 +80,22 @@ class ExecMakeTarget(AsyncOperation):
             }
             return
 
-        try:
-            line = ["make", target, "--quiet"]
-            process = await self.create_sub_proccess(line)
+        line = ["make", target, "--quiet"]
+        process = await self.create_sub_proccess(line)
 
-            stdout, stderr = await process.communicate()
+        stdout, stderr = await process.communicate()
 
-            res = {
-                # "command": line,
-                "stdout": stdout.decode(errors="replace"),
-                "stderr": stderr.decode(errors="replace"),
-                "exitcode": process.returncode,
-                "cwd": self._root_path.as_posix(),
-            }
-            result[target] = res
-        except Exception as e:
-            result[target] = {
-                "error": f"Error running makefile command: {str(e)}",
-                "make-target": target,
-                "cwd": self._root_path.as_posix(),
-            }
+        res = {
+            "target": target,
+            "stdout": stdout.decode(errors="replace"),
+            "stderr": stderr.decode(errors="replace"),
+            "exitcode": process.returncode,
+            "cwd": self._root_path.as_posix(),
+        }
+        if process.returncode != 0:
+            raise RuntimeError(f"non-zero exitcode: {process.returncode}. details: {res}")
+
+        result[target] = res
 
     async def create_sub_proccess(self, cmd: List[str]) -> asyncio.subprocess.Process:
         """Create a subprocess to execute a shell command.

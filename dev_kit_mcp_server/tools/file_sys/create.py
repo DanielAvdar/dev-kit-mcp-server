@@ -47,15 +47,9 @@ class CreateDirOperation(FileOperation):
         """
         # Handle both model and direct path input for backward compatibility
 
-        try:
-            self._create_folder(path)
-            return {
-                "status": "success",
-                "message": f"Successfully created folder: {path}",
-                "path": path,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error creating file or folder: {str(e)}",
-                "path": path,
-            }
+        self._create_folder(path)
+        return {
+            "status": "success",
+            "message": f"Successfully created folder: {path}",
+            "path": path,
+        }

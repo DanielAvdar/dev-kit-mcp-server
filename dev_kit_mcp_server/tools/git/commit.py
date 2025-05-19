@@ -28,26 +28,20 @@ class GitCommitOperation(AsyncOperation):
         """
         # Handle both model and direct parameter input for backward compatibility
 
-        try:
-            # Get the repository
-            repo = self._repo
+        # Get the repository
+        repo = self._repo
 
-            # Commit the changes
-            if not message:
-                return {
-                    "error": "Commit message cannot be empty",
-                }
-
-            # Commit the changes
-            commit = repo.git.commit(m=message)
-
+        # Commit the changes
+        if not message:
             return {
-                "status": "success",
-                "message": f"Successfully committed changes: {message}",
-                "commit": commit,
+                "error": "Commit message cannot be empty",
             }
-        except Exception as e:
-            return {
-                "error": f"Error committing changes: {str(e)}",
-                "message": message,
-            }
+
+        # Commit the changes
+        commit = repo.git.commit(m=message)
+
+        return {
+            "status": "success",
+            "message": f"Successfully committed changes: {message}",
+            "commit": commit,
+        }

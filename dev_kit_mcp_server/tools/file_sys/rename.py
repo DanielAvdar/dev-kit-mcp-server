@@ -56,17 +56,10 @@ class RenameOperation(FileOperation):
             A dictionary containing the status and paths of the renamed file or folder
 
         """
-        try:
-            self._rename_file_or_folder(path, new_name)
-            return {
-                "status": "success",
-                "message": f"Successfully renamed {path} to {new_name}",
-                "path": path,
-                "new_name": new_name,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error renaming file or folder: {str(e)}",
-                "path": path,
-                "new_name": new_name,
-            }
+        self._rename_file_or_folder(path, new_name)
+        return {
+            "status": "success",
+            "message": f"Successfully renamed {path} to {new_name}",
+            "path": path,
+            "new_name": new_name,
+        }

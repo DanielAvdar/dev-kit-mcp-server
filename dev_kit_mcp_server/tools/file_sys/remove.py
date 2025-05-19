@@ -51,15 +51,9 @@ class RemoveFileOperation(FileOperation):
         """
         # Handle both model and direct path input for backward compatibility
 
-        try:
-            self._remove_folder(path)
-            return {
-                "status": "success",
-                "message": f"Successfully removed: {path}",
-                "path": path,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error removing file or folder: {str(e)}",
-                "path": path,
-            }
+        self._remove_folder(path)
+        return {
+            "status": "success",
+            "message": f"Successfully removed: {path}",
+            "path": path,
+        }

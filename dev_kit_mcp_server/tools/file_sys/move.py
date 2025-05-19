@@ -59,17 +59,10 @@ class MoveDirOperation(FileOperation):
         """
         # Handle both model and direct path input for backward compatibility
 
-        try:
-            self._move_folder(path1, path2)
-            return {
-                "status": "success",
-                "message": f"Successfully moved from {path1} to {path2}",
-                "path1": path1,
-                "path2": path2,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error moving file or folder: {str(e)}",
-                "path1": path1,
-                "path2": path2,
-            }
+        self._move_folder(path1, path2)
+        return {
+            "status": "success",
+            "message": f"Successfully moved from {path1} to {path2}",
+            "path1": path1,
+            "path2": path2,
+        }

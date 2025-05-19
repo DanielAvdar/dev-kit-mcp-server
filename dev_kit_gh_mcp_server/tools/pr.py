@@ -43,55 +43,44 @@ class GitHubPROperation(GitHubOperation):
 
         owner, repo_name = repo_info
 
+        # Import Github here to handle import errors
         try:
-            # Import Github here to handle import errors
-            try:
-                from github import Github
-            except ImportError as err:
-                raise ImportError(
-                    "The PyGithub package is not installed. Please install it with 'pip install PyGithub'."
-                ) from err
+            from github import Github
+        except ImportError as err:
+            raise ImportError(
+                "The PyGithub package is not installed. Please install it with 'pip install PyGithub'."
+            ) from err
 
-            # Initialize GitHub instance if not already initialized
-            if self.github_instance is None:
-                if self.token:
-                    self.github_instance = Github(self.token)
-                else:
-                    self.github_instance = Github()
-
-            # Get the repository
-            full_name = f"{owner}/{repo_name}"
-            repo = self.github_instance.get_repo(full_name)
-
-            # Get the pull requests
-            if pr_number is not None:
-                # Get a specific pull request
-                pr = repo.get_pull(pr_number)
-                return {
-                    "status": "success",
-                    "message": f"Successfully retrieved PR #{pr.number} from '{repo.full_name}'",
-                    "pr": self._format_pr(pr),
-                }
+        # Initialize GitHub instance if not already initialized
+        if self.github_instance is None:
+            if self.token:
+                self.github_instance = Github(self.token)
             else:
-                # Get all pull requests
-                prs = []
-                for pr in repo.get_pulls(state=state):
-                    prs.append(self._format_pr(pr))
+                self.github_instance = Github()
 
-                return {
-                    "status": "success",
-                    "message": f"Successfully retrieved {len(prs)} pull requests from '{repo.full_name}'",
-                    "prs": prs,
-                }
-        except ImportError:
-            # Re-raise ImportError to be caught by the caller
-            raise
-        except Exception as e:
+        # Get the repository
+        full_name = f"{owner}/{repo_name}"
+        repo = self.github_instance.get_repo(full_name)
+
+        # Get the pull requests
+        if pr_number is not None:
+            # Get a specific pull request
+            pr = repo.get_pull(pr_number)
             return {
-                "error": f"Error retrieving pull requests: {str(e)}",
-                "repo_name": repo_name,
-                "owner": owner,
-                "pr_number": pr_number,
+                "status": "success",
+                "message": f"Successfully retrieved PR #{pr.number} from '{repo.full_name}'",
+                "pr": self._format_pr(pr),
+            }
+        else:
+            # Get all pull requests
+            prs = []
+            for pr in repo.get_pulls(state=state):
+                prs.append(self._format_pr(pr))
+
+            return {
+                "status": "success",
+                "message": f"Successfully retrieved {len(prs)} pull requests from '{repo.full_name}'",
+                "prs": prs,
             }
 
     async def get_review(
@@ -124,63 +113,49 @@ class GitHubPROperation(GitHubOperation):
         if not pr_number:
             raise ValueError("Pull request number must be provided")
 
+        # Import Github here to handle import errors
         try:
-            # Import Github here to handle import errors
-            try:
-                from github import Github
-            except ImportError as err:
-                raise ImportError(
-                    "The PyGithub package is not installed. Please install it with 'pip install PyGithub'."
-                ) from err
+            from github import Github
+        except ImportError as err:
+            raise ImportError(
+                "The PyGithub package is not installed. Please install it with 'pip install PyGithub'."
+            ) from err
 
-            # Initialize GitHub instance if not already initialized
-            if self.github_instance is None:
-                if self.token:
-                    self.github_instance = Github(self.token)
-                else:
-                    self.github_instance = Github()
-
-            # Get the repository
-            full_name = f"{owner}/{repo_name}"
-            repo = self.github_instance.get_repo(full_name)
-
-            # Get the pull request
-            pr = repo.get_pull(pr_number)
-
-            # Get the reviews
-            if review_id is not None:
-                # Get a specific review
-                review = pr.get_review(review_id)
-                return {
-                    "status": "success",
-                    "message": (
-                        f"Successfully retrieved review #{review.id} for PR #{pr.number} from '{repo.full_name}'"
-                    ),
-                    "review": self._format_review(review),
-                }
+        # Initialize GitHub instance if not already initialized
+        if self.github_instance is None:
+            if self.token:
+                self.github_instance = Github(self.token)
             else:
-                # Get all reviews
-                reviews = []
-                for review in pr.get_reviews():
-                    reviews.append(self._format_review(review))
+                self.github_instance = Github()
 
-                return {
-                    "status": "success",
-                    "message": (
-                        f"Successfully retrieved {len(reviews)} reviews for PR #{pr.number} from '{repo.full_name}'"
-                    ),
-                    "reviews": reviews,
-                }
-        except ImportError:
-            # Re-raise ImportError to be caught by the caller
-            raise
-        except Exception as e:
+        # Get the repository
+        full_name = f"{owner}/{repo_name}"
+        repo = self.github_instance.get_repo(full_name)
+
+        # Get the pull request
+        pr = repo.get_pull(pr_number)
+
+        # Get the reviews
+        if review_id is not None:
+            # Get a specific review
+            review = pr.get_review(review_id)
             return {
-                "error": f"Error retrieving reviews: {str(e)}",
-                "repo_name": repo_name,
-                "owner": owner,
-                "pr_number": pr_number,
-                "review_id": review_id,
+                "status": "success",
+                "message": (f"Successfully retrieved review #{review.id} for PR #{pr.number} from '{repo.full_name}'"),
+                "review": self._format_review(review),
+            }
+        else:
+            # Get all reviews
+            reviews = []
+            for review in pr.get_reviews():
+                reviews.append(self._format_review(review))
+
+            return {
+                "status": "success",
+                "message": (
+                    f"Successfully retrieved {len(reviews)} reviews for PR #{pr.number} from '{repo.full_name}'"
+                ),
+                "reviews": reviews,
             }
 
     def _format_review(self, review: Union["PullRequestReview", Any]) -> Dict[str, Any]:
