@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-from ..core import AsyncOperation
+from ...core import AsyncOperation
 
 
 @dataclass(unsafe_hash=True, slots=True)

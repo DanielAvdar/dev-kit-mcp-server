@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
-from ..core import AsyncOperation
+from ...core import AsyncOperation
 
 
 @dataclass

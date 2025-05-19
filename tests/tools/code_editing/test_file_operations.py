@@ -6,6 +6,7 @@ from typing import Tuple
 
 import pytest
 
+from dev_kit_mcp_server.core import AsyncOperation
 from dev_kit_mcp_server.tools import (
     CreateDirOperation,
     EditFileOperation,
@@ -13,7 +14,6 @@ from dev_kit_mcp_server.tools import (
     RemoveFileOperation,
     RenameOperation,
 )
-from dev_kit_mcp_server.tools.core import AsyncOperation
 
 
 @pytest.fixture(scope="function")

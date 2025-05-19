@@ -6,7 +6,7 @@ from fastmcp import FastMCP
 from fastmcp.tools import Tool
 from mcp.types import ToolAnnotations
 
-from .tools.core import AsyncOperation
+from .core import AsyncOperation
 
 
 class RepoFastMCPServerError(FastMCP):
