@@ -38,9 +38,6 @@ async def test_tool_functionality(fastmcp_server):
 
 @pytest.mark.asyncio
 async def test_encoding_error(fastmcp_server):
-    # This test reproduces the encoding error
-    # 'utf-8' codec can't decode byte 0x85 in position 4301: invalid start byte
-    # ExecMakeTargetParams(**{"commands": ["encoding-error"]})
     async with Client(fastmcp_server) as client:
         make_cmd = [tool for tool in await client.list_tools() if tool.name == "exec_make_target"][0]
         res = await client.call_tool(make_cmd.name, {"commands": ["encoding-error"]})

@@ -17,6 +17,9 @@ from dev_kit_mcp_server.tools.git import (
 def temp_dir_git(temp_dir: str) -> str:
     """Create a temporary directory for testing."""
     repo = Repo(temp_dir)
+    cr = repo.config_writer(config_level="repository")
+    cr.set_value("user", "name", "Test User")
+    cr.set_value("user", "email", "TestUser@forgit.tests")
     dummy_file = Path(temp_dir) / "dummy.txt"
     dummy_file.write_text("This is a dummy file.")
     repo.index.add([dummy_file])
