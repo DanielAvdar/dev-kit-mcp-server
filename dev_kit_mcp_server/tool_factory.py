@@ -1,6 +1,6 @@
 """Tool factory for dynamically decorating functions as MCP tools at runtime."""
 
-from typing import Any, Callable, List
+from typing import Any, Callable, List, Sequence
 
 from fastmcp import FastMCP
 from fastmcp.tools import Tool
@@ -35,11 +35,11 @@ class ToolFactory:
         self._pre_hooks: List[Callable[..., Any]] = []
         self._post_hooks: List[Callable[..., Any]] = []
 
-    def __call__(self, obj: List[_Operation]) -> None:
+    def __call__(self, obj: Sequence[_Operation]) -> None:
         """Make the factory callable to directly decorate functions, lists of functions, or classes.
 
         Args:
-            obj: List of _Operation instances (FileOperation or AsyncOperation) to decorate
+            obj: Sequence of _Operation instances (FileOperation or AsyncOperation) to decorate
 
         """
         for func in obj:
