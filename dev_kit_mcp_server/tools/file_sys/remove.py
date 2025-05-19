@@ -3,13 +3,13 @@
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict
+from typing import Any, Dict
 
-from .file_ops import FileOperation
+from ...core import AsyncOperation
 
 
 @dataclass
-class RemoveFileOperation(FileOperation):
+class RemoveFileOperation(AsyncOperation):
     """Class to Remove a file or folder."""
 
     name = "remove_file"
@@ -39,7 +39,7 @@ class RemoveFileOperation(FileOperation):
         else:
             file_path.unlink()
 
-    def __call__(self, path: str) -> Dict[str, Any]:
+    async def __call__(self, path: str) -> Dict[str, Any]:
         """Remove a file or folder.
 
         Args:
@@ -49,43 +49,11 @@ class RemoveFileOperation(FileOperation):
             A dictionary containing the status and path of the removed file or folder
 
         """
-        try:
-            self._remove_folder(path)
-            return {
-                "status": "success",
-                "message": f"Successfully removed: {path}",
-                "path": path,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error removing file or folder: {str(e)}",
-                "path": path,
-            }
+        # Handle both model and direct path input for backward compatibility
 
-    def self_warpper(
-        self,
-    ) -> Callable:
-        """Return the self wrapper function.
-
-        Returns:
-            A callable function that wraps the __call__ method
-
-        """
-
-        def self_wrapper(
-            path: str,
-        ) -> Dict[str, Any]:
-            """Remove a file or folder.
-
-            Args:
-                path: Path to the file or folder to remove
-
-            Returns:
-                A dictionary containing the status and path of the removed file or folder
-
-            """
-            return self.__call__(path)
-
-        self_wrapper.__name__ = self.name
-
-        return self_wrapper
+        self._remove_folder(path)
+        return {
+            "status": "success",
+            "message": f"Successfully removed: {path}",
+            "path": path,
+        }

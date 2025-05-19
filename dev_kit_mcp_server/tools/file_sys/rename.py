@@ -3,13 +3,13 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict
+from typing import Any, Dict
 
-from .file_ops import FileOperation
+from ...core import AsyncOperation
 
 
 @dataclass(unsafe_hash=True, slots=True)
-class RenameOperation(FileOperation):
+class RenameOperation(AsyncOperation):
     """Class to rename a file or folder in the workspace."""
 
     name = "rename_file"
@@ -45,7 +45,7 @@ class RenameOperation(FileOperation):
         # Rename the file or folder
         os.rename(str(source_path), str(new_path))
 
-    def __call__(self, path: str, new_name: str) -> Dict[str, Any]:
+    async def __call__(self, path: str, new_name: str = None) -> Dict[str, Any]:
         """Rename a file or folder.
 
         Args:
@@ -56,42 +56,10 @@ class RenameOperation(FileOperation):
             A dictionary containing the status and paths of the renamed file or folder
 
         """
-        try:
-            self._rename_file_or_folder(path, new_name)
-            return {
-                "status": "success",
-                "message": f"Successfully renamed {path} to {new_name}",
-                "path": path,
-                "new_name": new_name,
-            }
-        except Exception as e:
-            return {
-                "error": f"Error renaming file or folder: {str(e)}",
-                "path": path,
-                "new_name": new_name,
-            }
-
-    def self_warpper(self) -> Callable:
-        """Return the self wrapper function.
-
-        Returns:
-            A callable function that wraps the __call__ method
-
-        """
-
-        def self_wrapper(path: str, new_name: str) -> Dict[str, Any]:
-            """Rename a file or folder.
-
-            Args:
-                path: Path to the file or folder to rename
-                new_name: New name for the file or folder (not a full path, just the name)
-
-            Returns:
-                A dictionary containing the status and paths of the renamed file or folder
-
-            """
-            return self.__call__(path, new_name)
-
-        self_wrapper.__name__ = self.name
-
-        return self_wrapper
+        self._rename_file_or_folder(path, new_name)
+        return {
+            "status": "success",
+            "message": f"Successfully renamed {path} to {new_name}",
+            "path": path,
+            "new_name": new_name,
+        }

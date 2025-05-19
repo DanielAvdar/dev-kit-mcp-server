@@ -1,24 +1,38 @@
 """Tools subpackage for MCP server implementations."""
 
-from .create import CreateDirOperation
-from .file_ops import FileOperation
-from .move import MoveDirOperation
-from .remove import RemoveFileOperation
-from .rename import RenameOperation
+import importlib.util
 
-# Import from code_editing
-# Import from tool factory
-from .tool_factory import ToolFactory
+from .commands_tool import ExecMakeTarget
+from .file_sys.create import CreateDirOperation
+from .file_sys.edit import EditFileOperation
+from .file_sys.move import MoveDirOperation
+from .file_sys.remove import RemoveFileOperation
+from .file_sys.rename import RenameOperation
+from .git.add import GitAddOperation
+from .git.checkout import GitCheckoutOperation
+from .git.commit import GitCommitOperation
+from .git.create_branch import GitCreateBranchOperation
+from .git.diff import GitDiffOperation
+from .git.pull import GitPullOperation
+from .git.push import GitPushOperation
+from .git.status import GitStatusOperation
 
-# Import utilities
+# Check if PyGithub is available
+GITHUB_AVAILABLE = importlib.util.find_spec("github") is not None
 
 __all__ = [
-    # Code editing tools
-    # Tool factory
-    "ToolFactory",
     "CreateDirOperation",
+    "EditFileOperation",
     "RemoveFileOperation",
     "MoveDirOperation",
     "RenameOperation",
-    "FileOperation",
+    "GitStatusOperation",
+    "GitCommitOperation",
+    "GitPushOperation",
+    "GitAddOperation",
+    "GitPullOperation",
+    "GitCheckoutOperation",
+    "GitCreateBranchOperation",
+    "GitDiffOperation",
+    "ExecMakeTarget",
 ]

@@ -31,8 +31,14 @@ dependencies = [
 
     "mcp>=1.8.1",
     "fastmcp>=2.3.3",
-]
+    "gitpython>=3.1.43",
+    "PyGithub",
 
+]
+[project.optional-dependencies]
+github = [
+    "PyGithub",
+]
 [project.scripts]
 dev-kit-mcp-server = "dev_kit_mcp_server:run_server"
 
@@ -69,7 +75,6 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
-[project.optional-dependencies]
 
 [tool.ruff]
 line-length = 120

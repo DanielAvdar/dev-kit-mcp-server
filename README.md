@@ -23,6 +23,7 @@ A Model Context Protocol (MCP) server targeted for agent development tools, prov
 - 🔒 **Secure Operations**: Execute operations within a scoped, authorized root directory
 - 🛠️ **Makefile Command Execution**: Run makefile commands securely within the project
 - 📁 **File Operations**: Move, Create, Rename and Delete files within the authorized directory
+- 🔄 **Git Operations**: Perform Git operations like status, add, commit, push, pull, and checkout
 - 🔌 **MCP Integration**: Turn any codebase into an MCP-compliant system
 - 🤖 **AI-Assisted Development**: Excellent integration with VS-Code copilot and other AI tools
 - 🔄 **Extensible Framework**: Easily add new tools for code editing and other operations
@@ -53,23 +54,35 @@ The `--root-dir` parameter specifies the directory where file operations will be
 
 The server provides the following tools:
 
-- **exec_make_target**: Run makefile commands securely within the project
+#### File Operations
 - **create_dir**: Create directories within the authorized root directory
+- **edit_file**: Edit files by replacing lines between specified start and end lines with new text
 - **move_dir**: Move files and directories within the authorized root directory
 - **remove_file**: Delete files within the authorized root directory
+- **rename_file**: Rename files and directories within the authorized root directory
+
+#### Git Operations
+- **git_status**: Get the status of the Git repository (changed files, untracked files, etc.)
+- **git_add**: Add files to the Git index (staging area)
+- **git_commit**: Commit changes to the Git repository
+- **git_push**: Push changes to a remote Git repository
+- **git_pull**: Pull changes from a remote Git repository
+- **git_checkout**: Checkout or create a branch in the Git repository
+- **git_diff**: Show diffs between commits, commit and working tree, etc.
+
+#### Makefile Operations
+- **exec_make_target**: Run makefile commands securely within the project
 
 ### Example Usage with MCP Client
 
 ```python
 from fastmcp import Client
-async def example()
+async def example():
     async with Client() as client:
         # List available tools
         tools = await client.list_tools()
 
-        # Run a makefile command
-        result = await client.call_tool("exec_make_target", {"commands": ["test"]})
-
+        # File Operations
         # Create a directory
         result = await client.call_tool("create_dir", {"path": "new_directory"})
 
@@ -80,7 +93,38 @@ async def example()
         result = await client.call_tool("remove_file", {"path": "file_to_remove.txt"})
 
         # Rename a file
-        result = await client.call_tool("rename_file", {"path1": "old_name.txt", "path2": "new_name.txt"})
+        result = await client.call_tool("rename_file", {"path": "old_name.txt", "new_name": "new_name.txt"})
+
+        # Edit a file
+        result = await client.call_tool("edit_file", {
+            "path": "file_to_edit.txt",
+            "start_line": 2,
+            "end_line": 4,
+            "text": "This text will replace lines 2-4"
+        })
+
+        # Git Operations
+        # Get repository status
+        result = await client.call_tool("git_status")
+
+        # Add files to the index
+        result = await client.call_tool("git_add", {"paths": ["file1.txt", "file2.txt"]})
+
+        # Commit changes
+        result = await client.call_tool("git_commit", {"message": "Add new files"})
+
+        # Pull changes from remote
+        result = await client.call_tool("git_pull", {"remote": "origin", "branch": "main"})
+
+        # Push changes to remote
+        result = await client.call_tool("git_push")
+
+        # Checkout a branch
+        result = await client.call_tool("git_checkout", {"branch": "feature-branch", "create": True})
+
+        # Makefile Operations
+        # Run a makefile command
+        result = await client.call_tool("exec_make_target", {"commands": ["test"]})
 ```
 
 ## Development

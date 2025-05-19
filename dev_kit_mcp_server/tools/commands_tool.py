@@ -7,9 +7,9 @@ that make would run for the specified targets.
 import asyncio
 import re
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List
 
-from .file_ops import AsyncOperation
+from ..core import AsyncOperation
 
 
 @dataclass
@@ -30,6 +30,7 @@ class ExecMakeTarget(AsyncOperation):
         super().__post_init__()
         self._make_file_exists = (self._root_path / "Makefile").exists()
 
+    def _repo_init(self) -> None: ...
     async def __call__(
         self,
         commands: List[str],
@@ -37,7 +38,7 @@ class ExecMakeTarget(AsyncOperation):
         """Execute Makefile targets.
 
         Args:
-            commands: List of Makefile targets to execute (e.g. ["test", "lint"])
+            commands: List of Makefile targets to execute
 
         Returns:
             A dictionary containing the execution results for each target
@@ -46,48 +47,26 @@ class ExecMakeTarget(AsyncOperation):
             ValueError: If commands is not a list
 
         """
+        # Handle both model and direct list input for backward compatibility
         if not isinstance(commands, list):
             raise ValueError("Expected a list of commands as the argument")
+
         result: Dict[str, Any] = {}
+
         for cmd in commands:
-            await self._exec_commands(cmd, commands, result)
+            await self._exec_commands(cmd, result)
         return result
 
-    def self_warpper(
-        self,
-    ) -> Callable:
-        """Return the self wrapper function.
-
-        Returns:
-            A callable function that wraps the __call__ method
-
-        """
-
-        async def self_wrapper(
-            commands: List[str],
-        ) -> Dict[str, Any]:
-            """Execute Makefile targets.
-
-            Args:
-                commands: List of Makefile targets to execute (e.g. ["test", "lint"])
-
-            Returns:
-                A dictionary containing the execution results for each target
-
-            """
-            return await self.__call__(commands)
-
-        self_wrapper.__name__ = self.name
-
-        return self_wrapper
-
-    async def _exec_commands(self, target: str, commands: List[str], result: Dict[str, Any]) -> None:
+    async def _exec_commands(self, target: str, result: Dict[str, Any]) -> None:
         """Execute a Makefile target and store the result.
 
         Args:
             target: The Makefile target to execute
             commands: The list of all targets being executed
             result: Dictionary to store the execution results
+
+        Raises:
+            RuntimeError: If the make command returns a non-zero exit code
 
         """
         if not self._make_file_exists:
@@ -101,31 +80,25 @@ class ExecMakeTarget(AsyncOperation):
         if not re.match(valid_cmd_regex, target):
             result[target] = {
                 "error": f"Target '{target}' is invalid.",
-                "commands": commands,
             }
             return
 
-        try:
-            line = ["make", target, "--quiet"]
-            process = await self.create_sub_proccess(line)
+        line = ["make", target, "--quiet"]
+        process = await self.create_sub_proccess(line)
 
-            stdout, stderr = await process.communicate()
+        stdout, stderr = await process.communicate()
 
-            res = {
-                # "command": line,
-                "stdout": stdout.decode(errors="replace"),
-                "stderr": stderr.decode(errors="replace"),
-                "exitcode": process.returncode,
-                "cwd": self._root_path.as_posix(),
-            }
-            result[target] = res
-        except Exception as e:
-            result[target] = {
-                "error": f"Error running makefile command: {str(e)}",
-                "make-target": target,
-                "commands": commands,
-                "cwd": self._root_path.as_posix(),
-            }
+        res = {
+            "target": target,
+            "stdout": stdout.decode(errors="replace"),
+            "stderr": stderr.decode(errors="replace"),
+            "exitcode": process.returncode,
+            "cwd": self._root_path.as_posix(),
+        }
+        if process.returncode != 0:
+            raise RuntimeError(f"non-zero exitcode: {process.returncode}. details: {res}")
+
+        result[target] = res
 
     async def create_sub_proccess(self, cmd: List[str]) -> asyncio.subprocess.Process:
         """Create a subprocess to execute a shell command.

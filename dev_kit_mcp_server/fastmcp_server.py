@@ -6,12 +6,30 @@ import os
 import sys
 from pathlib import Path
 
-# from mcp.server.fastmcp import FastMCP  # type: ignore
-from fastmcp import FastMCP
+import dev_kit_mcp_server.tools as tools_module  # Import the tools module
 
-from .tools import CreateDirOperation, MoveDirOperation, RemoveFileOperation, RenameOperation
+# from mcp.server.fastmcp import FastMCP  # type: ignore
+# from fastmcp import FastMCP
+from .tool_factory import RepoFastMCPServerError as FastMCP, ToolFactory
+from .tools import (
+    CreateDirOperation,
+    EditFileOperation,
+    GitAddOperation,
+    GitCheckoutOperation,
+    GitCommitOperation,
+    GitCreateBranchOperation,
+    GitDiffOperation,
+    GitPullOperation,
+    GitPushOperation,
+    GitStatusOperation,
+    MoveDirOperation,
+    RemoveFileOperation,
+    RenameOperation,
+    __all__ as tools_names,  # Import all tools for registration
+)
 from .tools.commands_tool import ExecMakeTarget
-from .tools.tool_factory import ToolFactory
+
+# from importlib import import_module
 
 
 def start_server(root_dir: str = None) -> FastMCP:
@@ -34,15 +52,33 @@ def start_server(root_dir: str = None) -> FastMCP:
         f" and running authorized makefile commands in root directory: {root_dir}",
     )
 
-    tool_factory = ToolFactory(fastmcp)
-    tool_factory([
-        # move_dir_tool,
+    # Create a list of tools to register
+    tools = [
+        # File system operations
         MoveDirOperation(root_dir=root_dir),
         CreateDirOperation(root_dir=root_dir),
+        EditFileOperation(root_dir=root_dir),
         RemoveFileOperation(root_dir=root_dir),
         RenameOperation(root_dir=root_dir),
+        # Git operations
+        GitStatusOperation(root_dir=root_dir),
+        GitCommitOperation(root_dir=root_dir),
+        GitPushOperation(root_dir=root_dir),
+        GitPullOperation(root_dir=root_dir),
+        GitAddOperation(root_dir=root_dir),
+        GitCheckoutOperation(root_dir=root_dir),
+        GitCreateBranchOperation(root_dir=root_dir),
+        GitDiffOperation(root_dir=root_dir),
+        # Make operations
         ExecMakeTarget(root_dir=root_dir),
-    ])
+    ]
+    [getattr(tools_module, tool_name)(root_dir=root_dir) for tool_name in tools_names]
+
+    # Register all tools
+    tool_factory = ToolFactory(fastmcp)
+    tool_factory(
+        tools,
+    )
     return fastmcp
 
 

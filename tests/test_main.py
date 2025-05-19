@@ -1,16 +1,14 @@
 """Tests for the __main__ module."""
 
-import tempfile
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-
-@pytest.fixture
-def temp_dir():
-    """Create a temporary directory for testing."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        yield temp_dir
+# @pytest.fixture
+# def temp_dir(tmp_path) -> str:
+#     """Create a temporary directory for testing."""
+#     Repo.init(tmp_path)
+#     return Path(tmp_path).as_posix()
 
 
 # We need to patch argparse before importing the module
