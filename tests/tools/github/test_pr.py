@@ -80,14 +80,8 @@ async def test_github_pr_operation_exception(temp_dir, mock_github_error):
     # Mock get_repo_info to return a valid repo info
     with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
         # Attempt to get pull request information
-        result = await operation(pr_number=1)
-
-        # Check the result
-        assert "error" in result
-        assert "Error retrieving pull requests" in result["error"]
-        assert result["repo_name"] == "test-repo"
-        assert result["owner"] == "test-owner"
-        assert result["pr_number"] == 1
+        with pytest.raises(Exception, match="Simulated error"):
+            await operation(pr_number=1)
 
 
 @pytest.mark.asyncio
@@ -187,14 +181,8 @@ async def test_github_pr_get_review_exception(temp_dir, mock_github_error):
     # Mock get_repo_info to return a valid repo info
     with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
         # Attempt to get review information
-        result = await operation.get_review(1)
-
-        # Check the result
-        assert "error" in result
-        assert "Error retrieving reviews" in result["error"]
-        assert result["repo_name"] == "test-repo"
-        assert result["owner"] == "test-owner"
-        assert result["pr_number"] == 1
+        with pytest.raises(Exception, match="Simulated error"):
+            await operation.get_review(1)
 
 
 @pytest.mark.asyncio

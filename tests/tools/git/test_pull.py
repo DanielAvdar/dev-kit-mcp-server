@@ -91,13 +91,9 @@ async def test_git_pull_operation_nonexistent_remote(temp_dir_git):
         # Set up the mock repo to raise ValueError when remote is called
         mock_repo.remote = MagicMock(side_effect=ValueError("Remote not found"))
 
-        # Pull from a nonexistent remote
-        result = await operation("nonexistent")
-
-    # Check the result
-    assert "error" in result
-    assert "Remote 'nonexistent' does not exist" in result["error"]
-    assert result["remote"] == "nonexistent"
+        # Pull from a nonexistent remote - should raise ValueError
+        with pytest.raises(ValueError, match="Remote not found"):
+            await operation("nonexistent")
 
 
 @pytest.mark.asyncio
@@ -120,13 +116,9 @@ async def test_git_pull_operation_detached_head(temp_dir_git):
 
         type(mock_repo).active_branch = property(active_branch_getter)
 
-        # Pull without specifying a branch
-        result = await operation()
-
-    # Check the result
-    assert "error" in result
-    assert "Cannot pull when HEAD is detached" in result["error"]
-    assert result["remote"] == "origin"
+        # Pull without specifying a branch - should raise TypeError
+        with pytest.raises(TypeError, match="HEAD is detached"):
+            await operation()
 
 
 @pytest.mark.asyncio
@@ -149,10 +141,6 @@ async def test_git_pull_operation_exception(temp_dir_git):
         mock_branch.name = "main"
         type(mock_repo).active_branch = mock_branch
 
-        # Pull from the remote
-        result = await operation()
-
-    # Check the result
-    assert "error" in result
-    assert "Error pulling changes: Network error" in result["error"]
-    assert result["remote"] == "origin"
+        # Pull from the remote - should raise the network error
+        with pytest.raises(Exception, match="Network error"):
+            await operation()

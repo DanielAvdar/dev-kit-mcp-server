@@ -198,12 +198,11 @@ class TestMoveDirOperation:
         _, _, non_existent = setup_test_files
         new_location = os.path.join(temp_root_dir, "should_not_exist")
 
-        # Act
-        result = move_operation(non_existent, new_location)
+        # Act & Assert
+        with pytest.raises(FileNotFoundError, match="Source path does not exist"):
+            move_operation(non_existent, new_location)
 
-        # Assert
-        assert "error" in result
-        assert "does not exist" in result.get("error", "")
+        # Verify destination was not created
         assert not os.path.exists(new_location)
 
     def test_move_destination_exists(
@@ -213,12 +212,11 @@ class TestMoveDirOperation:
         # Arrange
         test_dir, test_file, _ = setup_test_files
 
-        # Act
-        result = move_operation(test_dir, test_file)
+        # Act & Assert
+        with pytest.raises(FileExistsError, match="Destination path already exists"):
+            move_operation(test_dir, test_file)
 
-        # Assert
-        assert "error" in result
-        assert "already exists" in result.get("error", "")
+        # Verify both paths still exist
         assert os.path.exists(test_dir)
         assert os.path.exists(test_file)
 
@@ -277,12 +275,9 @@ class TestRemoveFileOperation:
         # Arrange
         _, _, non_existent = setup_test_files
 
-        # Act
-        result = remove_operation(non_existent)
-
-        # Assert
-        assert "error" in result
-        assert "does not exist" in result.get("error", "")
+        # Act & Assert
+        with pytest.raises(FileNotFoundError, match="Path does not exist"):
+            remove_operation(non_existent)
 
     @pytest.mark.skip(reason="Test for is OS dependent")
     def test_remove_outside_root(self, remove_operation: RemoveFileOperation) -> None:
@@ -368,13 +363,12 @@ class TestRemoveFileOperation:
         assert res_remove.get("status") == "success"
         assert not fun_path.exists()
         invalid = f"./../{valid_rel_path}"
-        invalid_res = remove_operation(invalid)
-        assert "error" in invalid_res
-        assert "not within the root directory" in invalid_res.get("error", "")
-        invalid_res = create_operation(invalid)
-        assert "error" in invalid_res
-        invalid_res = move_operation(invalid, "some_folder")
-        assert "error" in invalid_res
+        with pytest.raises(ValueError):
+            remove_operation(invalid)
+        with pytest.raises(ValueError):
+            create_operation(invalid)
+        with pytest.raises(ValueError):
+            move_operation(invalid, "some_folder")
 
 
 class TestRenameOperation:
@@ -435,12 +429,9 @@ class TestRenameOperation:
         _, _, non_existent = setup_test_files
         new_name = "should_not_exist"
 
-        # Act
-        result = rename_operation(non_existent, new_name)
-
-        # Assert
-        assert "error" in result
-        assert "does not exist" in result.get("error", "")
+        # Act & Assert
+        with pytest.raises(FileNotFoundError, match="Path does not exist"):
+            rename_operation(non_existent, new_name)
 
     def test_rename_to_existing_name(
         self, rename_operation: RenameOperation, setup_test_files: Tuple[str, str, str], temp_root_dir: str
@@ -455,12 +446,11 @@ class TestRenameOperation:
         with open(existing_path, "w") as f:
             f.write("Existing content")
 
-        # Act
-        result = rename_operation(test_file, existing_name)
+        # Act & Assert
+        with pytest.raises(FileExistsError, match="A file or folder with the name .* already exists"):
+            rename_operation(test_file, existing_name)
 
-        # Assert
-        assert "error" in result
-        assert "already exists" in result.get("error", "")
+        # Verify files still exist
         assert os.path.exists(test_file)
         assert os.path.exists(existing_path)
 
