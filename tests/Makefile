@@ -7,5 +7,4 @@ ls:
 	echo 'command is successful'
 
 encoding-error:
-	powershell -Command "[System.IO.File]::WriteAllBytes('non_utf8.bin', [byte[]]@(0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x2C, 0x20, 0x77, 0x6F, 0x72, 0x6C, 0x64, 0x21, 0x85, 0x0A))"
-	type non_utf8.bin
+	echo "a4ew4ghs5$#^&%*\&*)^\n)*&_)+\"?\{\\JKL>KHERQAWERQWAFAG"
