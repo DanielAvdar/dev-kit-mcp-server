@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from dev_kit_mcp_server.tools.github import (
+from dev_kit_gh_mcp_server.tools import (
     GitHubIssueOperation,
     GitHubPROperation,
     GitHubRepoOperation,

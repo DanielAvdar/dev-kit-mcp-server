@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from dev_kit_mcp_server.tools.github import GitHubPROperation
+from dev_kit_gh_mcp_server.tools import GitHubPROperation
 
 
 @pytest.mark.asyncio

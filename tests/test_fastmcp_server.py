@@ -8,12 +8,6 @@ import pytest
 
 from dev_kit_mcp_server.fastmcp_server import start_server
 
-# @pytest.fixture
-# def temp_dir(tmp_path) -> str:
-#     """Create a temporary directory for testing."""
-#     Repo.init(tmp_path)
-#     return Path(tmp_path).as_posix()
-
 
 class TestFastMCPServer:
     """Tests for the FastMCP server."""
