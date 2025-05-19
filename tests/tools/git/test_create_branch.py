@@ -125,5 +125,5 @@ async def test_git_create_branch_operation_exception(
     mock_repo_error(git_create_branch_operation)
 
     # Attempt to create a branch - should raise the simulated error
-    with pytest.raises(Exception):
+    with pytest.raises(AttributeError):
         await git_create_branch_operation("feature-branch")

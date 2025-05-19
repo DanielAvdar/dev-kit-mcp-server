@@ -78,7 +78,7 @@ async def test_git_add_operation(
 
     if should_raise:
         # For nonexistent file, we expect a git command error
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match=".*nonexistent_file.txt.*"):
             await git_add_operation(file_paths)
     else:
         # Execute: Add the files to the index

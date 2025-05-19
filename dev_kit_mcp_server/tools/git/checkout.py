@@ -28,6 +28,7 @@ class GitCheckoutOperation(AsyncOperation):
 
         Raises:
             ValueError: If branch is not provided
+            Exception: If the branch doesn't exist and create is False
 
         """
         # Validate input
