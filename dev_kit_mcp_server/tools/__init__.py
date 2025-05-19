@@ -10,6 +10,7 @@ from .file_sys.rename import RenameOperation
 from .git.add import GitAddOperation
 from .git.checkout import GitCheckoutOperation
 from .git.commit import GitCommitOperation
+from .git.create_branch import GitCreateBranchOperation
 from .git.pull import GitPullOperation
 from .git.push import GitPushOperation
 from .git.status import GitStatusOperation
@@ -28,5 +29,6 @@ __all__ = [
     "GitAddOperation",
     "GitPullOperation",
     "GitCheckoutOperation",
+    "GitCreateBranchOperation",
     "ExecMakeTarget",
 ]
