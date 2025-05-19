@@ -4,6 +4,7 @@ import importlib.util
 
 from .commands_tool import ExecMakeTarget
 from .file_sys.create import CreateDirOperation
+from .file_sys.edit import EditFileOperation
 from .file_sys.move import MoveDirOperation
 from .file_sys.remove import RemoveFileOperation
 from .file_sys.rename import RenameOperation
@@ -21,6 +22,7 @@ GITHUB_AVAILABLE = importlib.util.find_spec("github") is not None
 
 __all__ = [
     "CreateDirOperation",
+    "EditFileOperation",
     "RemoveFileOperation",
     "MoveDirOperation",
     "RenameOperation",

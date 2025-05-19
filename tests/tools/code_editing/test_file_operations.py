@@ -8,6 +8,7 @@ import pytest
 
 from dev_kit_mcp_server.tools import (
     CreateDirOperation,
+    EditFileOperation,
     MoveDirOperation,
     RemoveFileOperation,
     RenameOperation,
@@ -43,6 +44,12 @@ def remove_operation(temp_root_dir: str) -> RemoveFileOperation:
 def rename_operation(temp_root_dir: str) -> RenameOperation:
     """Create a RenameOperation instance with a temporary root directory."""
     return RenameOperation(root_dir=temp_root_dir)
+
+
+@pytest.fixture
+def edit_operation(temp_root_dir: str) -> EditFileOperation:
+    """Create an EditFileOperation instance with a temporary root directory."""
+    return EditFileOperation(root_dir=temp_root_dir)
 
 
 @pytest.fixture(
@@ -369,6 +376,168 @@ class TestRemoveFileOperation:
             create_operation(invalid)
         with pytest.raises(ValueError):
             move_operation(invalid, "some_folder")
+
+
+class TestEditFileOperation:
+    """Tests for EditFileOperation."""
+
+    def test_edit_file_success(
+        self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str], temp_root_dir: str
+    ) -> None:
+        """Test editing a file successfully."""
+        # Arrange
+        _, test_file, _ = setup_test_files
+
+        # Create a test file with multiple lines
+        with open(test_file, "w") as f:
+            f.write("Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n")
+
+        # Act
+        result = edit_operation(test_file, 2, 4, "New Line 2\nNew Line 3")
+
+        # Assert
+        assert result["status"] == "success"
+        assert f"Successfully edited file: {test_file}" in result["message"]
+        assert result["path"] == test_file
+        assert result["start_line"] == 2
+        assert result["end_line"] == 4
+        assert result["text_length"] == len("New Line 2\nNew Line 3")
+
+        # Check the file content
+        with open(test_file, "r") as f:
+            content = f.read()
+        assert content == "Line 1\nNew Line 2\nNew Line 3\nLine 5\n"
+
+    def test_edit_file_append(self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]) -> None:
+        """Test appending to a file by setting start_line beyond the end of the file."""
+        # Arrange
+        _, test_file, _ = setup_test_files
+
+        # Create a test file with multiple lines
+        with open(test_file, "w") as f:
+            f.write("Line 1\nLine 2\nLine 3\n")
+
+        # Act
+        result = edit_operation(test_file, 4, 4, "Line 4\nLine 5")
+
+        # Assert
+        assert result["status"] == "success"
+
+        # Check the file content
+        with open(test_file, "r") as f:
+            content = f.read()
+        assert content == "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n"
+
+    def test_edit_file_invalid_start_line(
+        self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
+        """Test editing a file with an invalid start line."""
+        # Arrange
+        _, test_file, _ = setup_test_files
+
+        # Create a test file with multiple lines
+        with open(test_file, "w") as f:
+            f.write("Line 1\nLine 2\nLine 3\n")
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Start line must be at least 1"):
+            edit_operation(test_file, 0, 2, "New content")
+
+    def test_edit_file_invalid_end_line(
+        self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
+        """Test editing a file with an invalid end line."""
+        # Arrange
+        _, test_file, _ = setup_test_files
+
+        # Create a test file with multiple lines
+        with open(test_file, "w") as f:
+            f.write("Line 1\nLine 2\nLine 3\n")
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="End line must be greater than or equal to start line"):
+            edit_operation(test_file, 3, 1, "New content")
+
+    def test_edit_file_start_line_beyond_file(
+        self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
+        """Test editing a file with a start line beyond the end of the file."""
+        # Arrange
+        _, test_file, _ = setup_test_files
+
+        # Create a test file with multiple lines
+        with open(test_file, "w") as f:
+            f.write("Line 1\nLine 2\nLine 3\n")
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Start line .* is beyond the end of the file"):
+            edit_operation(test_file, 10, 12, "New content")
+
+    def test_edit_file_end_line_beyond_file(
+        self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
+        """Test editing a file with an end line beyond the end of the file."""
+        # Arrange
+        _, test_file, _ = setup_test_files
+
+        # Create a test file with multiple lines
+        with open(test_file, "w") as f:
+            f.write("Line 1\nLine 2\nLine 3\n")
+
+        # Act
+        result = edit_operation(test_file, 2, 10, "New Line 2")
+
+        # Assert
+        assert result["status"] == "success"
+
+        # Check the file content
+        with open(test_file, "r") as f:
+            content = f.read()
+        assert content == "Line 1\nNew Line 2\n"
+
+    def test_edit_nonexistent_file(
+        self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]
+    ) -> None:
+        """Test editing a non-existent file."""
+        # Arrange
+        _, _, non_existent = setup_test_files
+
+        # Act & Assert
+        with pytest.raises(FileNotFoundError, match="Path does not exist"):
+            edit_operation(non_existent, 1, 2, "New content")
+
+    def test_edit_directory(self, edit_operation: EditFileOperation, setup_test_files: Tuple[str, str, str]) -> None:
+        """Test editing a directory."""
+        # Arrange
+        test_dir, _, _ = setup_test_files
+
+        # Act & Assert
+        with pytest.raises(IsADirectoryError, match="Path is a directory, not a file"):
+            edit_operation(test_dir, 1, 2, "New content")
+
+    @pytest.mark.skip(reason="Test is OS dependent")
+    def test_edit_outside_root(self, edit_operation: EditFileOperation) -> None:
+        """Test editing a file outside the root directory."""
+        # Arrange
+        outside_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "outside_file.txt"))
+
+        # Create the file temporarily to ensure it exists
+        try:
+            with open(outside_path, "w") as f:
+                f.write("Should not be edited")
+
+            # Act & Assert
+            with pytest.raises(ValueError, match="not within the root directory"):
+                edit_operation(outside_path, 1, 1, "New content")
+
+            # Verify the file was not edited
+            with open(outside_path, "r") as f:
+                content = f.read()
+            assert content == "Should not be edited"
+        finally:
+            # Clean up
+            if os.path.exists(outside_path):
+                os.remove(outside_path)
 
 
 class TestRenameOperation:

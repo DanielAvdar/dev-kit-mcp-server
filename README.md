@@ -56,6 +56,7 @@ The server provides the following tools:
 
 #### File Operations
 - **create_dir**: Create directories within the authorized root directory
+- **edit_file**: Edit files by replacing lines between specified start and end lines with new text
 - **move_dir**: Move files and directories within the authorized root directory
 - **remove_file**: Delete files within the authorized root directory
 - **rename_file**: Rename files and directories within the authorized root directory
@@ -92,7 +93,15 @@ async def example():
         result = await client.call_tool("remove_file", {"path": "file_to_remove.txt"})
 
         # Rename a file
-        result = await client.call_tool("rename_file", {"path1": "old_name.txt", "path2": "new_name.txt"})
+        result = await client.call_tool("rename_file", {"path": "old_name.txt", "new_name": "new_name.txt"})
+
+        # Edit a file
+        result = await client.call_tool("edit_file", {
+            "path": "file_to_edit.txt",
+            "start_line": 2,
+            "end_line": 4,
+            "text": "This text will replace lines 2-4"
+        })
 
         # Git Operations
         # Get repository status

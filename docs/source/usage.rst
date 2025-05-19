@@ -95,6 +95,30 @@ The operation will fail if:
 * The path does not exist
 * A file or folder with the new name already exists in the same directory
 
+Edit File
+~~~~~~~~~
+
+Edits a file by replacing lines between specified start and end lines with new text.
+
+.. code-block:: python
+
+   # Using the MCP client
+   result = await client.call_tool("edit_file", {
+       "path": "path/to/file.txt",
+       "start_line": 2,
+       "end_line": 4,
+       "text": "This text will replace lines 2-4"
+   })
+
+The operation will fail if:
+
+* The path is outside the root directory
+* The path does not exist
+* The path is a directory, not a file
+* The start line is less than 1
+* The end line is less than the start line
+* The start line is beyond the end of the file
+
 Git Operations
 --------------
 

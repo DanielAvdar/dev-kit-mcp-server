@@ -13,6 +13,7 @@ import dev_kit_mcp_server.tools as tools_module  # Import the tools module
 from .tool_factory import RepoFastMCPServerError as FastMCP, ToolFactory
 from .tools import (
     CreateDirOperation,
+    EditFileOperation,
     GitAddOperation,
     GitCheckoutOperation,
     GitCommitOperation,
@@ -56,6 +57,7 @@ def start_server(root_dir: str = None) -> FastMCP:
         # File system operations
         MoveDirOperation(root_dir=root_dir),
         CreateDirOperation(root_dir=root_dir),
+        EditFileOperation(root_dir=root_dir),
         RemoveFileOperation(root_dir=root_dir),
         RenameOperation(root_dir=root_dir),
         # Git operations
