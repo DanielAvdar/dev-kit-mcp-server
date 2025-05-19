@@ -345,6 +345,7 @@ dependencies = [
     { name = "fastmcp" },
     { name = "gitpython" },
     { name = "mcp" },
+    { name = "pygithub" },
 ]
 
 [package.optional-dependencies]
@@ -375,6 +376,7 @@ requires-dist = [
     { name = "fastmcp", specifier = ">=2.3.3" },
     { name = "gitpython", specifier = ">=3.1.43" },
     { name = "mcp", specifier = ">=1.8.1" },
+    { name = "pygithub" },
     { name = "pygithub", marker = "extra == 'github'" },
 ]
 provides-extras = ["github"]
