@@ -19,16 +19,12 @@ class GitHubPROperation(GitHubOperation):
 
     async def __call__(
         self,
-        repo_name: str,
-        owner: str,
         pr_number: Optional[int] = None,
         state: str = "open",
     ) -> Dict[str, Any]:
         """Get information about GitHub pull requests.
 
         Args:
-            repo_name: Name of the repository
-            owner: Owner of the repository
             pr_number: Number of the pull request to get (default: None, which means get all PRs)
             state: State of the pull requests to get (default: "open")
 
@@ -36,15 +32,16 @@ class GitHubPROperation(GitHubOperation):
             A dictionary containing information about the pull requests
 
         Raises:
-            ValueError: If repo_name or owner is not provided
+            ValueError: If repository information cannot be determined from git remote
             ImportError: If the PyGithub package is not installed
 
         """
-        # Validate input
-        if not repo_name:
-            raise ValueError("Repository name must be provided")
-        if not owner:
-            raise ValueError("Repository owner must be provided")
+        # Get repo info from git remote
+        repo_info = self.get_repo_info()
+        if not repo_info:
+            raise ValueError("Repository information could not be extracted from git remote")
+
+        owner, repo_name = repo_info
 
         try:
             # Import Github here to handle import errors
@@ -99,16 +96,12 @@ class GitHubPROperation(GitHubOperation):
 
     async def get_review(
         self,
-        repo_name: str,
-        owner: str,
-        pr_number: int,
+        pr_number: int = 0,
         review_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Get reviews for a pull request.
 
         Args:
-            repo_name: Name of the repository
-            owner: Owner of the repository
             pr_number: Number of the pull request to get reviews for
             review_id: ID of the specific review to get (default: None, which means get all reviews)
 
@@ -116,15 +109,18 @@ class GitHubPROperation(GitHubOperation):
             A dictionary containing information about the reviews
 
         Raises:
-            ValueError: If repo_name, owner, or pr_number is not provided
+            ValueError: If repository information cannot be determined from git remote or pr_number is not provided
             ImportError: If the PyGithub package is not installed
 
         """
+        # Get repo info from git remote
+        repo_info = self.get_repo_info()
+        if not repo_info:
+            raise ValueError("Repository information could not be extracted from git remote")
+
+        owner, repo_name = repo_info
+
         # Validate input
-        if not repo_name:
-            raise ValueError("Repository name must be provided")
-        if not owner:
-            raise ValueError("Repository owner must be provided")
         if not pr_number:
             raise ValueError("Pull request number must be provided")
 

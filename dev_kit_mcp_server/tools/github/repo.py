@@ -1,7 +1,7 @@
 """Module for interacting with GitHub repositories."""
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict
 
 # Import GitHub types for type checking only
 if TYPE_CHECKING:
@@ -18,26 +18,23 @@ class GitHubRepoOperation(GitHubOperation):
 
     async def __call__(
         self,
-        repo_name: str,
-        owner: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Get information about a GitHub repository.
-
-        Args:
-            repo_name: Name of the repository
-            owner: Owner of the repository (default: None, which means the authenticated user)
 
         Returns:
             A dictionary containing information about the repository
 
         Raises:
-            ValueError: If repo_name is not provided
+            ValueError: If repository information cannot be determined from git remote
             ImportError: If the PyGithub package is not installed
 
         """
-        # Validate input
-        if not repo_name:
-            raise ValueError("Repository name must be provided")
+        # Get repo info from git remote
+        repo_info = self.get_repo_info()
+        if not repo_info:
+            raise ValueError("Repository information could not be extracted from git remote")
+
+        owner, repo_name = repo_info
 
         try:
             # Import Github here to handle import errors
