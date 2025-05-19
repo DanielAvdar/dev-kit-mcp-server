@@ -12,9 +12,11 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Last Commit](https://img.shields.io/github/last-commit/DanielAvdar/dev-kit-mcp-server/main)
 
-A Model Context Protocol (MCP) server targeted for agent development tools, providing scoped authorized operations in the root project directory.
-This package enables secure execution of operations such as running makefile commands, moving and deleting files, with future plans to include more tools for code editing.
-It serves as an excellent MCP server for VS-Code copilot and other AI-assisted development tools.
+A Model Context Protocol (MCP) server targeted for agent development tools, providing scoped authorized operations in the root project directory. This package enables secure execution of operations such as running makefile commands, moving and deleting files, with future plans to include more tools for code editing. It serves as an excellent MCP server for VS-Code copilot and other AI-assisted development tools.
+
+<a href="https://glama.ai/mcp/servers/@DanielAvdar/dev-kit-mcp-server">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@DanielAvdar/dev-kit-mcp-server/badge" alt="dev-kit-mcp-server MCP server" />
+</a>
 
 ## Features
 
