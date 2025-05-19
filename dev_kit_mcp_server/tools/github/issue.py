@@ -18,8 +18,6 @@ class GitHubIssueOperation(GitHubOperation):
 
     async def __call__(
         self,
-        repo_name: str,
-        owner: str,
         issue_number: Optional[int] = None,
         state: str = "open",
         labels: Optional[List[str]] = None,
@@ -27,8 +25,6 @@ class GitHubIssueOperation(GitHubOperation):
         """Get information about GitHub issues.
 
         Args:
-            repo_name: Name of the repository
-            owner: Owner of the repository
             issue_number: Number of the issue to get (default: None, which means get all issues)
             state: State of the issues to get (default: "open")
             labels: Labels to filter issues by (default: None)
@@ -37,15 +33,16 @@ class GitHubIssueOperation(GitHubOperation):
             A dictionary containing information about the issues
 
         Raises:
-            ValueError: If repo_name or owner is not provided
+            ValueError: If repository information cannot be determined from git remote
             ImportError: If the PyGithub package is not installed
 
         """
-        # Validate input
-        if not repo_name:
-            raise ValueError("Repository name must be provided")
-        if not owner:
-            raise ValueError("Repository owner must be provided")
+        # Get repo info from git remote
+        repo_info = self.get_repo_info()
+        if not repo_info:
+            raise ValueError("Repository information could not be extracted from git remote")
+
+        owner, repo_name = repo_info
 
         try:
             # Import Github here to handle import errors

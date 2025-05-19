@@ -10,12 +10,10 @@ from dev_kit_mcp_server.tools.github import GitHubIssueOperation
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "repo_name,owner,issue_number,state,labels,expected_result",
+    "issue_number,state,labels,expected_result",
     [
         # Test case 1: Get a specific issue
         (
-            "test-repo",  # repo_name
-            "test-owner",  # owner
             1,  # issue_number
             "open",  # state
             None,  # labels
@@ -28,8 +26,6 @@ from dev_kit_mcp_server.tools.github import GitHubIssueOperation
         ),
         # Test case 2: Get all issues
         (
-            "test-repo",  # repo_name
-            "test-owner",  # owner
             None,  # issue_number
             "open",  # state
             None,  # labels
@@ -44,16 +40,16 @@ from dev_kit_mcp_server.tools.github import GitHubIssueOperation
 )
 async def test_github_issue_operation(
     github_issue_operation: GitHubIssueOperation,
-    repo_name: str,
-    owner: str,
     issue_number: Optional[int],
     state: str,
     labels: Optional[List[str]],
     expected_result: Dict[str, Any],
 ):
     """Test the GitHubIssueOperation class with various scenarios."""
-    # Execute: Get issue information
-    result = await github_issue_operation(repo_name, owner, issue_number=issue_number, state=state, labels=labels)
+    # Mock get_repo_info to return a valid repo info
+    with patch.object(github_issue_operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+        # Execute: Get issue information
+        result = await github_issue_operation(issue_number=issue_number, state=state, labels=labels)
 
     # Verify: Check the result
     assert result["status"] == expected_result["status"]
@@ -69,19 +65,13 @@ async def test_github_issue_operation(
 
 
 @pytest.mark.asyncio
-async def test_github_issue_operation_empty_repo_name(github_issue_operation: GitHubIssueOperation):
-    """Test the GitHubIssueOperation class with an empty repository name."""
-    # Try to get issue information with an empty repository name
-    with pytest.raises(ValueError, match="Repository name must be provided"):
-        await github_issue_operation("", "test-owner")
-
-
-@pytest.mark.asyncio
-async def test_github_issue_operation_empty_owner(github_issue_operation: GitHubIssueOperation):
-    """Test the GitHubIssueOperation class with an empty owner."""
-    # Try to get issue information with an empty owner
-    with pytest.raises(ValueError, match="Repository owner must be provided"):
-        await github_issue_operation("test-repo", "")
+async def test_github_issue_operation_no_git_remote(github_issue_operation: GitHubIssueOperation):
+    """Test the GitHubIssueOperation class with no git remote."""
+    # Mock get_repo_info to return None to simulate no git remote
+    with patch.object(github_issue_operation, "get_repo_info", return_value=None):
+        # Try to get issue information with no git remote
+        with pytest.raises(ValueError, match="Repository information could not be extracted from git remote"):
+            await github_issue_operation()
 
 
 @pytest.mark.asyncio
@@ -90,15 +80,17 @@ async def test_github_issue_operation_exception(temp_dir, mock_github_error):
     # Create the operation with the mock that raises an exception
     operation = GitHubIssueOperation(root_dir=temp_dir, token="test-token")
 
-    # Attempt to get issue information
-    result = await operation("test-repo", "test-owner", issue_number=1)
+    # Mock get_repo_info to return a valid repo info
+    with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+        # Attempt to get issue information
+        result = await operation(issue_number=1)
 
-    # Check the result
-    assert "error" in result
-    assert "Error retrieving issues" in result["error"]
-    assert result["repo_name"] == "test-repo"
-    assert result["owner"] == "test-owner"
-    assert result["issue_number"] == 1
+        # Check the result
+        assert "error" in result
+        assert "Error retrieving issues" in result["error"]
+        assert result["repo_name"] == "test-repo"
+        assert result["owner"] == "test-owner"
+        assert result["issue_number"] == 1
 
 
 @pytest.mark.asyncio
@@ -109,6 +101,8 @@ async def test_github_issue_operation_import_error(temp_dir):
         # Create the operation
         operation = GitHubIssueOperation(root_dir=temp_dir, token="test-token")
 
-        # Attempt to get issue information
-        with pytest.raises(ImportError, match="The PyGithub package is not installed"):
-            await operation("test-repo", "test-owner")
+        # Mock get_repo_info to return a valid repo info
+        with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+            # Attempt to get issue information
+            with pytest.raises(ImportError, match="The PyGithub package is not installed"):
+                await operation()

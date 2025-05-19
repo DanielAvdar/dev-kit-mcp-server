@@ -10,12 +10,10 @@ from dev_kit_mcp_server.tools.github import GitHubPROperation
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "repo_name,owner,pr_number,state,expected_result",
+    "pr_number,state,expected_result",
     [
         # Test case 1: Get a specific pull request
         (
-            "test-repo",  # repo_name
-            "test-owner",  # owner
             1,  # pr_number
             "open",  # state
             {
@@ -27,8 +25,6 @@ from dev_kit_mcp_server.tools.github import GitHubPROperation
         ),
         # Test case 2: Get all pull requests
         (
-            "test-repo",  # repo_name
-            "test-owner",  # owner
             None,  # pr_number
             "open",  # state
             {
@@ -42,15 +38,15 @@ from dev_kit_mcp_server.tools.github import GitHubPROperation
 )
 async def test_github_pr_operation(
     github_pr_operation: GitHubPROperation,
-    repo_name: str,
-    owner: str,
     pr_number: Optional[int],
     state: str,
     expected_result: Dict[str, Any],
 ):
     """Test the GitHubPROperation class with various scenarios."""
-    # Execute: Get pull request information
-    result = await github_pr_operation(repo_name, owner, pr_number=pr_number, state=state)
+    # Mock get_repo_info to return a valid repo info
+    with patch.object(github_pr_operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+        # Execute: Get pull request information
+        result = await github_pr_operation(pr_number=pr_number, state=state)
 
     # Verify: Check the result
     assert result["status"] == expected_result["status"]
@@ -66,19 +62,13 @@ async def test_github_pr_operation(
 
 
 @pytest.mark.asyncio
-async def test_github_pr_operation_empty_repo_name(github_pr_operation: GitHubPROperation):
-    """Test the GitHubPROperation class with an empty repository name."""
-    # Try to get pull request information with an empty repository name
-    with pytest.raises(ValueError, match="Repository name must be provided"):
-        await github_pr_operation("", "test-owner")
-
-
-@pytest.mark.asyncio
-async def test_github_pr_operation_empty_owner(github_pr_operation: GitHubPROperation):
-    """Test the GitHubPROperation class with an empty owner."""
-    # Try to get pull request information with an empty owner
-    with pytest.raises(ValueError, match="Repository owner must be provided"):
-        await github_pr_operation("test-repo", "")
+async def test_github_pr_operation_no_git_remote(github_pr_operation: GitHubPROperation):
+    """Test the GitHubPROperation class with no git remote."""
+    # Mock get_repo_info to return None to simulate no git remote
+    with patch.object(github_pr_operation, "get_repo_info", return_value=None):
+        # Try to get pull request information with no git remote
+        with pytest.raises(ValueError, match="Repository information could not be extracted from git remote"):
+            await github_pr_operation(pr_number=1)
 
 
 @pytest.mark.asyncio
@@ -87,15 +77,17 @@ async def test_github_pr_operation_exception(temp_dir, mock_github_error):
     # Create the operation with the mock that raises an exception
     operation = GitHubPROperation(root_dir=temp_dir, token="test-token")
 
-    # Attempt to get pull request information
-    result = await operation("test-repo", "test-owner", pr_number=1)
+    # Mock get_repo_info to return a valid repo info
+    with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+        # Attempt to get pull request information
+        result = await operation(pr_number=1)
 
-    # Check the result
-    assert "error" in result
-    assert "Error retrieving pull requests" in result["error"]
-    assert result["repo_name"] == "test-repo"
-    assert result["owner"] == "test-owner"
-    assert result["pr_number"] == 1
+        # Check the result
+        assert "error" in result
+        assert "Error retrieving pull requests" in result["error"]
+        assert result["repo_name"] == "test-repo"
+        assert result["owner"] == "test-owner"
+        assert result["pr_number"] == 1
 
 
 @pytest.mark.asyncio
@@ -106,19 +98,19 @@ async def test_github_pr_operation_import_error(temp_dir):
         # Create the operation
         operation = GitHubPROperation(root_dir=temp_dir, token="test-token")
 
-        # Attempt to get pull request information
-        with pytest.raises(ImportError, match="The PyGithub package is not installed"):
-            await operation("test-repo", "test-owner")
+        # Mock get_repo_info to return a valid repo info
+        with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+            # Attempt to get pull request information
+            with pytest.raises(ImportError, match="The PyGithub package is not installed"):
+                await operation()
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "repo_name,owner,pr_number,review_id,expected_result",
+    "pr_number,review_id,expected_result",
     [
         # Test case 1: Get a specific review
         (
-            "test-repo",  # repo_name
-            "test-owner",  # owner
             1,  # pr_number
             1,  # review_id
             {
@@ -130,8 +122,6 @@ async def test_github_pr_operation_import_error(temp_dir):
         ),
         # Test case 2: Get all reviews
         (
-            "test-repo",  # repo_name
-            "test-owner",  # owner
             1,  # pr_number
             None,  # review_id
             {
@@ -145,15 +135,15 @@ async def test_github_pr_operation_import_error(temp_dir):
 )
 async def test_github_pr_get_review(
     github_pr_operation: GitHubPROperation,
-    repo_name: str,
-    owner: str,
     pr_number: int,
     review_id: Optional[int],
     expected_result: Dict[str, Any],
 ):
     """Test the get_review method of GitHubPROperation class with various scenarios."""
-    # Execute: Get review information
-    result = await github_pr_operation.get_review(repo_name, owner, pr_number, review_id=review_id)
+    # Mock get_repo_info to return a valid repo info
+    with patch.object(github_pr_operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+        # Execute: Get review information
+        result = await github_pr_operation.get_review(pr_number, review_id=review_id)
 
     # Verify: Check the result
     assert result["status"] == expected_result["status"]
@@ -169,27 +159,23 @@ async def test_github_pr_get_review(
 
 
 @pytest.mark.asyncio
-async def test_github_pr_get_review_empty_repo_name(github_pr_operation: GitHubPROperation):
-    """Test the get_review method with an empty repository name."""
-    # Try to get review information with an empty repository name
-    with pytest.raises(ValueError, match="Repository name must be provided"):
-        await github_pr_operation.get_review("", "test-owner", 1)
-
-
-@pytest.mark.asyncio
-async def test_github_pr_get_review_empty_owner(github_pr_operation: GitHubPROperation):
-    """Test the get_review method with an empty owner."""
-    # Try to get review information with an empty owner
-    with pytest.raises(ValueError, match="Repository owner must be provided"):
-        await github_pr_operation.get_review("test-repo", "", 1)
+async def test_github_pr_get_review_no_git_remote(github_pr_operation: GitHubPROperation):
+    """Test the get_review method with no git remote."""
+    # Mock get_repo_info to return None to simulate no git remote
+    with patch.object(github_pr_operation, "get_repo_info", return_value=None):
+        # Try to get review information with no git remote
+        with pytest.raises(ValueError, match="Repository information could not be extracted from git remote"):
+            await github_pr_operation.get_review(1)
 
 
 @pytest.mark.asyncio
 async def test_github_pr_get_review_empty_pr_number(github_pr_operation: GitHubPROperation):
     """Test the get_review method with an empty PR number."""
-    # Try to get review information with an empty PR number
-    with pytest.raises(ValueError, match="Pull request number must be provided"):
-        await github_pr_operation.get_review("test-repo", "test-owner", 0)
+    # Mock get_repo_info to return a valid repo info
+    with patch.object(github_pr_operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+        # Try to get review information with an empty PR number
+        with pytest.raises(ValueError, match="Pull request number must be provided"):
+            await github_pr_operation.get_review(0)
 
 
 @pytest.mark.asyncio
@@ -198,15 +184,17 @@ async def test_github_pr_get_review_exception(temp_dir, mock_github_error):
     # Create the operation with the mock that raises an exception
     operation = GitHubPROperation(root_dir=temp_dir, token="test-token")
 
-    # Attempt to get review information
-    result = await operation.get_review("test-repo", "test-owner", 1)
+    # Mock get_repo_info to return a valid repo info
+    with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+        # Attempt to get review information
+        result = await operation.get_review(1)
 
-    # Check the result
-    assert "error" in result
-    assert "Error retrieving reviews" in result["error"]
-    assert result["repo_name"] == "test-repo"
-    assert result["owner"] == "test-owner"
-    assert result["pr_number"] == 1
+        # Check the result
+        assert "error" in result
+        assert "Error retrieving reviews" in result["error"]
+        assert result["repo_name"] == "test-repo"
+        assert result["owner"] == "test-owner"
+        assert result["pr_number"] == 1
 
 
 @pytest.mark.asyncio
@@ -217,6 +205,8 @@ async def test_github_pr_get_review_import_error(temp_dir):
         # Create the operation
         operation = GitHubPROperation(root_dir=temp_dir, token="test-token")
 
-        # Attempt to get review information
-        with pytest.raises(ImportError, match="The PyGithub package is not installed"):
-            await operation.get_review("test-repo", "test-owner", 1)
+        # Mock get_repo_info to return a valid repo info
+        with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
+            # Attempt to get review information
+            with pytest.raises(ImportError, match="The PyGithub package is not installed"):
+                await operation.get_review(1)
