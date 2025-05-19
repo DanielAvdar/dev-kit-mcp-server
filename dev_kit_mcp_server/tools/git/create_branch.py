@@ -28,6 +28,7 @@ class GitCreateBranchOperation(AsyncOperation):
 
         Raises:
             ValueError: If new_branch is not provided
+            Exception: If the branch already exists or the source branch doesn't exist
 
         """
         # Validate input

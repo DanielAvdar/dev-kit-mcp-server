@@ -104,5 +104,7 @@ async def test_git_checkout_operation_exception(git_checkout_operation: GitCheck
     mock_repo_error(git_checkout_operation)
 
     # Attempt to checkout a branch - should raise the simulated error
-    with pytest.raises(Exception):
+    with pytest.raises(
+        TypeError,
+    ):
         await git_checkout_operation("main")

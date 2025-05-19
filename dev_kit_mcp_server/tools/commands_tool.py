@@ -65,6 +65,9 @@ class ExecMakeTarget(AsyncOperation):
             commands: The list of all targets being executed
             result: Dictionary to store the execution results
 
+        Raises:
+            RuntimeError: If the make command returns a non-zero exit code
+
         """
         if not self._make_file_exists:
             result[target] = {
