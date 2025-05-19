@@ -95,6 +95,110 @@ The operation will fail if:
 * The path does not exist
 * A file or folder with the new name already exists in the same directory
 
+Git Operations
+--------------
+
+The server provides several tools for Git operations:
+
+Git Status
+~~~~~~~~~~
+
+Gets the status of the Git repository, including changed files, untracked files, and staged files.
+
+.. code-block:: python
+
+   # Using the MCP client
+   result = await client.call_tool("git_status")
+
+Git Add
+~~~~~~~
+
+Adds files to the Git index (staging area).
+
+.. code-block:: python
+
+   # Using the MCP client
+   result = await client.call_tool("git_add", {"paths": ["file1.txt", "file2.txt"]})
+
+The operation will fail if:
+
+* Any of the paths are outside the root directory
+* Any of the paths do not exist
+
+Git Commit
+~~~~~~~~~~
+
+Commits changes to the Git repository.
+
+.. code-block:: python
+
+   # Using the MCP client
+   result = await client.call_tool("git_commit", {"message": "Commit message"})
+
+The operation will fail if:
+
+* The commit message is empty
+
+Git Push
+~~~~~~~~
+
+Pushes changes to a remote Git repository.
+
+.. code-block:: python
+
+   # Using the MCP client
+   result = await client.call_tool("git_push")
+
+Git Pull
+~~~~~~~~
+
+Pulls changes from a remote Git repository.
+
+.. code-block:: python
+
+   # Using the MCP client
+   result = await client.call_tool("git_pull", {"remote": "origin", "branch": "main"})
+
+Git Checkout
+~~~~~~~~~~~~
+
+Checks out or creates a branch in the Git repository.
+
+.. code-block:: python
+
+   # Using the MCP client
+   # Checkout existing branch
+   result = await client.call_tool("git_checkout", {"branch": "main"})
+
+   # Create and checkout new branch
+   result = await client.call_tool("git_checkout", {"branch": "feature-branch", "create": True})
+
+The operation will fail if:
+
+* The branch name is empty
+* The branch doesn't exist and create is False
+
+Makefile Operations
+-------------------
+
+The server provides a tool for executing Makefile targets:
+
+Execute Makefile Target
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Executes a Makefile target securely within the project.
+
+.. code-block:: python
+
+   # Using the MCP client
+   result = await client.call_tool("exec_make_target", {"commands": ["test"]})
+
+The operation will fail if:
+
+* The Makefile doesn't exist in the root directory
+* The target is invalid
+* The command execution fails
+
 Security Considerations
 ------------------------
 
