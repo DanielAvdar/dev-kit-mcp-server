@@ -10,7 +10,7 @@ from dev_kit_mcp_server.tools.git import GitCheckoutOperation
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "branch_name,create,setup_branch,expected_result,expected_branch_exists",
+    "branch_name,create,setup_branch,expected_result,expected_branch_exists,should_raise",
     [
         # Test case 1: Checkout existing branch
         (
@@ -24,6 +24,7 @@ from dev_kit_mcp_server.tools.git import GitCheckoutOperation
                 "message_contains": "Successfully checked out branch 'test-branch'",
             },
             True,  # expected_branch_exists
+            False,  # should_raise
         ),
         # Test case 2: Create and checkout new branch
         (
@@ -37,17 +38,16 @@ from dev_kit_mcp_server.tools.git import GitCheckoutOperation
                 "message_contains": "Successfully created and checked out branch 'feature-branch'",
             },
             True,  # expected_branch_exists
+            False,  # should_raise
         ),
         # Test case 3: Attempt to checkout nonexistent branch
         (
             "nonexistent-branch",  # branch_name
             False,  # create
             False,  # setup_branch
-            {
-                "error_contains": "Branch 'nonexistent-branch' does not exist",
-                "branch": "nonexistent-branch",
-            },
+            None,  # No expected result as we expect an exception
             False,  # expected_branch_exists
+            True,  # should_raise
         ),
     ],
     ids=["existing_branch", "create_branch", "nonexistent_branch"],
@@ -60,6 +60,7 @@ async def test_git_checkout_operation(
     setup_branch: bool,
     expected_result: Dict[str, Any],
     expected_branch_exists: bool,
+    should_raise: bool,
 ):
     """Test the GitCheckoutOperation class with various scenarios."""
     # Setup: Create a branch if needed
@@ -67,25 +68,25 @@ async def test_git_checkout_operation(
     if setup_branch:
         repo.git.branch(branch_name)
 
-    # Execute: Checkout the branch
-    result = await git_checkout_operation(branch_name, create=create)
+    if should_raise:
+        # For nonexistent branch, we expect an exception
+        with pytest.raises(Exception, match=f"Branch '{branch_name}' does not exist"):
+            await git_checkout_operation(branch_name, create=create)
+    else:
+        # Execute: Checkout the branch
+        result = await git_checkout_operation(branch_name, create=create)
 
-    # Verify: Check the result
-    if "status" in expected_result:
+        # Verify: Check the result
         assert result["status"] == expected_result["status"]
         assert expected_result["message_contains"] in result["message"]
         assert result["branch"] == expected_result["branch"]
         assert result["created"] == expected_result["created"]
-    else:
-        assert "error" in result
-        assert expected_result["error_contains"] in result["error"]
-        assert result["branch"] == expected_result["branch"]
 
-    # Verify: Check if the branch exists and is checked out
-    branches = [b.name for b in repo.branches]
-    assert (branch_name in branches) == expected_branch_exists
-    if expected_branch_exists and "status" in expected_result:
-        assert repo.active_branch.name == branch_name
+        # Verify: Check if the branch exists and is checked out
+        branches = [b.name for b in repo.branches]
+        assert (branch_name in branches) == expected_branch_exists
+        if expected_branch_exists:
+            assert repo.active_branch.name == branch_name
 
 
 @pytest.mark.asyncio
@@ -102,10 +103,6 @@ async def test_git_checkout_operation_exception(git_checkout_operation: GitCheck
     # Apply the mock to simulate an error
     mock_repo_error(git_checkout_operation)
 
-    # Attempt to checkout a branch
-    result = await git_checkout_operation("main")
-
-    # Check the result
-    assert "error" in result
-    assert "Error checking out branch:" in result["error"]
-    assert result["branch"] == "main"
+    # Attempt to checkout a branch - should raise the simulated error
+    with pytest.raises(Exception):
+        await git_checkout_operation("main")

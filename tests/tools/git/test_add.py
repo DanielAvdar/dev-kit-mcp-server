@@ -29,7 +29,7 @@ def create_test_files(temp_dir: str, file_count: int = 1) -> List[str]:
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "file_paths,setup_files,expected_result",
+    "file_paths,setup_files,expected_result,should_raise",
     [
         # Test case 1: Add a single file
         (
@@ -40,6 +40,7 @@ def create_test_files(temp_dir: str, file_count: int = 1) -> List[str]:
                 "file_count": 1,
                 "message_contains": "Successfully added 1 files to the index",
             },
+            False,  # should_raise
         ),
         # Test case 2: Add multiple files
         (
@@ -50,15 +51,14 @@ def create_test_files(temp_dir: str, file_count: int = 1) -> List[str]:
                 "file_count": 3,
                 "message_contains": "Successfully added 3 files to the index",
             },
+            False,  # should_raise
         ),
         # Test case 3: Add a nonexistent file
         (
             ["nonexistent_file.txt"],  # file_paths
             0,  # setup_files (don't create any files)
-            {
-                "error_contains": "Error adding files to the index",
-                "paths": ["nonexistent_file.txt"],
-            },
+            None,  # No expected result as we expect an exception
+            True,  # should_raise
         ),
     ],
     ids=["single_file", "multiple_files", "nonexistent_file"],
@@ -69,17 +69,22 @@ async def test_git_add_operation(
     file_paths: List[str],
     setup_files: int,
     expected_result: Dict[str, Any],
+    should_raise: bool,
 ):
     """Test the GitAddOperation class with various scenarios."""
     # Setup: Create test files if needed
     if setup_files > 0:
         create_test_files(temp_dir_git, setup_files)
 
-    # Execute: Add the files to the index
-    result = await git_add_operation(file_paths)
+    if should_raise:
+        # For nonexistent file, we expect a git command error
+        with pytest.raises(Exception):
+            await git_add_operation(file_paths)
+    else:
+        # Execute: Add the files to the index
+        result = await git_add_operation(file_paths)
 
-    # Verify: Check the result
-    if "status" in expected_result:
+        # Verify: Check the result
         assert result["status"] == expected_result["status"]
         assert expected_result["message_contains"] in result["message"]
         assert len(result["added_files"]) == expected_result["file_count"]
@@ -90,10 +95,6 @@ async def test_git_add_operation(
         staged_files = [item.a_path for item in repo.index.diff("HEAD")]
         for file in file_paths:
             assert file in staged_files
-    else:
-        assert "error" in result
-        assert expected_result["error_contains"] in result["error"]
-        assert result["paths"] == expected_result["paths"]
 
 
 @pytest.mark.asyncio
@@ -114,10 +115,6 @@ async def test_git_add_operation_exception(git_add_operation: GitAddOperation, m
     # Apply the mock to simulate an error
     mock_repo_error(git_add_operation)
 
-    # Attempt to add the file
-    result = await git_add_operation([test_file.name])
-
-    # Check the result
-    assert "error" in result
-    assert "Error adding files to the index" in result["error"]
-    assert result["paths"] == [test_file.name]
+    # Attempt to add the file - should raise the simulated error
+    with pytest.raises(Exception, match="Simulated error"):
+        await git_add_operation([test_file.name])

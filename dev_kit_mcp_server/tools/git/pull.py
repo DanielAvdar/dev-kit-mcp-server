@@ -33,25 +33,14 @@ class GitPullOperation(AsyncOperation):
         # Get the remote (default to 'origin' if not specified)
         remote_name = remote or "origin"
 
-        # Check if the remote exists
-        try:
-            repo_remote = repo.remote(remote_name)
-        except ValueError:
-            return {
-                "error": f"Remote '{remote_name}' does not exist",
-                "remote": remote_name,
-            }
+        # Check if the remote exists - let the ValueError propagate
+        repo_remote = repo.remote(remote_name)
 
         # Get the branch (default to current branch if not specified)
         branch_name = branch
         if not branch_name:
-            try:
-                branch_name = repo.active_branch.name
-            except TypeError:
-                return {
-                    "error": "Cannot pull when HEAD is detached. Please specify a branch.",
-                    "remote": remote_name,
-                }
+            # Let the TypeError propagate if HEAD is detached
+            branch_name = repo.active_branch.name
 
         # Pull the changes
         pull_info = repo_remote.pull(branch_name)

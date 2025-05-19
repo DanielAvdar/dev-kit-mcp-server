@@ -129,8 +129,6 @@ async def test_exec_make_target_exception_handling(exec_make_target):
     with patch.object(exec_make_target, "create_sub_proccess") as mock_create_subprocess:
         mock_create_subprocess.side_effect = Exception("Command failed")
 
-        result = await exec_make_target(["test"])
-
-        assert "error" in result["test"]
-        assert "Error running makefile command: Command failed" == result["test"]["error"]
-        assert result["test"]["make-target"] == "test"
+        # Should raise the exception from create_sub_proccess
+        with pytest.raises(Exception, match="Command failed"):
+            await exec_make_target(["test"])

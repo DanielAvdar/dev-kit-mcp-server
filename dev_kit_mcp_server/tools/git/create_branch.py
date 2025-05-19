@@ -44,20 +44,12 @@ class GitCreateBranchOperation(AsyncOperation):
         # Check if the new branch already exists
         branch_exists = new_branch in [b.name for b in repo.branches]
         if branch_exists:
-            return {
-                "error": f"Branch '{new_branch}' already exists.",
-                "new_branch": new_branch,
-                "source_branch": source_branch,
-            }
+            raise Exception(f"Branch '{new_branch}' already exists.")
 
         # Check if the source branch exists
         source_exists = source_branch in [b.name for b in repo.branches]
         if not source_exists:
-            return {
-                "error": f"Source branch '{source_branch}' does not exist.",
-                "new_branch": new_branch,
-                "source_branch": source_branch,
-            }
+            raise Exception(f"Source branch '{source_branch}' does not exist.")
 
         # Create a new branch from the source branch
         # First, checkout the source branch

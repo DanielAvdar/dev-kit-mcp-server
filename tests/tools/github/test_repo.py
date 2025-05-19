@@ -58,13 +58,8 @@ async def test_github_repo_operation_exception(temp_dir, mock_github_error):
     # Mock get_repo_info to return a valid repo info
     with patch.object(operation, "get_repo_info", return_value=("test-owner", "test-repo")):
         # Attempt to get repository information
-        result = await operation()
-
-        # Check the result
-        assert "error" in result
-        assert "Error retrieving repository information" in result["error"]
-        assert result["repo_name"] == "test-repo"
-        assert result["owner"] == "test-owner"
+        with pytest.raises(Exception, match="Simulated error"):
+            await operation()
 
 
 @pytest.mark.asyncio

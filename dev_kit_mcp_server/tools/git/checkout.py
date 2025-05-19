@@ -40,12 +40,9 @@ class GitCheckoutOperation(AsyncOperation):
         # Check if the branch exists
         branch_exists = branch in [b.name for b in repo.branches]
 
-        # If the branch doesn't exist and create is False, return an error
+        # If the branch doesn't exist and create is False, raise an exception
         if not branch_exists and not create:
-            return {
-                "error": f"Branch '{branch}' does not exist. Use create=True to create it.",
-                "branch": branch,
-            }
+            raise Exception(f"Branch '{branch}' does not exist. Use create=True to create it.")
 
         # Checkout the branch
         if branch_exists:
