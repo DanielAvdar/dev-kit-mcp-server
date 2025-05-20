@@ -57,7 +57,7 @@ class TestCLI:
 
         with patch("os.path.isdir", return_value=False):
             # Act & Assert
-            with pytest.raises(SystemExit):
+            with pytest.raises(ValueError):
                 main()
 
             # The server should not be started if the root directory doesn't exist

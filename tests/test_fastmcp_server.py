@@ -6,7 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from dev_kit_mcp_server.fastmcp_server import arun_server, run_server, start_server
+from dev_kit_mcp_server import start_server
+from dev_kit_mcp_server.fastmcp_server import arun_server, run_server
 
 
 @pytest.mark.parametrize(
@@ -32,6 +33,8 @@ def test_start_server(mock_parse_args, root_dir_type, expected_error, temp_dir):
         with open(test_file, "w") as f:
             f.write("Test content")
         mock_args.root_dir = test_file
+    # Set copilot_mode to False by default
+    mock_args.copilot_mode = False
     mock_parse_args.return_value = mock_args
 
     # Act & Assert
