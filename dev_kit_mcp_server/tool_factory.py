@@ -2,11 +2,11 @@
 
 from typing import Any, Callable, List, Sequence
 
-# from fastmcp.tools import Tool
+from fastmcp.tools import Tool
 from mcp.types import ToolAnnotations
 
 from .core import AsyncOperation
-from .custom_fastmcp import RepoFastMCPServerError, RepoTool as Tool
+from .custom_fastmcp import RepoFastMCPServerError, RepoTool
 
 # RepoTool
 # def exept_wrapper(fn: Callable[..., Any]):
@@ -63,9 +63,18 @@ class ToolFactory:
             tool=tool,
         )
 
-    def create_tool(self, func):
+    def create_tool(self, func: AsyncOperation) -> Tool:
+        """Create a Tool instance from an AsyncOperation.
+
+        Args:
+            func: The AsyncOperation instance to convert to a Tool
+
+        Returns:
+            A Tool instance configured with the operation's properties
+
+        """
         description = f"Use instead of terminal:\n{func.docstring}"
-        tool = Tool.from_function(
+        tool = RepoTool.from_function(
             fn=func.__call__,
             name=func.name,
             description=description,

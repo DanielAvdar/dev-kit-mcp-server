@@ -1,3 +1,5 @@
+"""Custom FastMCP and Tool classes with extended functionality for repository operations."""
+
 from typing import Any
 
 from fastmcp import FastMCP
@@ -9,8 +11,16 @@ class RepoTool(Tool):
     """Custom tool class for RepoTool."""
 
     async def run(self, arguments: dict[str, Any]) -> list[TextContent | ImageContent | EmbeddedResource]:
-        """Run the tool with arguments."""
+        """Run the tool with arguments.
 
+        Args:
+            arguments: Dictionary of arguments to pass to the tool
+
+        Returns:
+            A list of content objects (TextContent, ImageContent, or EmbeddedResource)
+            containing the tool's output or error message
+
+        """
         try:
             # Call the original run method
             result = await super().run(arguments)

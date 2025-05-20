@@ -1,3 +1,5 @@
+"""Module for creating and starting the FastMCP server with file operation tools."""
+
 import argparse
 import os
 from pathlib import Path
@@ -9,7 +11,16 @@ from dev_kit_mcp_server.tools import __all__ as tools_names
 
 
 def create_ops(root_dir: str, copilot_mode: bool = False) -> list:
-    """Create a list of file operation tools."""
+    """Create a list of file operation tools.
+
+    Args:
+        root_dir: Root directory for file operations
+        copilot_mode: Whether to run in copilot mode with limited tools
+
+    Returns:
+        A list of file operation tool instances
+
+    """
     ops = [getattr(tools_module, tool_name)(root_dir=root_dir) for tool_name in tools_names]
     if copilot_mode:
         relevant_ops = ["create_dir", "move_dir", "remove_file", "exec_make_target"]
@@ -17,28 +28,34 @@ def create_ops(root_dir: str, copilot_mode: bool = False) -> list:
     return ops
 
 
-def start_server(root_dir: str = None,copilot_mode: bool = False) -> FastMCP:
+def start_server(root_dir: str = None, copilot_mode: bool = False) -> FastMCP:
     """Start the FastMCP server.
 
     Args:
         root_dir: Root directory for file operations (default: current working directory)
+        copilot_mode: Run in copilot mode with limited tools (default: False)
 
     Returns:
         A FastMCP instance configured with file operation tools
 
     """
     # Parse command line arguments
-    root_dir = root_dir or arg_parse().root_dir
+    args = arg_parse()
+    root_dir = root_dir or args.root_dir
+    copilot_mode = copilot_mode or args.copilot_mode
 
+    fastmcp = server_init(root_dir, copilot_mode)
+    return fastmcp
+
+
+def server_init(root_dir, copilot_mode):
     # Create a FastMCP instance
     fastmcp: FastMCP = FastMCP(
         name="Dev-Kit MCP Server",
         instructions="This server provides tools for file operations"
         f" and running authorized makefile commands in root directory: {root_dir}",
     )
-
-    ops = create_ops(root_dir)
-
+    ops = create_ops(root_dir, copilot_mode)
     # Register all tools
     tool_factory = ToolFactory(fastmcp)
     tool_factory(
@@ -63,6 +80,12 @@ def arg_parse() -> argparse.Namespace:
         type=str,
         default=os.getcwd(),
         help="Root directory for file operations (default: current working directory)",
+    )
+    parser.add_argument(
+        "--copilot-mode",
+        action="store_true",
+        default=False,
+        help="Run in copilot mode with limited tools (default: False)",
     )
     args = parser.parse_args()
     # Validate root directory

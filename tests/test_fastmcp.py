@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from fastmcp import Client
 
-from dev_kit_mcp_server import start_server
+from dev_kit_mcp_server.create_server import server_init
 from dev_kit_mcp_server.tools import __all__
 
 
@@ -14,7 +14,7 @@ def fastmcp_server(temp_dir):
         make_content = f.read()
     with open(Path(temp_dir) / "Makefile", "w") as f:
         f.write(make_content)
-    server = start_server(temp_dir)
+    server = server_init(root_dir=temp_dir, copilot_mode=False)
 
     return server
 
