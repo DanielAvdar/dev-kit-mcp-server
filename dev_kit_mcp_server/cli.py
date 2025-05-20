@@ -1,31 +1,21 @@
 """Command-line interface for running the MCP server."""
 
-import argparse
-import os
 import sys
+
+from dev_kit_mcp_server.create_server import arg_parse
 
 
 def main() -> None:
     """Parse command line arguments and start the server."""
-    parser = argparse.ArgumentParser(
-        description="Dev-Kit MCP Server",
-        epilog="Provides tools for file operations and running makefile commands",
-    )
-    parser.add_argument(
-        "--root-dir", type=str, help="Root directory for file operations (defaults to current directory)"
-    )
+    # parser = argparse.ArgumentParser(
+    #     description="Dev-Kit MCP Server",
+    #     epilog="Provides tools for file operations and running makefile commands",
+    # )
+    # parser.add_argument(
+    #     "--root-dir", type=str, help="Root directory for file operations (defaults to current directory)"
+    # )
 
-    args = parser.parse_args()
-
-    # Set default root directory if not provided
-    if args.root_dir is None:
-        args.root_dir = os.getcwd()
-        print(f"No root directory specified, using current directory: {args.root_dir}")
-
-    # Validate root directory
-    if not os.path.isdir(args.root_dir):
-        print(f"Error: Root directory '{args.root_dir}' does not exist or is not a directory")
-        sys.exit(1)
+    args = arg_parse()
 
     print("Starting Dev-Kit MCP Server")
     print(f"Root directory: {args.root_dir}")

@@ -17,7 +17,7 @@ def create_ops(root_dir: str, copilot_mode: bool = False) -> list:
     return ops
 
 
-def start_server(root_dir: str = None) -> FastMCP:
+def start_server(root_dir: str = None,copilot_mode: bool = False) -> FastMCP:
     """Start the FastMCP server.
 
     Args:
@@ -28,7 +28,7 @@ def start_server(root_dir: str = None) -> FastMCP:
 
     """
     # Parse command line arguments
-    root_dir = root_dir or arg_parse()
+    root_dir = root_dir or arg_parse().root_dir
 
     # Create a FastMCP instance
     fastmcp: FastMCP = FastMCP(
@@ -47,7 +47,7 @@ def start_server(root_dir: str = None) -> FastMCP:
     return fastmcp
 
 
-def arg_parse() -> str:
+def arg_parse() -> argparse.Namespace:
     """Parse command line arguments and validate the root directory.
 
     Returns:
@@ -72,4 +72,5 @@ def arg_parse() -> str:
         raise ValueError(f"Root directory does not exist: {root_dir}")
     if not root_path.is_dir():
         raise ValueError(f"Root directory is not a directory: {root_dir}")
-    return root_dir
+
+    return args
