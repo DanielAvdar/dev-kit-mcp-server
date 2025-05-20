@@ -39,8 +39,6 @@ dependencies = [
 github = [
     "PyGithub",
 ]
-[project.scripts]
-dev-kit-mcp-server = "dev_kit_mcp_server:run_server"
 
 [dependency-groups]
 dev = [
@@ -59,6 +57,9 @@ docs = [
     "sphinx>=7.0.0; python_version < '3.11'",
     "sphinx-rtd-theme>=3.0.2",
 ]
+[project.scripts]
+dev-kit-mcp-server = "dev_kit_mcp_server:arun_server"
+
 [tool.hatch.build.targets.sdist]
 only-include = ["dev_kit_mcp_server"]
 source = "."
