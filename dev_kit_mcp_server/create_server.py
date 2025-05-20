@@ -48,7 +48,17 @@ def start_server(root_dir: str = None, copilot_mode: bool = False) -> FastMCP:
     return fastmcp
 
 
-def server_init(root_dir, copilot_mode):
+def server_init(root_dir: str, copilot_mode: bool) -> FastMCP:
+    """Initialize the FastMCP server with the specified configuration.
+
+    Args:
+        root_dir: Root directory for file operations
+        copilot_mode: Whether to run in copilot mode with limited tools
+
+    Returns:
+        A configured FastMCP instance ready to be run
+
+    """
     # Create a FastMCP instance
     fastmcp: FastMCP = FastMCP(
         name="Dev-Kit MCP Server",
