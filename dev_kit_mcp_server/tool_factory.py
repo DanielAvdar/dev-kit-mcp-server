@@ -2,19 +2,23 @@
 
 from typing import Any, Callable, List, Sequence
 
-from fastmcp import FastMCP
-from fastmcp.tools import Tool
+# from fastmcp.tools import Tool
 from mcp.types import ToolAnnotations
 
 from .core import AsyncOperation
+from .custom_fastmcp import RepoFastMCPServerError, RepoTool as Tool
 
-
-class RepoFastMCPServerError(FastMCP):
-    """Extended FastMCP class with additional tool management functionality."""
-
-    def add_fast_tool(self, tool: Tool) -> None:
-        """Add a tool to the server."""
-        self._tool_manager.add_tool(tool)
+# RepoTool
+# def exept_wrapper(fn: Callable[..., Any]):
+#     """Wrapper to handle exceptions during function execution."""
+#
+#     def wrapper(*args, **kwargs):
+#         try:
+#             return fn(*args, **kwargs)
+#         except Exception as e:
+#             return dict(error=str(e))
+#
+#     return wrapper
 
 
 class ToolFactory:
@@ -54,6 +58,12 @@ class ToolFactory:
         """
         # Get the wrapper function from the operation
         # Set the name attribute for compatibility with FastMCP
+        tool = self.create_tool(func)
+        self.mcp.add_fast_tool(
+            tool=tool,
+        )
+
+    def create_tool(self, func):
         description = f"Use instead of terminal:\n{func.docstring}"
         tool = Tool.from_function(
             fn=func.__call__,
@@ -63,6 +73,5 @@ class ToolFactory:
                 destructiveHint=True,
             ),
         )
-        self.mcp.add_fast_tool(
-            tool=tool,
-        )
+
+        return tool

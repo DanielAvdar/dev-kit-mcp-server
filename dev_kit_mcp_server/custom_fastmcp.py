@@ -1,0 +1,28 @@
+from typing import Any
+
+from fastmcp import FastMCP
+from fastmcp.tools import Tool
+from mcp.types import EmbeddedResource, ImageContent, TextContent
+
+
+class RepoTool(Tool):
+    """Custom tool class for RepoTool."""
+
+    async def run(self, arguments: dict[str, Any]) -> list[TextContent | ImageContent | EmbeddedResource]:
+        """Run the tool with arguments."""
+
+        try:
+            # Call the original run method
+            result = await super().run(arguments)
+            return result
+        except Exception as e:
+            # Handle exceptions and return an error message
+            return [TextContent(text=f"Error: {str(e)}", type="text")]
+
+
+class RepoFastMCPServerError(FastMCP):
+    """Extended FastMCP class with additional tool management functionality."""
+
+    def add_fast_tool(self, tool: Tool) -> None:
+        """Add a tool to the server."""
+        self._tool_manager.add_tool(tool)

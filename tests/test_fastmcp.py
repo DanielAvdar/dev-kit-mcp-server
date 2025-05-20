@@ -24,8 +24,9 @@ async def test_tool_functionality(fastmcp_server):
     # Pass the server directly to the Client constructor
     async with Client(fastmcp_server) as client:
         result = await client.list_tools()
+        list_tools = [tool.name for tool in result]
         assert len(result) == len(__all__)
-        assert "move_dir" in str(result[0].name)
+        assert "move_dir" in list_tools
         # Find the make command by name
         make_cmd = next((tool for tool in result if tool.name == "exec_make_target"), None)
         assert make_cmd is not None

@@ -6,7 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from dev_kit_mcp_server.fastmcp_server import arun_server, run_server, start_server
+from dev_kit_mcp_server import start_server
+from dev_kit_mcp_server.fastmcp_server import arun_server, run_server
 
 
 @pytest.mark.parametrize(
