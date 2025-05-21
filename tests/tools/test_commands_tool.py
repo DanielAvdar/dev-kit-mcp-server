@@ -359,7 +359,7 @@ async def test_predefined_commands_exec_with_invalid_param(predefined_commands):
 
         assert "test" in result
         assert "error" in result["test"]
-        assert "contains invalid characters" in result["test"]["error"]
+        assert "follow the regex pattern:" in result["test"]["error"]
 
 
 @pytest.mark.asyncio

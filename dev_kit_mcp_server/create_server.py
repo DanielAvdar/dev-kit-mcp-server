@@ -4,37 +4,8 @@ import argparse
 import os
 from pathlib import Path
 
-from dev_kit_mcp_server import tools as tools_module
 from dev_kit_mcp_server.custom_fastmcp import RepoFastMCPServerError as FastMCP
 from dev_kit_mcp_server.tool_factory import ToolFactory
-from dev_kit_mcp_server.tools import __all__ as tools_names
-
-
-def create_ops(root_dir: str, copilot_mode: bool = False, commands_toml: str = None) -> list:
-    """Create a list of file operation tools.
-
-    Args:
-        root_dir: Root directory for file operations
-        copilot_mode: Whether to run in copilot mode with limited tools
-        commands_toml: Path to a custom TOML file for predefined commands (default: None)
-
-    Returns:
-        A list of file operation tool instances
-
-    """
-    ops = []
-    for tool_name in tools_names:
-        tool_class = getattr(tools_module, tool_name)
-        if tool_name == "PredefinedCommands" and commands_toml:
-            # Pass the custom TOML file path to PredefinedCommands
-            ops.append(tool_class(root_dir=root_dir, commands_toml=commands_toml))
-        else:
-            ops.append(tool_class(root_dir=root_dir))
-
-    if copilot_mode:
-        relevant_ops = ["create_dir", "move_dir", "remove_file", "exec_make_target"]
-        ops = [op for op in ops if op.name in relevant_ops]
-    return ops
 
 
 def start_server(root_dir: str = None, copilot_mode: bool = False, commands_toml: str = None) -> FastMCP:
@@ -55,11 +26,11 @@ def start_server(root_dir: str = None, copilot_mode: bool = False, commands_toml
     copilot_mode = copilot_mode or args.copilot_mode
     commands_toml = commands_toml or args.commands_toml
 
-    fastmcp = server_init(root_dir, copilot_mode, commands_toml)
+    fastmcp = server_init(root_dir, commands_toml)
     return fastmcp
 
 
-def server_init(root_dir: str, copilot_mode: bool, commands_toml: str = None) -> FastMCP:
+def server_init(root_dir: str, commands_toml: str = None) -> FastMCP:
     """Initialize the FastMCP server with the specified configuration.
 
     Args:
@@ -77,12 +48,9 @@ def server_init(root_dir: str, copilot_mode: bool, commands_toml: str = None) ->
         instructions="This server provides tools for file operations"
         f" and running authorized makefile commands in root directory: {root_dir}",
     )
-    ops = create_ops(root_dir, copilot_mode, commands_toml)
     # Register all tools
     tool_factory = ToolFactory(fastmcp)
-    tool_factory(
-        ops,
-    )
+    tool_factory(["dev_kit_mcp_server.tools"], root_dir=root_dir, commands_toml=commands_toml)
     return fastmcp
 
 

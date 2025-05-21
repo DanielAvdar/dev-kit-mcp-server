@@ -14,7 +14,7 @@ def fastmcp_server(temp_dir):
         make_content = f.read()
     with open(Path(temp_dir) / "Makefile", "w") as f:
         f.write(make_content)
-    server = server_init(root_dir=temp_dir, copilot_mode=False)
+    server = server_init(root_dir=temp_dir)
 
     return server
 

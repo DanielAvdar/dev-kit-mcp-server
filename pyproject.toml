@@ -117,3 +117,8 @@ pytest = "uv run pytest"
 make = "make"
 check = "uvx pre-commit run --all-files"
 doctest = "make doctest"
+[tool.dkmcp.factory]
+include = [
+    "exec_make_target",
+    "predefined_commands"
+]
