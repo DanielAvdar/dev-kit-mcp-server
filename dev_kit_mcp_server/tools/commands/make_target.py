@@ -9,7 +9,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
-from ..core import AsyncOperation
+from dev_kit_mcp_server.core import AsyncOperation
 
 
 @dataclass

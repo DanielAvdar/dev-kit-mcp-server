@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from dev_kit_mcp_server.tools.commands_tool import ExecMakeTarget
+from dev_kit_mcp_server.tools import ExecMakeTarget
 
 
 @pytest.fixture
