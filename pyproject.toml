@@ -111,3 +111,9 @@ module = [
     "uvicorn"
 ]
 ignore_missing_imports = true
+
+[tool.dkmcp.commands]
+pytest = "uv run pytest"
+make = "make"
+check = "uvx pre-commit run --all-files"
+doctest = "make doctest"
