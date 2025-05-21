@@ -272,33 +272,47 @@ The TOML file format for predefined commands is as follows:
 
 Each command is defined as a key-value pair where the key is the command name and the value is the command to execute. For example, when you call the predefined command "test", it will execute "uv run pytest" in the root directory.
 
-Here's a simple example of how to define commands in a custom TOML file:
+Factory Configuration
+---------------------
+
+The Factory component allows for dynamically decorating functions with the MCP tool decorator. This configuration can be specified in the TOML file (default: pyproject.toml under [tool.dkmcp.factory] section).
 
 .. code-block:: toml
 
-   # custom_commands.toml
-   [tool.dkmcp.commands]
-   # Basic commands
-   hello = "echo Hello, World!"
-   date = "date"
+   [tool.dkmcp.factory]
+   # Include only these tools
+   include = ["exec_make_target", "predefined_commands"]
 
-   # Development commands
-   test = "pytest"
-   lint = "ruff check ."
-   build = "python setup.py build"
+   # Exclude these tools
+   exclude = ["git_push", "git_commit"]
+
+The factory configuration supports the following options:
+
+* ``include``: List of tool names to include. If specified, only these tools will be registered.
+* ``exclude``: List of tool names to exclude. These tools will not be registered.
+
+If both ``include`` and ``exclude`` are specified, the ``include`` list takes precedence, and the ``exclude`` list will only be applied to the tools in the ``include`` list.
+
+Here's a simple example of a complete factory configuration in pyproject.toml:
+
+.. code-block:: toml
+
+   [tool.dkmcp.factory]
+   # Only include specific tools
+   include = [
+     "exec_make_target",
+     "predefined_commands",
+     "git_status"
+   ]
+
+   # Exclude specific tools from the included list
+   exclude = []
 
 You can specify a custom TOML file using the ``--commands-toml`` parameter:
 
 .. code-block:: bash
 
    dev-kit-mcp-server --root-dir=workdir --commands-toml=custom_commands.toml
-
-The operation will fail if:
-
-* The TOML file doesn't exist
-* The command doesn't exist in the TOML file
-* The command execution fails
-* The parameter contains invalid characters (only alphanumeric characters, underscores, hyphens, dots, spaces, slashes, colons, and @ are allowed)
 
 Security Considerations
 ------------------------
