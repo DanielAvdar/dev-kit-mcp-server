@@ -2,7 +2,7 @@
 
 import importlib.util
 
-from .commands_tool import ExecMakeTarget
+from .commands import ExecMakeTarget, PredefinedCommands
 from .file_sys.create import CreateDirOperation
 from .file_sys.edit import EditFileOperation
 from .file_sys.move import MoveDirOperation
@@ -35,4 +35,5 @@ __all__ = [
     "GitCreateBranchOperation",
     "GitDiffOperation",
     "ExecMakeTarget",
+    "PredefinedCommands",
 ]

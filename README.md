@@ -43,12 +43,17 @@ pip install dev-kit-mcp-server
 # Recommended method (with root directory specified)
 dev-kit-mcp-server --root-dir=workdir
 
+# With custom TOML file for predefined commands
+dev-kit-mcp-server --root-dir=workdir --commands-toml=custom_commands.toml
+
 # Alternative methods
 uv run python -m dev_kit_mcp_server.mcp_server --root-dir=workdir
 python -m dev_kit_mcp_server.mcp_server --root-dir=workdir
 ```
 
 The `--root-dir` parameter specifies the directory where file operations will be performed. This is important for security reasons, as it restricts file operations to this directory only.
+
+The `--commands-toml` parameter allows you to specify a custom TOML file for predefined commands instead of using the default `pyproject.toml` file. This is useful when you want to define a separate set of commands for different purposes.
 
 ### Available Tools
 
@@ -72,6 +77,36 @@ The server provides the following tools:
 
 #### Makefile Operations
 - **exec_make_target**: Run makefile commands securely within the project
+
+#### Predefined Commands
+- **predefined_commands**: Execute predefined commands from a TOML file (default: pyproject.toml under [tool.dkmcp.commands] section)
+
+The TOML file format for predefined commands is as follows:
+
+```toml
+[tool.dkmcp.commands]
+test = "uv run pytest"
+lint = "ruff check"
+check = "uvx pre-commit run --all-files"
+doctest = "make doctest"
+```
+
+Each command is defined as a key-value pair where the key is the command name and the value is the command to execute. For example, when you call the predefined command "test", it will execute "uv run pytest" in the root directory.
+
+Here's a simple example of how to define commands in a custom TOML file:
+
+```toml
+# custom_commands.toml
+[tool.dkmcp.commands]
+# Basic commands
+hello = "echo Hello, World!"
+date = "date"
+
+# Development commands
+test = "pytest"
+lint = "ruff check ."
+build = "python setup.py build"
+```
 
 ### Example Usage with MCP Client
 
@@ -125,6 +160,13 @@ async def example():
         # Makefile Operations
         # Run a makefile command
         result = await client.call_tool("exec_make_target", {"commands": ["test"]})
+
+        # Predefined Commands
+        # Execute a predefined command
+        result = await client.call_tool("predefined_commands", {"command": "test"})
+
+        # Execute a predefined command with a parameter
+        result = await client.call_tool("predefined_commands", {"command": "test", "param": "specific_test"})
 ```
 
 ## Development

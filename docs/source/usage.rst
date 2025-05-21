@@ -241,6 +241,79 @@ The operation will fail if:
 * The target is invalid
 * The command execution fails
 
+Predefined Commands
+-------------------
+
+The server provides a tool for executing predefined commands from a TOML file:
+
+Execute Predefined Command
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Executes a predefined command from a TOML file (default: pyproject.toml under [tool.dkmcp.commands] section).
+
+.. code-block:: python
+
+   # Using the MCP client
+   # Execute a predefined command
+   result = await client.call_tool("predefined_commands", {"command": "test"})
+
+   # Execute a predefined command with a parameter
+   result = await client.call_tool("predefined_commands", {"command": "test", "param": "specific_test"})
+
+The TOML file format for predefined commands is as follows:
+
+.. code-block:: toml
+
+   [tool.dkmcp.commands]
+   test = "uv run pytest"
+   lint = "ruff check"
+   check = "uvx pre-commit run --all-files"
+   doctest = "make doctest"
+
+Each command is defined as a key-value pair where the key is the command name and the value is the command to execute. For example, when you call the predefined command "test", it will execute "uv run pytest" in the root directory.
+
+Factory Configuration
+---------------------
+
+The Factory component allows for dynamically decorating functions with the MCP tool decorator. This configuration can be specified in the TOML file (default: pyproject.toml under [tool.dkmcp.factory] section).
+
+.. code-block:: toml
+
+   [tool.dkmcp.factory]
+   # Include only these tools
+   include = ["exec_make_target", "predefined_commands"]
+
+   # Exclude these tools
+   exclude = ["git_push", "git_commit"]
+
+The factory configuration supports the following options:
+
+* ``include``: List of tool names to include. If specified, only these tools will be registered.
+* ``exclude``: List of tool names to exclude. These tools will not be registered.
+
+If both ``include`` and ``exclude`` are specified, the ``include`` list takes precedence, and the ``exclude`` list will only be applied to the tools in the ``include`` list.
+
+Here's a simple example of a complete factory configuration in pyproject.toml:
+
+.. code-block:: toml
+
+   [tool.dkmcp.factory]
+   # Only include specific tools
+   include = [
+     "exec_make_target",
+     "predefined_commands",
+     "git_status"
+   ]
+
+   # Exclude specific tools from the included list
+   exclude = []
+
+You can specify a custom TOML file using the ``--commands-toml`` parameter:
+
+.. code-block:: bash
+
+   dev-kit-mcp-server --root-dir=workdir --commands-toml=custom_commands.toml
+
 Security Considerations
 ------------------------
 

@@ -9,11 +9,11 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
-from ..core import AsyncOperation
+from dev_kit_mcp_server.tools.commands.base import _BaseExec
 
 
 @dataclass
-class ExecMakeTarget(AsyncOperation):
+class ExecMakeTarget(_BaseExec):
     """Class to execute Makefile targets.
 
     This tool executes Makefile targets by running the commands that make would run

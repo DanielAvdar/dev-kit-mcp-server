@@ -14,7 +14,7 @@ def fastmcp_server(temp_dir):
         make_content = f.read()
     with open(Path(temp_dir) / "Makefile", "w") as f:
         f.write(make_content)
-    server = server_init(root_dir=temp_dir, copilot_mode=False)
+    server = server_init(root_dir=temp_dir)
 
     return server
 
@@ -28,9 +28,9 @@ async def test_tool_functionality(fastmcp_server):
         assert len(result) == len(__all__)
         assert "move_dir" in list_tools
         # Find the make command by name
-        make_cmd = next((tool for tool in result if tool.name == "exec_make_target"), None)
-        assert make_cmd is not None
-        assert make_cmd.name == "exec_make_target"
+        assert "exec_make_target" in list_tools
+        make_cmd = [tool for tool in result if tool.name == "exec_make_target"][0]
+
         res = await client.call_tool(make_cmd.name, {"commands": ["ls"]})
         text = res[0].text
         assert "ls" in text

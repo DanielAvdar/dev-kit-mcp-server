@@ -32,7 +32,7 @@ dependencies = [
     "mcp>=1.8.1",
     "fastmcp>=2.3.3",
     "gitpython>=3.1.43",
-    "PyGithub",
+    "toml>=0.10.2"
 
 ]
 [project.optional-dependencies]
@@ -59,13 +59,14 @@ docs = [
 ]
 [project.scripts]
 dev-kit-mcp-server = "dev_kit_mcp_server:arun_server"
+dkmcp-vscode = "dkmcp_utils:create_vscode_config"
 
 [tool.hatch.build.targets.sdist]
-only-include = ["dev_kit_mcp_server"]
+only-include = ["dev_kit_mcp_server","dkmcp_utils"]
 source = "."
 
 [tool.hatch.build.targets.wheel]
-only-include = ["dev_kit_mcp_server"]
+only-include = ["dev_kit_mcp_server","dkmcp_utils"]
 source = "."
 
 
@@ -89,6 +90,7 @@ fixable = ["ALL"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D", "DOC"]
 "docs/*" = ["D", "DOC"]
+"dkmcp_utils/*" = ["ALL"]
 [tool.ruff.lint.isort]
 combine-as-imports = true
 [tool.mypy]
@@ -111,3 +113,20 @@ module = [
     "uvicorn"
 ]
 ignore_missing_imports = true
+
+[tool.dkmcp.commands]
+pytest = "uv run pytest"
+make = "make"
+check = "uvx pre-commit run --all-files"
+doctest = "make doctest"
+[tool.dkmcp.factory]
+include = [
+    "exec_make_target",
+    "predefined_commands",
+    "create_dir",
+    "move_dir",
+    "remove_file",
+    "rename_file"
+
+
+]
