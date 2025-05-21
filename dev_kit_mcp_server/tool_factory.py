@@ -1,18 +1,18 @@
 """Tool factory for dynamically decorating functions as MCP tools at runtime."""
 
-import logging
 from importlib import import_module
 from pathlib import Path
 from typing import Any, Callable, List
 
 import tomllib
 from fastmcp.tools import Tool
+from fastmcp.utilities.logging import get_logger
 from mcp.types import ToolAnnotations
 
 from .core import AsyncOperation
 from .custom_fastmcp import RepoFastMCPServerError, RepoTool
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class ToolFactory:
@@ -58,6 +58,7 @@ class ToolFactory:
 
                 func = op(root_dir=root_dir)
                 self._decorate_function(func)
+        logger.info(f"Staged server in local directory: {root_dir}")
 
     def _decorate_function(self, func: AsyncOperation) -> None:
         """Decorate a function with MCP tool decorator and hooks.
