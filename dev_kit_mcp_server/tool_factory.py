@@ -40,6 +40,8 @@ class ToolFactory:
 
         Args:
             obj: Sequence of AsyncOperation instances (FileOperation or AsyncOperation) to decorate
+            root_dir: The root directory for file operations
+            commands_toml: Path to TOML configuration file relative to root_dir
 
         """
         conf = self.get_configuration(root_dir, commands_toml)
@@ -96,10 +98,17 @@ class ToolFactory:
 
         return tool
 
-    def get_configuration(self, root_dir, commands_toml) -> dict[str, Any]:
-        """Get the configuration for the tool factory."""
-        # if commands_toml is None:
-        #     return {}
+    def get_configuration(self, root_dir: str, commands_toml: str) -> dict[str, Any]:
+        """Get the configuration for the tool factory.
+
+        Args:
+            root_dir: The root directory for file operations
+            commands_toml: Path to TOML configuration file relative to root_dir
+
+        Returns:
+            Dictionary containing factory configuration options
+
+        """
         root_path = Path(root_dir)
 
         if commands_toml and (root_path / commands_toml).exists():
@@ -108,12 +117,15 @@ class ToolFactory:
             path = root_path / "pyproject.toml"
         else:
             return {}
+
         try:
             with open(path, "rb") as f:
                 toml_data = tomllib.load(f)
             commands = toml_data.get("tool", {}).get("dkmcp", {}).get("factory", {})
             if commands:
                 return commands
+            return {}
 
         except Exception as e:
             logger.warning("{" + f"Failed to load configuration from {path}: {e}" + "}")
+            return {}
