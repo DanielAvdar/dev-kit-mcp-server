@@ -241,6 +241,65 @@ The operation will fail if:
 * The target is invalid
 * The command execution fails
 
+Predefined Commands
+-------------------
+
+The server provides a tool for executing predefined commands from a TOML file:
+
+Execute Predefined Command
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Executes a predefined command from a TOML file (default: pyproject.toml under [tool.dkmcp.commands] section).
+
+.. code-block:: python
+
+   # Using the MCP client
+   # Execute a predefined command
+   result = await client.call_tool("predefined_commands", {"command": "test"})
+
+   # Execute a predefined command with a parameter
+   result = await client.call_tool("predefined_commands", {"command": "test", "param": "specific_test"})
+
+The TOML file format for predefined commands is as follows:
+
+.. code-block:: toml
+
+   [tool.dkmcp.commands]
+   test = "uv run pytest"
+   lint = "ruff check"
+   check = "uvx pre-commit run --all-files"
+   doctest = "make doctest"
+
+Each command is defined as a key-value pair where the key is the command name and the value is the command to execute. For example, when you call the predefined command "test", it will execute "uv run pytest" in the root directory.
+
+Here's a simple example of how to define commands in a custom TOML file:
+
+.. code-block:: toml
+
+   # custom_commands.toml
+   [tool.dkmcp.commands]
+   # Basic commands
+   hello = "echo Hello, World!"
+   date = "date"
+
+   # Development commands
+   test = "pytest"
+   lint = "ruff check ."
+   build = "python setup.py build"
+
+You can specify a custom TOML file using the ``--commands-toml`` parameter:
+
+.. code-block:: bash
+
+   dev-kit-mcp-server --root-dir=workdir --commands-toml=custom_commands.toml
+
+The operation will fail if:
+
+* The TOML file doesn't exist
+* The command doesn't exist in the TOML file
+* The command execution fails
+* The parameter contains invalid characters (only alphanumeric characters, underscores, hyphens, dots, spaces, slashes, colons, and @ are allowed)
+
 Security Considerations
 ------------------------
 
