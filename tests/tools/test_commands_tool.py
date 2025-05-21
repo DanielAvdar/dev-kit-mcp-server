@@ -305,6 +305,64 @@ async def test_predefined_commands_exec_subprocess_exception(predefined_commands
 
 
 @pytest.mark.asyncio
+async def test_predefined_commands_exec_with_valid_param(predefined_commands):
+    """Test execution of a command with valid parameters."""
+    # Test with various valid parameters
+    valid_params = [
+        "specific_test",
+        "test_file.py",
+        "path/to/test",
+        "path\\to\\test",
+        "test-file_name.py",
+        "test with spaces",
+        "test:module",
+        "test@param",
+    ]
+
+    for valid_param in valid_params:
+        # Mock the create_sub_proccess method
+        mock_process = AsyncMock()
+        mock_process.communicate.return_value = (b"command output", b"")
+        mock_process.returncode = 0
+
+        with patch.object(predefined_commands, "create_sub_proccess", return_value=mock_process):
+            result = {}
+            await predefined_commands._exec_commands("test", result, valid_param)
+
+            assert "test" in result
+            assert result["test"]["command"] == "test"
+            assert result["test"]["executed"] == f"pytest {valid_param}"
+            assert result["test"]["stdout"] == "command output"
+            assert result["test"]["stderr"] == ""
+            assert result["test"]["exitcode"] == 0
+
+
+@pytest.mark.asyncio
+async def test_predefined_commands_exec_with_invalid_param(predefined_commands):
+    """Test rejection of commands with invalid parameters that could lead to injection."""
+    # Test with various invalid parameters that could lead to command injection
+    invalid_params = [
+        "test; echo 'Injected command'",
+        "test && echo 'Injected command'",
+        "test || echo 'Injected command'",
+        "test | grep something",
+        "test > output.txt",
+        "test < input.txt",
+        "test `echo Injected command`",
+        "test $(echo 'Injected command')",
+        "test #comment",
+    ]
+
+    for invalid_param in invalid_params:
+        result = {}
+        await predefined_commands._exec_commands("test", result, invalid_param)
+
+        assert "test" in result
+        assert "error" in result["test"]
+        assert "contains invalid characters" in result["test"]["error"]
+
+
+@pytest.mark.asyncio
 async def test_predefined_commands_exec_nonzero_exit(predefined_commands):
     """Test handling of non-zero exit code."""
     # Mock the create_sub_proccess method
