@@ -8,18 +8,6 @@ from mcp.types import ToolAnnotations
 from .core import AsyncOperation
 from .custom_fastmcp import RepoFastMCPServerError, RepoTool
 
-# RepoTool
-# def exept_wrapper(fn: Callable[..., Any]):
-#     """Wrapper to handle exceptions during function execution."""
-#
-#     def wrapper(*args, **kwargs):
-#         try:
-#             return fn(*args, **kwargs)
-#         except Exception as e:
-#             return dict(error=str(e))
-#
-#     return wrapper
-
 
 class ToolFactory:
     """Factory for creating MCP tools at runtime by decorating functions.
