@@ -43,3 +43,6 @@ run:
 
 dev:
 	npx @modelcontextprotocol/inspector@latest node build/index.js
+
+vs-code:
+	uvx --from dev-kit-mcp-server dkmcp-vscode

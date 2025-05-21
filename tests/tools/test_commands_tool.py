@@ -136,7 +136,7 @@ async def test_exec_make_target_exception_handling(exec_make_target):
 @pytest.fixture
 def mock_tomllib_load():
     """Mock the tomllib.load function."""
-    with patch("tomllib.load") as mock_load:
+    with patch("dev_kit_mcp_server.core.tomllib.load") as mock_load:
         mock_load.return_value = {
             "tool": {"dkmcp": {"commands": {"test": "pytest", "lint": "ruff check", "build": "make build"}}}
         }
@@ -171,7 +171,7 @@ async def test_predefined_commands_init(temp_dir):
     with (
         patch("pathlib.Path.exists") as mock_exists,
         patch("builtins.open", MagicMock()),
-        patch("tomllib.load") as mock_load,
+        patch("dev_kit_mcp_server.core.tomllib.load") as mock_load,
     ):
         mock_exists.side_effect = [True, True]
         mock_load.side_effect = Exception("Error loading file")
@@ -179,13 +179,11 @@ async def test_predefined_commands_init(temp_dir):
         # Should not raise exception, just log error and continue with empty commands
         tool = PredefinedCommands(root_dir=temp_dir)
         assert tool._pyproject_exists is True
-        assert tool._commands_config == {}
-
-    # Test with existing directory and valid pyproject.toml
+        assert tool._commands_config == {}  # Test with existing directory and valid pyproject.toml
     with (
         patch("pathlib.Path.exists") as mock_exists,
         patch("builtins.open", MagicMock()),
-        patch("tomllib.load") as mock_load,
+        patch("dev_kit_mcp_server.core.tomllib.load") as mock_load,
     ):
         mock_exists.side_effect = [True, True]
         mock_load.return_value = {"tool": {"dkmcp": {"commands": {"test": "pytest", "lint": "ruff check"}}}}
