@@ -33,6 +33,13 @@ class PredefinedCommands(_BaseExec):
 
     name = "predefined_commands"
 
+    @property
+    def docstring(self) -> str:
+        """Return a docstring that includes the available commands from pyproject.toml."""
+        base_docstring = self.__call__.__doc__ or "No docstring provided"
+        cmd_list = sorted(self._commands_config.keys())
+        return base_docstring.format(cmd_list)
+
     def __post_init__(self) -> None:
         """Post-initialization to set the root path and load commands from pyproject.toml."""
         super().__post_init__()
@@ -64,6 +71,7 @@ class PredefinedCommands(_BaseExec):
         param: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Execute a predefined command with an optional parameter.
+           Available commands list: {}.
 
         Args:
             command: The name of the predefined command to execute
