@@ -17,9 +17,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-import tomllib
-
 from dev_kit_mcp_server.tools.commands.base import _BaseExec
+
+from ...core import tomllib
 
 
 @dataclass

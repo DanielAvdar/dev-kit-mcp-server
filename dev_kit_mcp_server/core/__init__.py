@@ -2,7 +2,13 @@
 
 from .base_op import AsyncOperation
 
+try:
+    import tomllib  # noqa
+except ImportError:
+    import tomli as tomllib  # noqa
+
+
 __all__ = [
     "AsyncOperation",
-    # "_Operation",
+    "tomllib",
 ]

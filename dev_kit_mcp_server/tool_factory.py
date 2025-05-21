@@ -4,12 +4,11 @@ from importlib import import_module
 from pathlib import Path
 from typing import Any, Callable, List
 
-import tomllib
 from fastmcp.tools import Tool
 from fastmcp.utilities.logging import get_logger
 from mcp.types import ToolAnnotations
 
-from .core import AsyncOperation
+from .core import AsyncOperation, tomllib
 from .custom_fastmcp import RepoFastMCPServerError, RepoTool
 
 logger = get_logger(__name__)
