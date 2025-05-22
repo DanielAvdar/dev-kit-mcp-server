@@ -127,8 +127,9 @@ class PredefinedCommands(_BaseExec):
 
         if command_name not in self._commands_config:
             toml_file = self.commands_toml or "pyproject.toml"
+            available = list(self._commands_config.keys())
             result[command_name] = {
-                "error": f"Command '{command_name}' not found in {toml_file}",
+                "error": f"Command '{command_name}', not found, the available commands are {available}",
             }
             return
 
