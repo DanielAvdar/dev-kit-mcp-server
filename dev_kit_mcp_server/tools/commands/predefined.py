@@ -36,6 +36,9 @@ class PredefinedCommands(_BaseExec):
 
     name = "predefined_commands"
 
+    # Class attribute for valid param regex
+    VALID_PARAM_REGEX = r"^[a-zA-Z0-9_\-\.\s\/\\:@=,]+$"
+
     @property
     def docstring(self) -> str:
         """Return a docstring that includes the available commands from pyproject.toml."""
@@ -135,9 +138,8 @@ class PredefinedCommands(_BaseExec):
         # Split the command string into a list of arguments
         if param is not None:
             # Validate param to prevent command injection
-            valid_param_regex = r"^[a-zA-Z0-9_\-\.\s\/\\:@]+$"
-            if not re.match(valid_param_regex, param):
-                error_msg = f"Parameter '{param}' must follow the regex pattern: {valid_param_regex}. "
+            if not re.match(self.VALID_PARAM_REGEX, param):
+                error_msg = f"Parameter '{param}' must follow the regex pattern: {self.VALID_PARAM_REGEX}. "
                 result[command_name] = {
                     "error": error_msg,
                     "directory": self._root_path.as_posix(),

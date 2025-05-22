@@ -372,3 +372,19 @@ async def test_predefined_commands_exec_nonzero_exit(predefined_commands):
         result = {}
         with pytest.raises(RuntimeError, match="non-zero exitcode: 1"):
             await predefined_commands._exec_commands("test", result)
+
+
+@pytest.mark.asyncio
+async def test_predefined_commands_exec_with_cov_param(predefined_commands):
+    """Test execution of a command with a pytest --cov=... param (regression for CLI regex)."""
+    mock_process = AsyncMock()
+    mock_process.communicate.return_value = (b"cov output", b"")
+    mock_process.returncode = 0
+    param = "--cov=tab_right/drift/drift_calculator.py --cov-report=term-missing"
+    with patch.object(predefined_commands, "create_sub_proccess", return_value=mock_process):
+        result = {}
+        await predefined_commands._exec_commands("test", result, param)
+        assert "test" in result
+        assert result["test"]["executed"].endswith(param)
+        assert result["test"]["stdout"] == "cov output"
+        assert result["test"]["exitcode"] == 0
