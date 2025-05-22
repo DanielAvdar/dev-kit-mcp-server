@@ -247,7 +247,8 @@ async def test_predefined_commands_exec_command_not_found(predefined_commands):
 
     assert "nonexistent" in result
     assert "error" in result["nonexistent"]
-    assert "Command 'nonexistent' not found in pyproject.toml" == result["nonexistent"]["error"]
+    # New error message format: Command 'nonexistent', not found, the available commands are [...]
+    assert result["nonexistent"]["error"].startswith("Command 'nonexistent', not found, the available commands are ")
 
 
 @pytest.mark.asyncio
