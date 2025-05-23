@@ -87,22 +87,29 @@ class PredefinedCommands(_BaseExec):
     async def __call__(
         self,
         command: str,
-        param: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Execute a predefined command with an optional parameter.
+        """Execute a predefined command. The command string may include parameters after the command name.
 
            Available commands list: {}.
 
         Args:
-            command: The name of the predefined command to execute
-            param: Optional parameter to append to the command
+            command: The command to execute, with optional parameters (e.g., 'test', 'test myparam')
 
         Returns:
             A dictionary containing the execution results for the command
 
+        Raises:
+            ValueError: If no command is provided
+
         """
         result: Dict[str, Any] = {}
-        await self._exec_commands(command, result, param)
+        # Split command into command_name and param (if any)
+        parts = shlex.split(command)
+        if not parts:
+            raise ValueError("No command provided")
+        command_name = parts[0]
+        param = " ".join(parts[1:]) if len(parts) > 1 else None
+        await self._exec_commands(command_name, result, param)
         return result
 
     async def _exec_commands(self, command_name: str, result: Dict[str, Any], param: Optional[str] = None) -> None:

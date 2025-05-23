@@ -220,8 +220,8 @@ async def test_predefined_commands_call(predefined_commands):
         mock_exec.assert_called_once_with("test", {}, None)
         mock_exec.reset_mock()
 
-        # Test with command and param
-        await predefined_commands("test", "specific_test")
+        # Test with command and param (now as a single string)
+        await predefined_commands("test specific_test")
         mock_exec.assert_called_once_with("test", {}, "specific_test")
 
 
