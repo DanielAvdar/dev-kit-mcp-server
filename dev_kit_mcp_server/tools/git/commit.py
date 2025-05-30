@@ -10,7 +10,9 @@ from ...core import AsyncOperation
 class GitCommitOperation(AsyncOperation):
     """Class to commit changes to a git repository."""
 
-    name = "git_commit"
+    @property
+    def _name(self) -> str:
+        return "git_commit"
 
     async def __call__(
         self,

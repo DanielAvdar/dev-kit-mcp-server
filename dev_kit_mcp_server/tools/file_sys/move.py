@@ -12,7 +12,9 @@ from ...core import AsyncOperation
 class MoveDirOperation(AsyncOperation):
     """Class to move a file or folder in the workspace."""
 
-    name = "move_dir"
+    @property
+    def _name(self) -> str:
+        return "move_dir"
 
     def _move_folder(self, path1: str, path2: str) -> None:
         """Move a file or folder from path1 to path2.

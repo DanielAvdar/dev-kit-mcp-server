@@ -10,7 +10,9 @@ from ...core import AsyncOperation
 class GitStatusOperation(AsyncOperation):
     """Class to get the status of a git repository."""
 
-    name = "git_status"
+    @property
+    def _name(self) -> str:
+        return "git_status"
 
     async def __call__(
         self,

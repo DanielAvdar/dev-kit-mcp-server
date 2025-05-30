@@ -10,7 +10,9 @@ from ...core import AsyncOperation
 class GitPullOperation(AsyncOperation):
     """Class to pull changes from a remote git repository."""
 
-    name = "git_pull"
+    @property
+    def _name(self) -> str:
+        return "git_pull"
 
     async def __call__(
         self,

@@ -10,7 +10,9 @@ from ...core import AsyncOperation
 class GitCheckoutOperation(AsyncOperation):
     """Class to checkout branches in a git repository."""
 
-    name = "git_checkout"
+    @property
+    def _name(self) -> str:
+        return "git_checkout"
 
     async def __call__(
         self,
