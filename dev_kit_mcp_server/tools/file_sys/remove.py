@@ -12,7 +12,9 @@ from ...core import AsyncOperation
 class RemoveFileOperation(AsyncOperation):
     """Class to Remove a file or folder."""
 
-    name = "remove_file"
+    @property
+    def _name(self) -> str:
+        return "remove_file"
 
     def _remove_folder(self, path: str) -> None:
         """Remove a file or folder at the specified path.

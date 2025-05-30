@@ -12,7 +12,9 @@ from ...core import AsyncOperation
 class RenameOperation(AsyncOperation):
     """Class to rename a file or folder in the workspace."""
 
-    name = "rename_file"
+    @property
+    def _name(self) -> str:
+        return "rename_file"
 
     def _rename_file_or_folder(self, path: str, new_name: str) -> None:
         """Rename a file or folder.

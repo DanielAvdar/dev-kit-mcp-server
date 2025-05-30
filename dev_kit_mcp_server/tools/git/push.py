@@ -10,7 +10,9 @@ from ...core import AsyncOperation
 class GitPushOperation(AsyncOperation):
     """Class to push changes to a remote git repository."""
 
-    name = "git_push"
+    @property
+    def _name(self) -> str:
+        return "git_push"
 
     async def __call__(
         self,

@@ -22,7 +22,9 @@ class ExecMakeTarget(_BaseExec):
 
     _make_file_exists: bool = field(init=False, default=False)
 
-    name = "exec_make_target"
+    @property
+    def _name(self) -> str:
+        return "exec_make_target"
 
     def __post_init__(self) -> None:
         """Post-initialization to set the root path."""

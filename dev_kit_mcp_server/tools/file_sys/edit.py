@@ -11,7 +11,9 @@ from ...core import AsyncOperation
 class EditFileOperation(AsyncOperation):
     """Class to edit a file in the workspace by replacing lines between start and end with new text."""
 
-    name = "edit_file"
+    @property
+    def _name(self) -> str:
+        return "edit_file"
 
     def _edit_file(self, path: str, start_line: int, end_line: int, text: str) -> None:
         """Edit a file by replacing lines between start and end with new text.
