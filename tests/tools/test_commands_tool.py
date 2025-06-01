@@ -46,7 +46,7 @@ async def test_exec_make_target_init(temp_dir):
         mock_exists.side_effect = [True, True]
         tool = ExecMakeTarget(root_dir=temp_dir)
         assert tool._make_file_exists is True
-        assert tool.name == "exec_make_target"
+        assert tool.name.endswith("/exec_make_target")
 
 
 @pytest.mark.asyncio
@@ -191,7 +191,7 @@ async def test_predefined_commands_init(temp_dir):
         tool = PredefinedCommands(root_dir=temp_dir)
         assert tool._pyproject_exists is True
         assert tool._commands_config == {"test": "pytest", "lint": "ruff check"}
-        assert tool.name == "predefined_commands"
+        assert tool.name.endswith("/predefined_commands")
 
 
 @pytest.mark.asyncio

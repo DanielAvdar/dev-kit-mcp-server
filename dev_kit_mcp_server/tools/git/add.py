@@ -10,7 +10,7 @@ from ...core import AsyncOperation
 class GitAddOperation(AsyncOperation):
     """Class to add files to the git index."""
 
-    name = "git_add"
+    _name = "git_add"
 
     async def __call__(
         self,
