@@ -39,6 +39,19 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 master_doc = "index"
+
+# PyData theme options
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/DanielAvdar/dev-kit-mcp-server",
+            "icon": "fa-brands fa-github",
+        }
+    ],
+    "use_edit_page_button": False,
+    "show_toc_level": 2,
+}
 # html_static_path = ["_static"]
