@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import git
+
 from ...core import AsyncOperation
 
 
@@ -52,24 +54,49 @@ class SearchFilesOperation(AsyncOperation):
         total_files_scanned = 0
 
         try:
+            # Try to get git repo for gitignore filtering
+            repo = None
+            try:
+                repo = git.Repo(self._root_path)
+            except (git.InvalidGitRepositoryError, OSError):
+                # Not a git repo or error accessing it, continue without gitignore filtering
+                pass
+
             for file_path in search_root.rglob("*"):
                 total_files_scanned += 1
-                if file_path.is_file() and compiled_pattern.search(file_path.name):
-                    # Get relative path from the project root
-                    try:
-                        relative_path = file_path.relative_to(self._root_path)
-                        matching_files.append(str(relative_path))
-                    except ValueError:
-                        # File is outside root directory, use absolute path
-                        matching_files.append(str(file_path))
+                if file_path.is_file():
+                    # Check gitignore if we have a repo
+                    if repo is not None:
+                        try:
+                            relative_path = file_path.relative_to(self._root_path)
+                            # Skip files ignored by gitignore
+                            if repo.ignored(str(relative_path)):
+                                continue
+                        except ValueError:
+                            # File is outside root directory, skip it
+                            continue
+                    else:
+                        # No git repo, skip hidden files/directories
+                        if any(part.startswith(".") for part in file_path.parts[len(self._root_path.parts) :]):
+                            continue
+
+                    # Check if filename matches pattern
+                    if compiled_pattern.search(file_path.name):
+                        # Get relative path from the project root
+                        try:
+                            relative_path = file_path.relative_to(self._root_path)
+                            matching_files.append(str(relative_path))
+                        except ValueError:
+                            # File is outside root directory, use absolute path
+                            matching_files.append(str(file_path))
 
         except (OSError, PermissionError) as e:
             raise ValueError(f"Error accessing files in directory: {e}") from e
 
         # Prepare output
         content_lines = [f"Files matching pattern '{pattern}':", ""]
-        for file_path in matching_files:
-            content_lines.append(f"  {file_path}")
+        for file_str in matching_files:
+            content_lines.append(f"  {file_str}")
 
         if not matching_files:
             content_lines.append("  No files found")

@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import git
+
 from ...core import AsyncOperation
 
 
@@ -45,41 +47,27 @@ class SearchTextOperation(AsyncOperation):
         # Determine files to search
         search_files: List[Path] = []
         if files is None:
-            # Search all text files in the project
-            text_extensions = {
-                ".txt",
-                ".md",
-                ".py",
-                ".js",
-                ".ts",
-                ".json",
-                ".yaml",
-                ".yml",
-                ".toml",
-                ".ini",
-                ".cfg",
-                ".conf",
-                ".log",
-                ".html",
-                ".css",
-                ".xml",
-                ".csv",
-                ".rst",
-                ".sh",
-                ".bat",
-                ".ps1",
-                ".sql",
-            }
+            # Search all files except those ignored by .gitignore
             try:
+                repo = git.Repo(self._root_path)
                 for file_path in self._root_path.rglob("*"):
-                    if (
-                        file_path.is_file()
-                        and file_path.suffix.lower() in text_extensions
-                        and not any(part.startswith(".") for part in file_path.parts[len(self._root_path.parts) :])
+                    if file_path.is_file():
+                        # Get relative path for gitignore check
+                        try:
+                            relative_path = file_path.relative_to(self._root_path)
+                            # Check if file is ignored by gitignore
+                            if not repo.ignored(str(relative_path)):
+                                search_files.append(file_path)
+                        except ValueError:
+                            # File is outside root directory, skip it
+                            continue
+            except (git.InvalidGitRepositoryError, OSError, PermissionError):
+                # If not a git repo or git error, fall back to all files except hidden
+                for file_path in self._root_path.rglob("*"):
+                    if file_path.is_file() and not any(
+                        part.startswith(".") for part in file_path.parts[len(self._root_path.parts) :]
                     ):
                         search_files.append(file_path)
-            except (OSError, PermissionError) as e:
-                raise ValueError(f"Error accessing files in directory: {e}") from e
         else:
             # Validate and collect specified files
             for file_str in files:
@@ -151,10 +139,11 @@ class SearchTextOperation(AsyncOperation):
                     content_lines.append(f"=== {match['file']} ===")
                     for ctx in match["context"]:
                         prefix = ">>> " if ctx["is_match"] else "    "
-                        content_lines.append(f"{prefix}{ctx['line_number']:4d}: {ctx['line']}")
+                        content_lines.append(f"{prefix}{ctx['line_number']:4d}:")
                     content_lines.append("")
                 else:
-                    content_lines.append(f"{match['file']}:{match['line_number']}: {match['line']}")
+                    # Simple format: file_path:line_number:
+                    content_lines.append(f"{match['file']}:{match['line_number']}:")
 
         content = "\n".join(content_lines)
         total_chars = len(content)

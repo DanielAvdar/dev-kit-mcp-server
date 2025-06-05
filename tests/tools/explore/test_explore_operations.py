@@ -376,9 +376,10 @@ class TestReadLinesOperation:
     @pytest.mark.asyncio
     async def test_read_lines_subdirectory(self, read_lines_operation, setup_test_files):
         """Test reading file in subdirectory."""
-        result = await read_lines_operation(file_path="subdir/README.md", start=1, end=3)
+        subdir_path = os.path.join("subdir", "README.md")
+        result = await read_lines_operation(file_path=subdir_path, start=1, end=3)
 
         assert result["status"] == "success"
         assert result["lines_returned"] == 3
         assert "# Test README" in result["content"]
-        assert "subdir/README.md" in result["content"]
+        assert os.path.normpath(subdir_path) in result["content"]
