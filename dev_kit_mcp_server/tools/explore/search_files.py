@@ -54,29 +54,17 @@ class SearchFilesOperation(AsyncOperation):
         total_files_scanned = 0
 
         try:
-            # Try to get git repo for gitignore filtering
-            repo = None
-            try:
-                repo = git.Repo(self._root_path)
-            except (git.InvalidGitRepositoryError, OSError):
-                # Not a git repo or error accessing it, continue without gitignore filtering
-                pass
-
             for file_path in search_root.rglob("*"):
                 total_files_scanned += 1
                 if file_path.is_file():
-                    # Check gitignore if we have a repo
-                    if repo is not None:
-                        try:
-                            relative_path = file_path.relative_to(self._root_path)
-                            # Skip files ignored by gitignore
-                            if repo.ignored(str(relative_path)):
-                                continue
-                        except ValueError:
-                            # File is outside root directory, skip it
+                    # Check gitignore using the base class repo
+                    try:
+                        relative_path = file_path.relative_to(self._root_path)
+                        # Skip files ignored by gitignore
+                        if self._repo.ignored(str(relative_path)):
                             continue
-                    else:
-                        # No git repo, skip hidden files/directories
+                    except (ValueError, git.InvalidGitRepositoryError, OSError):
+                        # File is outside root directory or git error, skip hidden files/directories
                         if any(part.startswith(".") for part in file_path.parts[len(self._root_path.parts) :]):
                             continue
 

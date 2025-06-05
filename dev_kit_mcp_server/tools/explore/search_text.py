@@ -49,14 +49,13 @@ class SearchTextOperation(AsyncOperation):
         if files is None:
             # Search all files except those ignored by .gitignore
             try:
-                repo = git.Repo(self._root_path)
                 for file_path in self._root_path.rglob("*"):
                     if file_path.is_file():
                         # Get relative path for gitignore check
                         try:
                             relative_path = file_path.relative_to(self._root_path)
                             # Check if file is ignored by gitignore
-                            if not repo.ignored(str(relative_path)):
+                            if not self._repo.ignored(str(relative_path)):
                                 search_files.append(file_path)
                         except ValueError:
                             # File is outside root directory, skip it
