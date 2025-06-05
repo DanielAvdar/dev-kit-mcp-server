@@ -55,6 +55,7 @@ dev = [
 docs = [
     "sphinx>=8.2.0; python_version >= '3.11'",
     "sphinx>=7.0.0; python_version < '3.11'",
+    "pydata-sphinx-theme",
     "sphinx-rtd-theme>=3.0.2",
 ]
 [project.scripts]
