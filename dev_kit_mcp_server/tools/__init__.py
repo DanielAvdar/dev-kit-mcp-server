@@ -3,6 +3,7 @@
 import importlib.util
 
 from .commands import ExecMakeTarget, PredefinedCommands
+from .explore import ReadLinesOperation, SearchFilesOperation, SearchTextOperation
 from .file_sys.create import CreateDirOperation
 from .file_sys.edit import EditFileOperation
 from .file_sys.move import MoveDirOperation
@@ -36,4 +37,7 @@ __all__ = [
     "GitDiffOperation",
     "ExecMakeTarget",
     "PredefinedCommands",
+    "SearchFilesOperation",
+    "SearchTextOperation",
+    "ReadLinesOperation",
 ]

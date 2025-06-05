@@ -78,6 +78,11 @@ The server provides the following tools:
 #### Makefile Operations
 - **exec_make_target**: Run makefile commands securely within the project
 
+#### Exploration Operations
+- **search_files**: Search for files by regex pattern in the project directory. Supports optional root directory and output length limits.
+- **search_text**: Search for lines in files matching a given pattern. Supports file filtering, context lines, and output length limits.
+- **read_lines**: Read specific lines or a range from a file. Supports line range selection and output length limits.
+
 #### Predefined Commands
 - **predefined_commands**: Execute predefined commands from a TOML file (default: pyproject.toml under [tool.dkmcp.commands] section)
 
@@ -160,6 +165,36 @@ async def example():
         # Makefile Operations
         # Run a makefile command
         result = await client.call_tool("exec_make_target", {"commands": ["test"]})
+
+        # Exploration Operations
+        # Search for Python files
+        result = await client.call_tool("search_files", {"pattern": ".*\\.py$"})
+
+        # Search for files in a specific directory with output limit
+        result = await client.call_tool("search_files", {
+            "pattern": "test.*",
+            "root": "tests",
+            "max_chars": 1000
+        })
+
+        # Search for text patterns in files
+        result = await client.call_tool("search_text", {"pattern": "def.*test"})
+
+        # Search in specific files with context
+        result = await client.call_tool("search_text", {
+            "pattern": "import",
+            "files": ["main.py", "utils.py"],
+            "context": 2
+        })
+
+        # Read specific lines from a file
+        result = await client.call_tool("read_lines", {"file_path": "README.md", "start": 1, "end": 10})
+
+        # Read entire file with character limit
+        result = await client.call_tool("read_lines", {
+            "file_path": "config.json",
+            "max_chars": 500
+        })
 
         # Predefined Commands
         # Execute a predefined command
