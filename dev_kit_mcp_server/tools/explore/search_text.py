@@ -1,10 +1,12 @@
 """Module for searching text content in files."""
 
+import asyncio
 import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import aiofiles
 import git
 
 from ...core import AsyncOperation
@@ -16,7 +18,70 @@ class SearchTextOperation(AsyncOperation):
 
     name = "search_text"
 
-    def _search_text(
+    async def _process_file_async(
+        self,
+        file_path: Path,
+        compiled_pattern: re.Pattern[str],
+        context: Optional[int] = None,
+    ) -> tuple[List[Dict[str, Any]], int]:
+        """Process a single file asynchronously for pattern matches.
+
+        Args:
+            file_path: Path to the file to process
+            compiled_pattern: Compiled regex pattern to search for
+            context: Number of context lines to include before/after matches
+
+        Returns:
+            Tuple of (matches found in file, number of lines searched)
+
+        """
+        matches = []
+        lines_searched = 0
+
+        try:
+            async with aiofiles.open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                lines = await f.readlines()
+
+            lines_searched = len(lines)
+
+            # Find matching lines
+            for line_num, line in enumerate(lines, 1):
+                if compiled_pattern.search(line):
+                    # Get relative path from project root
+                    try:
+                        relative_path = file_path.relative_to(self._root_path)
+                    except ValueError:
+                        relative_path = file_path
+
+                    match_data = {
+                        "file": str(relative_path),
+                        "line_number": line_num,
+                        "line": line.rstrip("\n\r"),
+                    }
+
+                    # Add context lines if requested
+                    if context is not None and context > 0:
+                        start_line = max(0, line_num - 1 - context)
+                        end_line = min(len(lines), line_num + context)
+
+                        context_lines = []
+                        for i in range(start_line, end_line):
+                            context_lines.append({
+                                "line_number": i + 1,
+                                "line": lines[i].rstrip("\n\r"),
+                                "is_match": i == line_num - 1,
+                            })
+                        match_data["context"] = context_lines
+
+                    matches.append(match_data)
+
+        except (UnicodeDecodeError, OSError, PermissionError):
+            # Skip binary files or files with access issues
+            pass
+
+        return matches, lines_searched
+
+    async def _search_text(
         self,
         pattern: str,
         files: Optional[List[str]] = None,
@@ -78,54 +143,33 @@ class SearchTextOperation(AsyncOperation):
                     raise ValueError(f"Path is not a file: {file_str}")
                 search_files.append(file_path)
 
-        # Search for matches
+        # Process files concurrently with limited concurrency
+        # Use a semaphore to limit concurrent file operations
+        max_concurrent_files = min(20, len(search_files))  # Limit to 20 concurrent files
+        semaphore = asyncio.Semaphore(max_concurrent_files)
+
+        async def process_file_with_semaphore(file_path: Path) -> tuple[List[Dict[str, Any]], int]:
+            async with semaphore:
+                return await self._process_file_async(file_path, compiled_pattern, context)
+
+        # Process all files concurrently
+        tasks = [process_file_with_semaphore(file_path) for file_path in search_files]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Collect results and handle any exceptions
         matches: List[Dict[str, Any]] = []
         total_files_searched = 0
         total_lines_searched = 0
 
-        for file_path in search_files:
-            total_files_searched += 1
-            try:
-                # Try to read as text file
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                    lines = f.readlines()
-
-                total_lines_searched += len(lines)
-
-                # Find matching lines
-                for line_num, line in enumerate(lines, 1):
-                    if compiled_pattern.search(line):
-                        # Get relative path from project root
-                        try:
-                            relative_path = file_path.relative_to(self._root_path)
-                        except ValueError:
-                            relative_path = file_path
-
-                        match_data = {
-                            "file": str(relative_path),
-                            "line_number": line_num,
-                            "line": line.rstrip("\n\r"),
-                        }
-
-                        # Add context lines if requested
-                        if context is not None and context > 0:
-                            start_line = max(0, line_num - 1 - context)
-                            end_line = min(len(lines), line_num + context)
-
-                            context_lines = []
-                            for i in range(start_line, end_line):
-                                context_lines.append({
-                                    "line_number": i + 1,
-                                    "line": lines[i].rstrip("\n\r"),
-                                    "is_match": i == line_num - 1,
-                                })
-                            match_data["context"] = context_lines
-
-                        matches.append(match_data)
-
-            except (UnicodeDecodeError, OSError, PermissionError):
-                # Skip binary files or files with access issues
+        for result in results:
+            if isinstance(result, Exception):
+                # Log the exception but continue processing other files
                 continue
+            else:
+                file_matches, lines_count = result
+                matches.extend(file_matches)
+                total_files_searched += 1
+                total_lines_searched += lines_count
 
         # Prepare output
         content_lines = [f"Text search results for pattern '{pattern}':", ""]
@@ -182,7 +226,7 @@ class SearchTextOperation(AsyncOperation):
 
         """
         try:
-            result = self._search_text(pattern, files, context, max_chars)
+            result = await self._search_text(pattern, files, context, max_chars)
             return {
                 "status": "success",
                 "message": (
