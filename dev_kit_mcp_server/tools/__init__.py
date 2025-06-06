@@ -3,7 +3,7 @@
 import importlib.util
 
 from .commands import ExecMakeTarget, PredefinedCommands
-from .explore import ReadLinesOperation, SearchFilesOperation, SearchTextOperation
+from .explore import ReadLinesOperation, SearchFilesOperation, SearchRegexOperation, SearchTextOperation
 from .file_sys.create import CreateDirOperation
 from .file_sys.edit import EditFileOperation
 from .file_sys.move import MoveDirOperation
@@ -39,5 +39,6 @@ __all__ = [
     "PredefinedCommands",
     "SearchFilesOperation",
     "SearchTextOperation",
+    "SearchRegexOperation",
     "ReadLinesOperation",
 ]

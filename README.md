@@ -81,6 +81,7 @@ The server provides the following tools:
 #### Exploration Operations
 - **search_files**: Search for files by regex pattern in the project directory. Supports optional root directory and output length limits.
 - **search_text**: Search for lines in files matching a given pattern. Supports file filtering, context lines, and output length limits.
+- **search_regex**: Search for regex patterns in specified files only. Requires a list of files to search, supports context lines and output length limits.
 - **read_lines**: Read specific lines or a range from a file. Supports line range selection and output length limits.
 
 #### Predefined Commands
@@ -185,6 +186,20 @@ async def example():
             "pattern": "import",
             "files": ["main.py", "utils.py"],
             "context": 2
+        })
+
+        # Search for regex patterns in specific files only
+        result = await client.call_tool("search_regex", {
+            "pattern": "def\\s+\\w+\\(",
+            "files": ["main.py", "utils.py"]
+        })
+
+        # Search regex with context lines
+        result = await client.call_tool("search_regex", {
+            "pattern": "class\\s+\\w+",
+            "files": ["src/models.py"],
+            "context": 3,
+            "max_chars": 1000
         })
 
         # Read specific lines from a file
