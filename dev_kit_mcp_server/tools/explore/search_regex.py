@@ -3,7 +3,7 @@
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from ...core import AsyncOperation
 
@@ -18,7 +18,6 @@ class SearchRegexOperation(AsyncOperation):
         self,
         pattern: str,
         files: List[str],
-        context: Optional[int] = None,
         max_chars: int = 2000,
     ) -> Dict[str, Any]:
         """Search for regex patterns in specified files.
@@ -26,7 +25,6 @@ class SearchRegexOperation(AsyncOperation):
         Args:
             pattern: Regex pattern to match against file content
             files: List of file paths to search (required)
-            context: Number of context lines to include before/after matches (optional)
             max_chars: Maximum characters to return in output
 
         Returns:
@@ -85,20 +83,6 @@ class SearchRegexOperation(AsyncOperation):
                             "line": line.rstrip("\n\r"),
                         }
 
-                        # Add context lines if requested
-                        if context is not None and context > 0:
-                            start_line = max(0, line_num - 1 - context)
-                            end_line = min(len(lines), line_num + context)
-
-                            context_lines = []
-                            for i in range(start_line, end_line):
-                                context_lines.append({
-                                    "line_number": i + 1,
-                                    "line": lines[i].rstrip("\n\r"),
-                                    "is_match": i == line_num - 1,
-                                })
-                            match_data["context"] = context_lines
-
                         matches.append(match_data)
 
             except (UnicodeDecodeError, OSError, PermissionError) as e:
@@ -112,15 +96,8 @@ class SearchRegexOperation(AsyncOperation):
             content_lines.append("No matches found")
         else:
             for match in matches:
-                if context is not None and "context" in match:
-                    content_lines.append(f"=== {match['file']} ===")
-                    for ctx in match["context"]:
-                        prefix = ">>> " if ctx["is_match"] else "    "
-                        content_lines.append(f"{prefix}{ctx['line_number']:4d}: {ctx['line']}")
-                    content_lines.append("")
-                else:
-                    # Simple format: file_path:line_number: line_content
-                    content_lines.append(f"{match['file']}:{match['line_number']}: {match['line']}")
+                # Simple format: file_path:line_number: line_content
+                content_lines.append(f"{match['file']}:{match['line_number']}: {match['line']}")
 
         content = "\n".join(content_lines)
         total_chars = len(content)
@@ -137,7 +114,6 @@ class SearchRegexOperation(AsyncOperation):
             "files_searched": total_files_searched,
             "lines_searched": total_lines_searched,
             "pattern": pattern,
-            "context": context,
             "files": files,
         }
 
@@ -145,7 +121,6 @@ class SearchRegexOperation(AsyncOperation):
         self,
         pattern: str,
         files: List[str],
-        context: Optional[int] = None,
         max_chars: int = 2000,
     ) -> Dict[str, Any]:
         """Search for regex patterns in specified files.
@@ -153,7 +128,6 @@ class SearchRegexOperation(AsyncOperation):
         Args:
             pattern: Regex pattern to match against file content (required)
             files: List of file paths to search (required, cannot be empty)
-            context: Number of context lines to include before/after matches (optional)
             max_chars: Maximum characters to return in output (optional, default 2000)
 
         Returns:
@@ -161,7 +135,7 @@ class SearchRegexOperation(AsyncOperation):
 
         """
         try:
-            result = self._search_regex(pattern, files, context, max_chars)
+            result = self._search_regex(pattern, files, max_chars)
             return {
                 "status": "success",
                 "message": (
@@ -177,5 +151,4 @@ class SearchRegexOperation(AsyncOperation):
                 "error": str(e),
                 "pattern": pattern,
                 "files": files,
-                "context": context,
             }

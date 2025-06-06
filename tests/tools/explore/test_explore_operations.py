@@ -418,17 +418,6 @@ class TestSearchRegexOperation:
         assert not result["truncated"]
 
     @pytest.mark.asyncio
-    async def test_search_regex_with_context(self, search_regex_operation, setup_test_files):
-        """Test regex search with context lines."""
-        result = await search_regex_operation(pattern="search", files=["sample.txt"], context=1)
-
-        assert result["status"] == "success"
-        assert result["matches_found"] == 2
-        assert "=== sample.txt ===" in result["content"]
-        assert ">>>" in result["content"]  # Context marker for match lines
-        assert "   " in result["content"]  # Context marker for non-match lines
-
-    @pytest.mark.asyncio
     async def test_search_regex_regex_pattern(self, search_regex_operation, setup_test_files):
         """Test regex search with regex pattern."""
         result = await search_regex_operation(pattern="Line \\d+:", files=["sample.txt"])
