@@ -52,6 +52,7 @@ dev = [
     "pytest-parametrization>=2022",
     "ruff>=0.8.2",
     "pytest-asyncio>=0.23.5",
+    "types-aiofiles>=24.1.0",
 ]
 docs = [
     "sphinx>=8.2.0; python_version >= '3.11'",

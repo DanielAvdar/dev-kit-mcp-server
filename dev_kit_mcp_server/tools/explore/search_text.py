@@ -162,7 +162,7 @@ class SearchTextOperation(AsyncOperation):
         total_lines_searched = 0
 
         for result in results:
-            if isinstance(result, Exception):
+            if isinstance(result, BaseException):
                 # Log the exception but continue processing other files
                 continue
             else:
