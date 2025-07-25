@@ -26,10 +26,10 @@ async def test_tool_functionality(fastmcp_server):
         result = await client.list_tools()
         list_tools = [tool.name for tool in result]
         assert len(result) == len(__all__)
-        assert "move_dir" in list_tools
+        assert any(tool.endswith("/move_dir") for tool in list_tools)
         # Find the make command by name
-        assert "exec_make_target" in list_tools
-        make_cmd = [tool for tool in result if tool.name == "exec_make_target"][0]
+        assert any(tool.endswith("/exec_make_target") for tool in list_tools)
+        make_cmd = [tool for tool in result if tool.name.endswith("/exec_make_target")][0]
 
         res = await client.call_tool(make_cmd.name, {"commands": ["ls"]})
         text = res[0].text
@@ -40,7 +40,7 @@ async def test_tool_functionality(fastmcp_server):
 @pytest.mark.asyncio
 async def test_encoding_error(fastmcp_server):
     async with Client(fastmcp_server) as client:
-        make_cmd = [tool for tool in await client.list_tools() if tool.name == "exec_make_target"][0]
+        make_cmd = [tool for tool in await client.list_tools() if tool.name.endswith("/exec_make_target")][0]
         res = await client.call_tool(make_cmd.name, {"commands": ["encoding-error"]})
         # Check that the result contains the expected error message
         assert "encoding-error" in res[0].text
