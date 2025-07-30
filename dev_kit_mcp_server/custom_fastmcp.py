@@ -4,21 +4,21 @@ from typing import Any
 
 from fastmcp import FastMCP
 from fastmcp.tools import Tool
-from mcp.types import EmbeddedResource, ImageContent, TextContent
+from fastmcp.tools.tool import ToolResult
+from mcp.types import TextContent
 
 
 class RepoTool(Tool):
     """Custom tool class for RepoTool."""
 
-    async def run(self, arguments: dict[str, Any]) -> list[TextContent | ImageContent | EmbeddedResource]:
+    async def run(self, arguments: dict[str, Any]) -> ToolResult:
         """Run the tool with arguments.
 
         Args:
             arguments: Dictionary of arguments to pass to the tool
 
         Returns:
-            A list of content objects (TextContent, ImageContent, or EmbeddedResource)
-            containing the tool's output or error message
+            A ToolResult containing the tool's output or error message
 
         """
         try:
@@ -27,7 +27,7 @@ class RepoTool(Tool):
             return result
         except Exception as e:
             # Handle exceptions and return an error message
-            return [TextContent(text=f"Error: {str(e)}", type="text")]
+            return ToolResult(content=[TextContent(text=f"Error: {str(e)}", type="text")])
 
 
 class RepoFastMCPServerError(FastMCP):
