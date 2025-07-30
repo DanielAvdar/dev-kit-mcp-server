@@ -32,7 +32,7 @@ async def test_tool_functionality(fastmcp_server):
         make_cmd = [tool for tool in result if tool.name == "exec_make_target"][0]
 
         res = await client.call_tool(make_cmd.name, {"commands": ["ls"]})
-        text = res[0].text
+        text = res.content[0].text
         assert "ls" in text
         assert "stdout" in text
 
@@ -43,5 +43,5 @@ async def test_encoding_error(fastmcp_server):
         make_cmd = [tool for tool in await client.list_tools() if tool.name == "exec_make_target"][0]
         res = await client.call_tool(make_cmd.name, {"commands": ["encoding-error"]})
         # Check that the result contains the expected error message
-        assert "encoding-error" in res[0].text
-        assert "UnicodeDecodeError" not in res[0].text
+        assert "encoding-error" in res.content[0].text
+        assert "UnicodeDecodeError" not in res.content[0].text
