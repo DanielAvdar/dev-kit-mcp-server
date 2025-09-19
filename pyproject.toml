@@ -47,7 +47,7 @@ dev = [
     "pre-commit>=2.20.0",
     "pre-commit-uv>=4",
     "pytest-cov>=4.0.0",
-    "mypy==1.18.1",
+    "mypy==1.18.2",
     "pytest-parametrization>=2022",
     "ruff>=0.8.2",
     "pytest-asyncio>=0.23.5",
