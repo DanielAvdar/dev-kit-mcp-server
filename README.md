@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/danielavdar-dev-kit-mcp-server-badge.png)](https://mseep.ai/app/danielavdar-dev-kit-mcp-server)
+
 # Dev-Kit MCP Server
 
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dev-kit-mcp-server)](https://pypi.org/project/dev-kit-mcp-server/)
