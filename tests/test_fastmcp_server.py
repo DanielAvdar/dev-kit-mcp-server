@@ -48,7 +48,10 @@ def test_start_server(mock_parse_args, root_dir_type, expected_error, temp_dir):
         # Check that the tools were registered
         tools = asyncio.run(server.get_tools())
         tool_names = [tool.name for tool in tools.values()]
-        assert all(name in tool_names for name in ["create_dir", "move_dir", "remove_file"])
+        assert all(
+            any(tool_name.endswith(f"/{name}") for tool_name in tool_names)
+            for name in ["create_dir", "move_dir", "remove_file"]
+        )
 
 
 @pytest.mark.parametrize(
