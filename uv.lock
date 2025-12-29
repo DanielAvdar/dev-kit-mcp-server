@@ -528,7 +528,7 @@ wheels = [
 
 [[package]]
 name = "cyclopts"
-version = "4.4.2"
+version = "4.4.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -538,9 +538,9 @@ dependencies = [
     { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/68/224dd5dd894bc8ef5c8eed9ebbe908b4b23a99a30b33b4cb71392a940e82/cyclopts-4.4.2.tar.gz", hash = "sha256:1c255a49eb63b631493491b4c97d0f35790d66beeb6fe4ef3ed041c745964077", size = 159303, upload-time = "2025-12-27T23:46:36.946Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8f/21/732453ae69d65d72fe37a34f8b1a455c72313b8b0a905b876da20ff7e81a/cyclopts-4.4.3.tar.gz", hash = "sha256:03797c71b49a39dcad8324d6655363056fb998e2ba0240940050331a7f63fe65", size = 159360, upload-time = "2025-12-28T18:57:03.831Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/0b/02057d57dc5cf935ba5344542445725c8a362a2b79cc633d65c0838c41b2/cyclopts-4.4.2-py3-none-any.whl", hash = "sha256:83186ca436b0ada2545571b759cc1b47f234e13a88b4fee11bb98f1acc28ff88", size = 196795, upload-time = "2025-12-27T23:46:35.262Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/28/03f9b8fbf396b3f2eaf65a7ff441ba2fb7dd397109d563a4e556dc5b3efb/cyclopts-4.4.3-py3-none-any.whl", hash = "sha256:951611a9d4d88d9916716ae281faca9af1cb79b88bb4f22bd0192cff54e7dec6", size = 196707, upload-time = "2025-12-28T18:57:04.884Z" },
 ]
 
 [[package]]
