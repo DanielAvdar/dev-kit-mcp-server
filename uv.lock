@@ -21,6 +21,15 @@ wheels = [
 ]
 
 [[package]]
+name = "aiofiles"
+version = "24.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0b/03/a88171e277e8caa88a4c77808c20ebb04ba74cc4681bf1e9416c862de237/aiofiles-24.1.0.tar.gz", hash = "sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c", size = 30247, upload-time = "2024-06-24T11:02:03.584Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a5/45/30bb92d442636f570cb5651bc661f52b610e2eec3f891a5dc3a4c3667db0/aiofiles-24.1.0-py3-none-any.whl", hash = "sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5", size = 15896, upload-time = "2024-06-24T11:02:01.529Z" },
+]
+
+[[package]]
 name = "alabaster"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -580,6 +589,7 @@ wheels = [
 name = "dev-kit-mcp-server"
 source = { editable = "." }
 dependencies = [
+    { name = "aiofiles" },
     { name = "fastmcp" },
     { name = "gitpython" },
     { name = "mcp" },
@@ -602,6 +612,7 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-parametrization" },
     { name = "ruff" },
+    { name = "types-aiofiles" },
 ]
 docs = [
     { name = "pydata-sphinx-theme" },
@@ -613,6 +624,7 @@ docs = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiofiles", specifier = ">=24.1.0" },
     { name = "fastmcp", specifier = ">=2.3.3" },
     { name = "gitpython", specifier = ">=3.1.43" },
     { name = "mcp", specifier = ">=1.8.1" },
@@ -632,6 +644,7 @@ dev = [
     { name = "pytest-cov", specifier = ">=4.0.0" },
     { name = "pytest-parametrization", specifier = ">=2022" },
     { name = "ruff", specifier = ">=0.8.2" },
+    { name = "types-aiofiles", specifier = ">=24.1.0" },
 ]
 docs = [
     { name = "pydata-sphinx-theme" },
@@ -2648,6 +2661,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/5a/b6/3e681d3b6bb22647509bdbfdd18055d5adc0dce5c5585359fa46ff805fdc/typer-0.24.0.tar.gz", hash = "sha256:f9373dc4eff901350694f519f783c29b6d7a110fc0dcc11b1d7e353b85ca6504", size = 118380, upload-time = "2026-02-16T22:08:48.496Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/85/d0/4da85c2a45054bb661993c93524138ace4956cb075a7ae0c9d1deadc331b/typer-0.24.0-py3-none-any.whl", hash = "sha256:5fc435a9c8356f6160ed6e85a6301fdd6e3d8b2851da502050d1f92c5e9eddc8", size = 56441, upload-time = "2026-02-16T22:08:47.535Z" },
+]
+
+[[package]]
+name = "types-aiofiles"
+version = "24.1.0.20250606"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/6e/fac4ffc896cb3faf2ac5d23747b65dd8bae1d9ee23305d1a3b12111c3989/types_aiofiles-24.1.0.20250606.tar.gz", hash = "sha256:48f9e26d2738a21e0b0f19381f713dcdb852a36727da8414b1ada145d40a18fe", size = 14364, upload-time = "2025-06-06T03:09:26.515Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/71/de/f2fa2ab8a5943898e93d8036941e05bfd1e1f377a675ee52c7c307dccb75/types_aiofiles-24.1.0.20250606-py3-none-any.whl", hash = "sha256:e568c53fb9017c80897a9aa15c74bf43b7ee90e412286ec1e0912b6e79301aee", size = 14276, upload-time = "2025-06-06T03:09:25.662Z" },
 ]
 
 [[package]]
