@@ -10,7 +10,7 @@ from ...core import AsyncOperation
 class GitCreateBranchOperation(AsyncOperation):
     """Class to create and checkout a new branch from a source branch in a git repository."""
 
-    name = "git_create_branch"
+    _name = "git_create_branch"
 
     async def __call__(
         self,

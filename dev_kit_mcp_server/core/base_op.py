@@ -44,8 +44,14 @@ class AsyncOperation:
 
     @property
     @abc.abstractmethod
+    def _name(self) -> str:
+        """Return the base name of the operation."""
+
+    @property
     def name(self) -> str:
-        """Return the name of the operation."""
+        """Return the name of the operation with git/foldername prefix."""
+        folder_name = self._root_path.name
+        return f"git/{folder_name}/{self._name}"
 
     @classmethod
     def get_absolute_path(cls, root_path: Path, path: str) -> Path:
