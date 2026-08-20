@@ -2,10 +2,12 @@
 
 from .read_lines import ReadLinesOperation
 from .search_files import SearchFilesOperation
+from .search_regex import SearchRegexOperation
 from .search_text import SearchTextOperation
 
 __all__ = [
     "SearchFilesOperation",
     "SearchTextOperation",
+    "SearchRegexOperation",
     "ReadLinesOperation",
 ]
