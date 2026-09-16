@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from dev_kit_mcp_server.tools import ReadLinesOperation, SearchFilesOperation, SearchTextOperation
+from dev_kit_mcp_server.tools import ReadLinesOperation, SearchFilesOperation, SearchRegexOperation, SearchTextOperation
 
 
 @pytest.fixture(scope="function")
@@ -23,6 +23,12 @@ def search_files_operation(temp_root_dir: str) -> SearchFilesOperation:
 def search_text_operation(temp_root_dir: str) -> SearchTextOperation:
     """Create a SearchTextOperation instance with a temporary root directory."""
     return SearchTextOperation(root_dir=temp_root_dir)
+
+
+@pytest.fixture
+def search_regex_operation(temp_root_dir: str) -> SearchRegexOperation:
+    """Create a SearchRegexOperation instance with a temporary root directory."""
+    return SearchRegexOperation(root_dir=temp_root_dir)
 
 
 @pytest.fixture
@@ -383,3 +389,105 @@ class TestReadLinesOperation:
         assert result["lines_returned"] == 3
         assert "# Test README" in result["content"]
         assert os.path.normpath(subdir_path) in result["content"]
+
+
+class TestSearchRegexOperation:
+    """Test the SearchRegexOperation class."""
+
+    @pytest.mark.asyncio
+    async def test_search_regex_single_file(self, search_regex_operation, setup_test_files):
+        """Test regex search in a single file."""
+        result = await search_regex_operation(pattern="search", files=["sample.txt"])
+
+        assert result["status"] == "success"
+        assert result["matches_found"] == 2  # Two lines in sample.txt contain "search"
+        assert result["files_searched"] == 1
+        assert "sample.txt:2: Line 2: This contains the word 'search'" in result["content"]
+        assert "sample.txt:4: Line 4: Final line with search term" in result["content"]
+        assert not result["truncated"]
+
+    @pytest.mark.asyncio
+    async def test_search_regex_multiple_files(self, search_regex_operation, setup_test_files):
+        """Test regex search across multiple files."""
+        result = await search_regex_operation(pattern="search", files=["sample.txt", "subdir/README.md", "data.json"])
+
+        assert result["status"] == "success"
+        assert result["matches_found"] >= 3  # Should find in all three files
+        assert result["files_searched"] == 3
+        assert "search" in result["content"]
+        assert not result["truncated"]
+
+    @pytest.mark.asyncio
+    async def test_search_regex_regex_pattern(self, search_regex_operation, setup_test_files):
+        """Test regex search with regex pattern."""
+        result = await search_regex_operation(pattern="Line \\d+:", files=["sample.txt"])
+
+        assert result["status"] == "success"
+        assert result["matches_found"] == 5  # All lines in sample.txt match this pattern
+
+    @pytest.mark.asyncio
+    async def test_search_regex_no_matches(self, search_regex_operation, setup_test_files):
+        """Test regex search with no matches."""
+        result = await search_regex_operation(pattern="nonexistent_pattern", files=["sample.txt"])
+
+        assert result["status"] == "success"
+        assert result["matches_found"] == 0
+        assert "No matches found" in result["content"]
+
+    @pytest.mark.asyncio
+    async def test_search_regex_invalid_regex(self, search_regex_operation, setup_test_files):
+        """Test regex search with invalid regex pattern."""
+        result = await search_regex_operation(pattern="[invalid", files=["sample.txt"])
+
+        assert result["status"] == "error"
+        assert "Invalid regex pattern" in result["message"]
+
+    @pytest.mark.asyncio
+    async def test_search_regex_invalid_file(self, search_regex_operation, setup_test_files):
+        """Test regex search with invalid file."""
+        result = await search_regex_operation(pattern="test", files=["nonexistent.txt"])
+
+        assert result["status"] == "error"
+        assert "does not exist" in result["message"]
+
+    @pytest.mark.asyncio
+    async def test_search_regex_outside_root(self, search_regex_operation, setup_test_files):
+        """Test regex search with file outside root directory."""
+        result = await search_regex_operation(pattern="test", files=["../../etc/passwd"])
+
+        assert result["status"] == "error"
+        assert "not within the root directory" in result["message"]
+
+    @pytest.mark.asyncio
+    async def test_search_regex_empty_files_list(self, search_regex_operation, setup_test_files):
+        """Test regex search with empty files list."""
+        result = await search_regex_operation(pattern="test", files=[])
+
+        assert result["status"] == "error"
+        assert "Files list cannot be empty" in result["message"]
+
+    @pytest.mark.asyncio
+    async def test_search_regex_max_chars(self, search_regex_operation, setup_test_files):
+        """Test regex search with character limit."""
+        result = await search_regex_operation(pattern=".", files=["sample.txt"], max_chars=100)
+
+        assert result["status"] == "success"
+        assert result["total_chars"] > 100
+        assert result["truncated"]
+        assert len(result["content"]) == 100
+
+    @pytest.mark.asyncio
+    async def test_search_regex_case_sensitive(self, search_regex_operation, setup_test_files):
+        """Test regex search is case sensitive by default."""
+        result = await search_regex_operation(pattern="SEARCH", files=["sample.txt"])
+
+        assert result["status"] == "success"
+        assert result["matches_found"] == 0
+
+    @pytest.mark.asyncio
+    async def test_search_regex_directory_not_file(self, search_regex_operation, setup_test_files):
+        """Test regex search with directory instead of file."""
+        result = await search_regex_operation(pattern="test", files=["subdir"])
+
+        assert result["status"] == "error"
+        assert "not a file" in result["message"]
