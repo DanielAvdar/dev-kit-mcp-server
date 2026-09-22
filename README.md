@@ -1,4 +1,5 @@
 [![MseeP.ai Security Assessment Badge](https://mseep.net/pr/danielavdar-dev-kit-mcp-server-badge.png)](https://mseep.ai/app/danielavdar-dev-kit-mcp-server)
+[![SafeSkill 92/100](https://img.shields.io/badge/SafeSkill-92%2F100_Verified%20Safe-brightgreen)](https://safeskill.dev/scan/danielavdar-dev-kit-mcp-server)
 
 # Dev-Kit MCP Server
 
