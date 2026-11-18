@@ -10,7 +10,7 @@ from ...core import AsyncOperation
 class GitStatusOperation(AsyncOperation):
     """Class to get the status of a git repository."""
 
-    name = "git_status"
+    _name = "git_status"
 
     async def __call__(
         self,

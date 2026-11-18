@@ -11,7 +11,7 @@ from ...core import AsyncOperation
 class CreateDirOperation(AsyncOperation):
     """Class to create a folder in the workspace."""
 
-    name = "create_dir"
+    _name = "create_dir"
 
     def _create_folder(self, path: str) -> None:
         """Create a folder at the specified path.

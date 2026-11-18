@@ -34,7 +34,7 @@ class PredefinedCommands(_BaseExec):
     _pyproject_exists: bool = field(init=False, default=False)
     commands_toml: Optional[str] = None
 
-    name = "predefined_commands"
+    _name = "predefined_commands"
 
     # Class attribute for valid param regex
     VALID_PARAM_REGEX = r"^[a-zA-Z0-9_\-\.\s\/\\:@=,]+$"

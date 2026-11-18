@@ -10,7 +10,7 @@ from ...core import AsyncOperation
 class GitDiffOperation(AsyncOperation):
     """Class to show diffs in a git repository."""
 
-    name = "git_diff"
+    _name = "git_diff"
 
     async def __call__(
         self,
